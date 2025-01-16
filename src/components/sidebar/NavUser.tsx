@@ -61,7 +61,7 @@ export function NavUser({ user }: NavUserProps) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 {user.profile_image ? (
-                    <AvatarImage src={`${import.meta.env.VITE_BACKEND_URL}${user.profile_image}`} alt={user.name} />
+                    <AvatarImage src={user.profile_image} alt={user.name} />
                     ) : (<AvatarImage src="/avatars/shadcn.jpg" alt={user.name} />)}
                 <AvatarFallback className="rounded-lg">NN</AvatarFallback>
               </Avatar>
@@ -82,7 +82,7 @@ export function NavUser({ user }: NavUserProps) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                 {user.profile_image ? (
-                    <AvatarImage src={`${import.meta.env.VITE_BACKEND_URL}${user.profile_image}`} alt={user.name} />
+                    <AvatarImage src={user.profile_image} alt={user.name} />
                     ) : (<AvatarImage src="/avatars/shadcn.jpg" alt={user.name} />)}
                   <AvatarFallback className="rounded-lg">NN</AvatarFallback>
                 </Avatar>

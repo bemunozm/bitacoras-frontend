@@ -48,7 +48,7 @@ export function EditUserModal({ id, setIsOpen }: EditUserModalProps) {
       setValue('run', user.run)
       setValue('profile_image', user.profile_image || '')
       setSelectedRoles(user.roles ? user.roles.filter((role: Role | undefined): role is Role => role !== undefined).map((role: Role) => role.id) : [])
-      setPreviewImage(user.profile_image ? `${import.meta.env.VITE_BACKEND_URL}${user.profile_image}` : null)
+      setPreviewImage(user.profile_image ? user.profile_image : null)
     }
   }, [user, setValue])
 

@@ -130,7 +130,7 @@ const Informe = ({ bitacora } : any) => {
                 </div>
                 <div className="informe-anexo-imagenes">
                   {activity.attachments.map((attachment: any) => (
-                    <img key={attachment.id} src={`${import.meta.env.VITE_BACKEND_URL}${attachment.image}`} alt={`Anexo ${attachment.id + 1}`} className="informe-anexo-imagen" />
+                    <img key={attachment.id} src={attachment.image} alt={`Anexo ${attachment.id + 1}`} className="informe-anexo-imagen" />
                   ))}
                 </div>
               </div>

@@ -185,7 +185,7 @@ export default function ActivityDetailsView() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
           {existingAttachments.map(attachment => (
             <div key={attachment.id} className="relative">
-              <img src={`${import.meta.env.VITE_BACKEND_URL}${attachment.image}`} alt={attachment.image.split('/').pop()} className="w-full h-auto" />
+              <img src={attachment.image} alt={attachment.image.split('/').pop()} className="w-full h-auto" />
             </div>
           ))}
           {selectedAttachments.map(attachment => (

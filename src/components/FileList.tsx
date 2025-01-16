@@ -17,7 +17,7 @@ export default function FileList({ files, existingFiles, onRemove }: FileListPro
           {existingFiles.map((file) => (
             <li key={file.id} className="flex items-center space-x-2 p-2 border border-sidebar-border rounded-md">
               {file.image ? (
-                <img src={`${import.meta.env.VITE_BACKEND_URL}${file.image}`} alt="Preview" className="w-10 h-10 object-cover rounded" />
+                <img src={file.image} alt="Preview" className="w-10 h-10 object-cover rounded" />
               ) : (
                 <div className="w-10 h-10 bg-gray-300 flex items-center justify-center rounded">
                   <span className="text-xs text-sidebar-foreground dark:text-white">{file.image.split('.').pop()}</span>

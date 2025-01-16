@@ -121,7 +121,7 @@ export default function EditProfileView() {
                         onMouseLeave={() => setIsHovered(false)}
                         onClick={() => document.getElementById('profile_image')?.click()}
                     >
-                        <AvatarImage src={previewImage || (data?.profile_image ? `${import.meta.env.VITE_BACKEND_URL}${data.profile_image}` : '')} alt="Foto de Perfil" />
+                        <AvatarImage src={previewImage || (data?.profile_image ? data.profile_image : '')} alt="Foto de Perfil" />
                         <AvatarFallback><User/></AvatarFallback>
                         {isHovered && (
                             <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
