@@ -1,0 +1,191 @@
+.full-width-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.informe-container {
+  width: 595px;
+  min-height: 842px; /* Cambiar a min-height para permitir expansión */
+  position: relative;
+  background-color: white;
+  overflow: visible; /* Cambiar a visible para permitir expansión */
+  padding-bottom: 20px; /* Agregar padding inferior */
+}
+
+.informe-title {
+  width: 199px;
+  height: 21px;
+  position: absolute;
+  left: 209px;
+  top: 126px;
+  color: black;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: 'Inter';
+}
+
+.informe-table {
+  position: absolute;
+  left: 39px;
+  top: 161px;
+  border-collapse: collapse;
+  border: 1px solid grey;
+  width: 517px; /* Ancho fijo para la tabla */
+}
+
+.informe-header {
+  border: 1px solid grey;
+  color: black;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'Inter';
+  width: 25%; /* Ancho fijo para las celdas de encabezado */
+  padding: 4px; /* Agregar padding */
+  height: 15px; /* Agregar altura */
+}
+
+.informe-data {
+  border: 1px solid grey;
+  color: black;
+  font-size: 8.6px;
+  font-weight: 400;
+  font-family: 'Inter';
+  width: 25%; /* Ancho fijo para las celdas de datos */
+  padding: 4px; /* Agregar padding */
+  height: 15px; /* Agregar altura */
+}
+
+.informe-data::first-letter {
+  text-transform: uppercase; /* Primera letra en mayúsculas */
+}
+
+.informe-logo-ministerio {
+  width: 75px;
+  height: 68px;
+  position: absolute;
+  left: 34px;
+  top: 26px;
+}
+
+.informe-logo-fundacion {
+  width: 75px;
+  height: 73px;
+  position: absolute;
+  left: 479px;
+  top: 20px;
+  border-radius: 43px;
+}
+
+.informe-actividades-title {
+  width: 225px;
+  height: 15px;
+  position: absolute;
+  left: 64px;
+  top: 300px; /* Posición fija debajo de la tabla */
+  color: black;
+  font-size: 9px;
+  font-weight: bold;
+  font-family: 'Inter';
+}
+
+.informe-actividades-sub-title {
+  width: 225px;
+  height: 15px;
+  margin-top: 10px; /* Ajustar margen superior */
+  color: black;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'Inter';
+}
+
+.informe-actividades-list {
+  margin-top: 5px; /* Ajustar margen superior */
+  color: black;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'Inter';
+  list-style-type: disc;
+  list-style-position: inside;
+}
+
+.informe-actividades-sublist {
+  font-size: 9px;
+  font-weight: 400;
+  font-family: 'Inter';
+  margin-left: 20px; /* Ajustar margen izquierdo */
+}
+
+.informe-actividades-container {
+  margin-top: 250px; /* Reducir margen superior */
+  padding: 0 64px; /* Agregar padding lateral */
+  page-break-after: always; /* Agregar salto de página después de las actividades */
+}
+
+.informe-anexos-title {
+  width: 225px;
+  height: 15px;
+  color: black;
+  font-size: 9px;
+  font-weight: bold;
+  font-family: 'Inter';
+  margin-bottom: 10px; /* Agregar margen inferior */
+}
+
+.informe-anexos {
+  margin-top: 20px; /* Ajustar margen superior */
+  padding: 0 64px; /* Agregar padding lateral */
+  display: flex;
+  flex-direction: column; /* Cambiar a columna */
+  gap: 20px; /* Ajustar espacio entre elementos */
+}
+
+.informe-anexo-actividad {
+  page-break-inside: avoid; /* Evitar saltos de página dentro de los anexos */
+  display: flex;
+  flex-direction: column; /* Cambiar a columna */
+  gap: 10px; /* Ajustar espacio entre elementos */
+}
+
+.informe-anexo-actividad-title {
+  font-size: 8px; /* Tamaño más pequeño */
+  font-weight: 400;
+  font-family: 'Inter';
+}
+
+.informe-anexo-actividad-list {
+  list-style-type: disc; /* Punteado al inicio */
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}
+
+.informe-anexo-imagenes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+  gap: 10px; /* Ajustar espacio entre imágenes */
+}
+
+.informe-anexo-imagen {
+  width: 100%; /* Usar todo el ancho disponible */
+  height: auto; /* Ajustar altura automáticamente */
+  object-fit: cover;
+  border: 1px solid grey;
+  padding: 4px;
+  box-sizing: border-box; /* Incluir padding y borde en el ancho total */
+}
+
+.informe-header-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding-bottom: 10px; /* Reducir padding inferior */
+}
+
+/* Agregar la directiva @layer base correctamente */
+@tailwind base;
+@layer base {
+  img {
+    display: initial;
+  }
+}
