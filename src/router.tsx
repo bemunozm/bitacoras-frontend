@@ -17,6 +17,11 @@ import BitacoraDetailsView from './views/bitacoras/BitacoraDetailsView'
 import ActivityDetailsView from './views/activities/ActivityDetailsView'
 import Informe from './components/pdfs/Informe'
 import EditProfileView from './views/profile/EditProfileView'
+import UnauthorizedView from './views/UnauthorizedView'
+import ProtectedRoute from './layouts/ProtectedRoute'
+import EditActivityDetailsView from './views/activities/EditActivityDetailsView'
+import NotFound from './views/NotFound'
+
 
 
 export default function Router(){
@@ -48,32 +53,35 @@ export default function Router(){
 
 
                     {/* Roles */}
-                    <Route path='/roles' element={<RolesView/>}/>
+                    <Route path='/administracion/roles' element={<ProtectedRoute requiredRoles={['Administrador']}><RolesView/></ProtectedRoute>}/>
 
                     {/* Usuarios */}
-                    <Route path='/users' element={<UsersView/>}/>
+                    <Route path='/administracion/usuarios' element={<ProtectedRoute requiredRoles={['Administrador']}><UsersView/></ProtectedRoute>}/>
 
                     {/* Residencias */}
-                    <Route path='/residences' element={<ResidencesView/>}/>
+                    <Route path='/administracion/residencias' element={<ProtectedRoute requiredRoles={['Administrador']}><ResidencesView/></ProtectedRoute>}/>
 
                     {/* Categorias */}
-                    <Route path='/categories' element={<CategoriesView/>}/>
+                    <Route path='/administracion/categorias' element={<ProtectedRoute requiredRoles={['Administrador']}><CategoriesView/></ProtectedRoute>}/>
 
                     {/* Programas */}
-                    <Route path='/programs' element={<ProgramsView/>}/>
+                    <Route path='/administracion/programas' element={<ProtectedRoute requiredRoles={['Administrador']}><ProgramsView/></ProtectedRoute>}/>
 
                     {/* Bitácora */}
                     <Route path='/bitacoras' element={<BitacorasView/>}/>
                     <Route path='/bitacoras/:id' element={<BitacoraDetailsView/>}/>
 
                     {/* Actividades */}
-                     <Route path='/activity/:id' element={<ActivityDetailsView/>}/>
+                     <Route path='/actividad/:id' element={<ActivityDetailsView/>}/>
+                     <Route path='/actividad/editar/:id' element={<EditActivityDetailsView/>}/>
 
                     {/* Profile  */}
-                    <Route path='/profile' element={<EditProfileView/>}/>
+                    <Route path='/perfil' element={<EditProfileView/>}/>
                 </Route>
 
                 <Route path='/informe' element={<Informe/>}/>
+                <Route path='/unauthorized' element={<UnauthorizedView/>}/>
+                <Route path='*' element={<NotFound/>}/>
             </Routes>
         </BrowserRouter>
     )

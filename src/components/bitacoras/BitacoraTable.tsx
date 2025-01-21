@@ -1,196 +1,194 @@
 import { getBitacoras } from "@/api/BitacoraAPI";
 import { Bitacora, User } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { Table, TableHead, TableHeader, TableRow, TableBody, TableCell } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import DataTable, { createTheme } from 'react-data-table-component';
 import { useState } from "react";
-import { ArrowUpDown, CircleCheck, CircleX, MoreVertical, SquarePen, Trash2 } from 'lucide-react';
+import { SquarePen, Trash2, MoreVertical, CircleCheck, CircleX } from 'lucide-react';
 import { ResponsiveDialog } from "../responsive-dialog";
 import LoadingSpinner from "../LoadingSpinner";
 import { getPeriod } from "@/helpers";
 import EditBitacoraModal from "@/components/bitacoras/EditBitacoraModal";
 import DeleteBitacoraModal from "@/components/bitacoras/DeleteBitacoraModal";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from '../theme-provider';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm: string, filter: string, user: User }) {
   const { data, isLoading } = useQuery({
     queryKey: ['bitacoras'],
-   queryFn: getBitacoras
-   });
+    queryFn: getBitacoras
+  });
 
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedBitacora, setSelectedBitacora] = useState<Bitacora | null>(null);
 
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof Bitacora | 'Completado' | 'Aprobado';
-    direction: 'asc' | 'desc';
-  } | null>(null);
-
-  const handleSort = (key: keyof Bitacora | 'Completado' | 'Aprobado') => {
-    setSortConfig(current => {
-      if (!current || current.key !== key) {
-        return { key, direction: 'asc' };
-      }
-      if (current.direction === 'asc') {
-        return { key, direction: 'desc' };
-      }
-      return null;
-    });
-  };
-
-  const filteredAndSortedBitacoras = data && data
-    .filter(bitacora => {
-      if (filter === "mine") {
-        const currentUser = user?.id; // Reemplaza esto con la lógica real
-        return bitacora.user_id === currentUser;
-      }
-      return true;
-    })
-    .filter(bitacora =>
-      bitacora.created_at.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bitacora.users.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (!sortConfig) return 0;
-
-      let aValue: any;
-      let bValue: any;
-
-      if (sortConfig.key === 'Completado' || sortConfig.key === 'Aprobado') {
-        aValue = a.status === (sortConfig.key === 'Completado' ? 'Completado' : 'Aprobado');
-        bValue = b.status === (sortConfig.key === 'Completado' ? 'Completado' : 'Aprobado');
-      } else {
-        aValue = a[sortConfig.key];
-        bValue = b[sortConfig.key];
-      }
-
-      if (sortConfig.key === 'Completado' || sortConfig.key === 'Aprobado') {
-        const aStatus = a.status === (sortConfig.key === 'Completado' ? 'Completado' : 'Aprobado');
-        const bStatus = b.status === (sortConfig.key === 'Completado' ? 'Completado' : 'Aprobado');
-        if (aStatus < bStatus) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aStatus > bStatus) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      }
-
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    const calculateTotalAttachments = (bitacora: Bitacora) => {
-        return bitacora.activities?.reduce((acc, activity) => {
-            return acc + activity.attachments.length;
-        }, 0);
+  const filteredBitacoras = data?.filter((bitacora: Bitacora) => {
+    if (filter === "mine") {
+      const currentUser = user?.id; // Reemplaza esto con la lógica real
+      return bitacora.user_id === currentUser;
     }
+    return bitacora.created_at.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           bitacora.users.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  createTheme(
+    'dark',
+    {
+        text: {
+            primary: '#f0f0f0', // --sidebar-foreground
+            secondary: '#c0c0c0', // --sidebar-accent-foreground
+        },
+        background: {
+            default: 'transparent', // --custom-background
+        },
+        context: {
+            background: '#3a3a3a', // --sidebar-accent
+            text: '#f0f0f0', // --sidebar-accent-foreground
+        },
+        divider: {
+            default: '#2a2a2a', // --sidebar-border
+        },
+        button: {
+            default: '#3a3a3a', // --sidebar-accent
+            hover: 'rgba(0,0,0,.08)',
+            focus: 'rgba(255,255,255,.12)',
+            disabled: 'rgba(255, 255, 255, .34)',
+        },
+        sortFocus: {
+            default: '#3a3a3a', // --sidebar-accent
+        },
+    },
+    'dark',
+);
+
+createTheme(
+    'default',
+    {
+        text: {
+            primary: '#3f3f3f', // --sidebar-foreground
+            secondary: '#1a1a1a', // --sidebar-primary
+        },
+        background: {
+            default: 'transparent', // --custom-background
+        },
+        context: {
+            background: '#e0e0e0', // --sidebar-accent
+            text: '#1a1a1a', // --sidebar-primary
+        },
+        divider: {
+            default: '#d0d0d0', // --sidebar-border
+        },
+        button: {
+            default: '#e0e0e0', // --sidebar-accent
+            hover: 'rgba(0,0,0,.08)',
+            focus: 'rgba(0,0,0,.12)',
+            disabled: 'rgba(0, 0, 0, .34)',
+        },
+        sortFocus: {
+            default: '#e0e0e0', // --sidebar-accent
+        },
+    },
+    'default',
+);
+
+  const columns = [
+    {
+      name: 'Periodo',
+      selector: (row: Bitacora) => getPeriod(row.month),
+      sortable: true,
+    },
+    {
+      name: 'Usuario',
+      selector: (row: Bitacora) => row.users.name,
+      sortable: true,
+    },
+    {
+      name: 'Número de actividades',
+      selector: (row: Bitacora) => row.activities?.length || 0,
+      sortable: true,
+    },
+    {
+      name: 'Número de fotos',
+      selector: (row: Bitacora) => row.activities?.reduce((acc, activity) => acc + activity.attachments.length, 0) || 0,
+      sortable: true,
+    },
+    {
+      name: 'Programa',
+      selector: (row: Bitacora) => row.programs.name,
+      sortable: true,
+    },
+    {
+      name: 'Coordinador',
+      selector: (row: Bitacora) => row.programs.coordinator.name,
+      sortable: true,
+    },
+    {
+      name: 'Terminado?',
+      cell: (row: Bitacora) => row.status === 'Completado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/>,
+    },
+    {
+      name: 'Aprobado?',
+      cell: (row: Bitacora) => row.status === 'Aprobado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/>,
+    },
+    ...(user.roles?.some((role) => role?.name === 'Administrador') || filter === 'mine' ? [{
+      name: 'Acciones',
+      cell: (row: Bitacora) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem 
+              onClick={() => { setSelectedBitacora(row); setIsEditOpen(true); }} 
+              disabled={row.status !== 'En Progreso' && !user.roles?.some((role) => role?.name === 'Administrador')}
+            >
+              <SquarePen className="h-4 w-4 mr-2" />
+              <span>Editar</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={() => { setSelectedBitacora(row); setIsDeleteOpen(true); }} 
+              className="text-red-500" 
+              disabled={row.status !== 'En Progreso' && !user.roles?.some((role) => role?.name === 'Administrador')}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              <span>Eliminar</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      ignoreRowClick: true,
+      
+      button: true
+    }] : [])
+  ];
+
+  const theme = useTheme().theme;
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className="overflow-x-auto rounded-md border dark:border-sidebar-border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead onClick={() => handleSort('created_at')} className="cursor-pointer">
-              <div className="flex items-center space-x-1">
-                <span>Periodo</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('users')} className="cursor-pointer">
-              <div className="flex items-center space-x-1">
-                <span>Usuario</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('activities')} className="cursor-pointer hidden md:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Número de actividades</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('activities')} className="cursor-pointer hidden lg:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Número de fotos</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('programs')} className="cursor-pointer hidden lg:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Programa</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('programs')} className="cursor-pointer hidden lg:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Coordinador</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('Completado')} className="cursor-pointer hidden lg:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Terminado?</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('Aprobado')} className="cursor-pointer hidden lg:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Aprobado?</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead className="w-[50px]">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredAndSortedBitacoras && filteredAndSortedBitacoras.map((bitacora) => (
-            <TableRow key={bitacora.id} onClick={(e) => {
-              if (!(e.target as HTMLElement).closest('.actions-cell')) {
-                navigate(`/bitacoras/${bitacora.id}`);
-              }
-            }} className="cursor-pointer">
-              <TableCell className="font-medium dark:text-sidebar-foreground first-letter:uppercase">{getPeriod(bitacora.month)}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground">{bitacora.users.name}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden md:table-cell">{bitacora.activities?.length}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden lg:table-cell">{calculateTotalAttachments(bitacora)}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden lg:table-cell">{bitacora.programs.name}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden lg:table-cell">{bitacora.programs.coordinator.name}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden lg:table-cell">{bitacora.status === 'Completado' || 'Aprobado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/> }</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden lg:table-cell">{bitacora.status === 'Aprobado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/> }</TableCell>
-              <TableCell className="dark:text-sidebar-foreground actions-cell" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => {
-                      setSelectedBitacora(bitacora);
-                      setIsEditOpen(true);
-                    }}>
-                      <SquarePen className="h-4 w-4 mr-2" />
-                      <span>Editar</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => {
-                      setSelectedBitacora(bitacora);
-                      setIsDeleteOpen(true);
-                    }} className="text-red-500">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      <span>Eliminar</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="grid grid-cols-1 overflow-x-scroll rounded-md border dark:border-sidebar-border">
+      <DataTable
+        title='Bitácoras'
+        columns={columns}
+        data={filteredBitacoras || []}
+        theme={theme === 'dark' ? 'dark' : 'default'}
+        pagination
+        paginationComponentOptions={{ rowsPerPageText: 'Filas por página', rangeSeparatorText: 'de', selectAllRowsItem: true, selectAllRowsItemText: 'Todos' }}
+        highlightOnHover
+        pointerOnHover
+        noHeader
+        noDataComponent="No hay bitácoras disponibles"
+        onRowClicked={(row) => navigate(`/bitacoras/${row.id}`)}
+      />
 
       {selectedBitacora && (
         <>
@@ -208,7 +206,7 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
             title={`Eliminar la bitácora ${getPeriod(selectedBitacora.month)}`}
             description={`¿Estás seguro de que deseas eliminar la bitácora ${getPeriod(selectedBitacora.month)}?\n Esta acción no se puede deshacer y se perderán todos los datos asociados.`}
           >
-            <DeleteBitacoraModal id={selectedBitacora.id} setIsOpen={setIsDeleteOpen} />
+            <DeleteBitacoraModal id={selectedBitacora.id} setIsOpen={setIsDeleteOpen} /> 
           </ResponsiveDialog>
         </>
       )}

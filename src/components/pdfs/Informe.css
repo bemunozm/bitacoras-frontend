@@ -116,6 +116,11 @@
   margin-left: 20px; /* Ajustar margen izquierdo */
 }
 
+.informe-actividades-sublist li {
+  list-style-type: disc; /* Punteado al inicio */
+  margin-left: 20px; /* Ajustar margen izquierdo */
+}
+
 .informe-actividades-container {
   margin-top: 250px; /* Reducir margen superior */
   padding: 0 64px; /* Agregar padding lateral */
@@ -167,8 +172,8 @@
 }
 
 .informe-anexo-imagen {
-  width: 100%; /* Usar todo el ancho disponible */
-  height: auto; /* Ajustar altura automáticamente */
+  width: 250px; /* Ajustar el tamaño a un cuadrado */
+  height: 250px; /* Ajustar el tamaño a un cuadrado */
   object-fit: cover;
   border: 1px solid grey;
   padding: 4px;
@@ -180,6 +185,50 @@
   width: 100%;
   height: auto;
   padding-bottom: 10px; /* Reducir padding inferior */
+}
+
+.signature-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 150px;
+  padding: 0 64px;
+}
+
+.signature-space {
+  text-align: center;
+  width: 45%;
+}
+
+.signature-line {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.signature-name {
+  margin-top: 5px;
+  font-size: 10px;
+  font-family: 'Inter';
+  width: 100%;
+  word-wrap: break-word;
+  text-align: center;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  font-family: 'Inter';
+  padding-bottom: 10px;
+}
+
+.pageNumber::after {
+  content: counter(page);
+}
+
+.totalPages::after {
+  content: counter(pages);
 }
 
 /* Agregar la directiva @layer base correctamente */

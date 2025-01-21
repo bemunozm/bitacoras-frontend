@@ -1,15 +1,16 @@
 import { getPrograms } from "@/api/ProgramAPI";
 import { Program } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { Table, TableHead, TableHeader, TableRow, TableBody, TableCell } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import DataTable, { createTheme } from 'react-data-table-component';
 import { useState } from "react";
-import { ArrowUpDown, MoreVertical, SquarePen, Trash2 } from 'lucide-react';
+import { SquarePen, Trash2, MoreVertical } from 'lucide-react';
 import { ResponsiveDialog } from "../responsive-dialog";
 import LoadingSpinner from "../LoadingSpinner";
 import EditProgramModal from "@/components/programs/EditProgramModal";
 import DeleteProgramModal from "@/components/programs/DeleteProgramModal";
+import { useTheme } from '../theme-provider';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
   const { data, isLoading } = useQuery({
@@ -21,114 +22,140 @@ export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof Program;
-    direction: 'asc' | 'desc';
-  } | null>(null);
+  const filteredPrograms = data?.filter((program: Program) => {
+    return program.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
-  const handleSort = (key: keyof Program) => {
-    setSortConfig(current => {
-      if (!current || current.key !== key) {
-        return { key, direction: 'asc' };
-      }
-      if (current.direction === 'asc') {
-        return { key, direction: 'desc' };
-      }
-      return null;
-    });
-  };
+  createTheme(
+    'dark',
+    {
+        text: {
+            primary: '#f0f0f0', // --sidebar-foreground
+            secondary: '#c0c0c0', // --sidebar-accent-foreground
+        },
+        background: {
+            default: 'transparent', // --custom-background
+        },
+        context: {
+            background: '#3a3a3a', // --sidebar-accent
+            text: '#f0f0f0', // --sidebar-accent-foreground
+        },
+        divider: {
+            default: '#2a2a2a', // --sidebar-border
+        },
+        button: {
+            default: '#3a3a3a', // --sidebar-accent
+            hover: 'rgba(0,0,0,.08)',
+            focus: 'rgba(255,255,255,.12)',
+            disabled: 'rgba(255, 255, 255, .34)',
+        },
+        sortFocus: {
+            default: '#3a3a3a', // --sidebar-accent
+        },
+    },
+    'dark',
+);
 
-  const filteredAndSortedPrograms = data && data
-    .filter(program =>
-      program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.state.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (!sortConfig) return 0;
+createTheme(
+    'default',
+    {
+        text: {
+            primary: '#3f3f3f', // --sidebar-foreground
+            secondary: '#1a1a1a', // --sidebar-primary
+        },
+        background: {
+            default: 'transparent', // --custom-background
+        },
+        context: {
+            background: '#e0e0e0', // --sidebar-accent
+            text: '#1a1a1a', // --sidebar-primary
+        },
+        divider: {
+            default: '#d0d0d0', // --sidebar-border
+        },
+        button: {
+            default: '#e0e0e0', // --sidebar-accent
+            hover: 'rgba(0,0,0,.08)',
+            focus: 'rgba(0,0,0,.12)',
+            disabled: 'rgba(0, 0, 0, .34)',
+        },
+        sortFocus: {
+            default: '#e0e0e0', // --sidebar-accent
+        },
+    },
+    'default',
+);
 
-      const aValue = a[sortConfig.key] || '';
-      const bValue = b[sortConfig.key] || '';
 
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
+  const columns = [
+    {
+      name: 'Nombre',
+      selector: (row: Program) => row.name,
+      sortable: true,
+    },
+    {
+      name: 'Mandante',
+      selector: (row: Program) => row.company,
+      sortable: true,
+    },
+    {
+      name: 'Dirección',
+      selector: (row: Program) => row.address,
+      sortable: true,
+    },
+    {
+      name: 'Región',
+      selector: (row: Program) => row.state,
+      sortable: true,
+    },
+    {
+      name: 'Acciones',
+      cell: (row: Program) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => { setSelectedProgram(row); setIsEditOpen(true); }}>
+              <SquarePen className="h-4 w-4 mr-2" />
+              <span>Editar</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => { setSelectedProgram(row); setIsDeleteOpen(true); }} className="text-red-500">
+              <Trash2 className="h-4 w-4 mr-2" />
+              <span>Eliminar</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      ignoreRowClick: true,
+      
+      button: true
+    }
+  ];
+
+  const theme = useTheme().theme;
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className="overflow-x-auto rounded-md border dark:border-sidebar-border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
-              <div className="flex items-center space-x-1">
-                <span>Nombre</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('company')} className="cursor-pointer hidden md:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Mandante</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('address')} className="cursor-pointer hidden md:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Dirección</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead onClick={() => handleSort('state')} className="cursor-pointer hidden md:table-cell">
-              <div className="flex items-center space-x-1">
-                <span>Región</span>
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead className="w-[50px]">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredAndSortedPrograms && filteredAndSortedPrograms.map((program) => (
-            <TableRow key={program.id}>
-              <TableCell className="font-medium dark:text-sidebar-foreground">{program.name}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden md:table-cell">{program.company}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden md:table-cell">{program.address}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground hidden md:table-cell">{program.state}</TableCell>
-              <TableCell className="dark:text-sidebar-foreground">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => {
-                      setSelectedProgram(program);
-                      setIsEditOpen(true);
-                    }}>
-                      <SquarePen className="h-4 w-4 mr-2" />
-                      <span>Editar</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => {
-                      setSelectedProgram(program);
-                      setIsDeleteOpen(true);
-                    }} className="text-red-500">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      <span>Eliminar</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="grid grid-cols-1 overflow-x-scroll rounded-md border dark:border-sidebar-border">
+      <DataTable
+        title='Programas'
+        columns={columns}
+        data={filteredPrograms || []}
+        theme={theme === 'dark' ? 'dark' : 'default'}
+        pagination
+        paginationComponentOptions={{ rowsPerPageText: 'Filas por página', rangeSeparatorText: 'de', selectAllRowsItem: true, selectAllRowsItemText: 'Todos' }}
+        highlightOnHover
+        pointerOnHover
+        noHeader
+        noDataComponent="No hay programas disponibles"
+      />
 
       {selectedProgram && (
         <>

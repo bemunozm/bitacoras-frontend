@@ -137,11 +137,22 @@ const Informe = ({ bitacora } : any) => {
             )
           ))}
         </div>
+        <div className="signature-container">
+          <div className="signature-space">
+            <hr className="signature-line" />
+            <div className="signature-name">Firma Coordinador General</div>
+          </div>
+          <div className="signature-space">
+            <hr className="signature-line" />
+            <div className="signature-name">{`Firma ${bitacora.users.name}`}</div>
+          </div>
+        </div>
+      </div>
+      <div className="footer">
+        Página <span className="pageNumber"></span> de <span className="totalPages"></span>
       </div>
     </div>
   );
 };
-
-
 
 export default Informe;

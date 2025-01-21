@@ -28,7 +28,7 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
 
   const initialValues = {
     description: '',
-    date: new Date().toISOString().split('T')[0],
+    date: '', // Inicializar la fecha como una cadena vacía
     bitacora_id: 0,
     category_id: 0,
     attachments: []
@@ -39,7 +39,9 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
   useEffect(() => {
     if (activity) {
       setValue('description', activity.description);
-      setValue('date', activity.date.split('T')[0]);
+      const date = new Date(activity.date);
+      date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
+      setValue('date', date.toISOString().split('T')[0]);
       setValue('bitacora_id', activity.bitacora_id);
       setValue('category_id', activity.category_id);
       setExistingAttachments(activity.attachments); // Guardar los adjuntos existentes
@@ -73,7 +75,9 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
 
   const handleUpdate = (formData: any) => {
     const date = new Date(formData.date);
-    mutate({ ...formData, id: id, date:date, newAttachments: selectedAttachments, existingAttachments: existingAttachments }); // Enviar los adjuntos existentes
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
+
+    mutate({ ...formData, id: id, date: date, newAttachments: selectedAttachments, existingAttachments: existingAttachments });
   };
 
   const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([]);

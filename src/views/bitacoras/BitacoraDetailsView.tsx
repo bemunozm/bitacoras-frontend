@@ -15,6 +15,7 @@ import { ResponsiveDialog } from '@/components/responsive-dialog'
 import { useState } from 'react'
 import Informe from '@/components/pdfs/Informe'
 import ReopenBitacoraModal from '@/components/bitacoras/ReopenBitacoraModal'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function BitacoraDetailsView() {
 
@@ -54,8 +55,12 @@ export default function BitacoraDetailsView() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isInformeOpen, setIsInformeOpen] = useState(false);
   const [isReopenConfirmOpen, setIsReopenConfirmOpen] = useState(false); // Nuevo estado para el modal de confirmación
+  const [isCompleteConfirmOpen, setIsCompleteConfirmOpen] = useState(false); // Nuevo estado para el modal de confirmación de completar
+  const [isApproveConfirmOpen, setIsApproveConfirmOpen] = useState(false); // Nuevo estado para el modal de confirmación de aprobar
 
-  if (isLoading) {
+  const {data: user, isLoading: isUserLoading} = useAuth()
+
+  if (isLoading || isUserLoading) {
     return <LoadingSpinner />
   }
 
@@ -79,38 +84,54 @@ export default function BitacoraDetailsView() {
             </Badge>
           </div>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            <Button 
-              onClick={() => {
-                if (bitacora?.status === 'Aprobado') {
-                  setIsReopenConfirmOpen(true); // Mostrar modal de confirmación
-                } else {
-                  handleStatusChange(bitacora?.status === 'En Progreso' ? 'Completado' : bitacora?.status === 'Completado' ? 'Aprobado' : 'En Progreso');
-                }
-              }}
-              variant={bitacora?.status === 'Aprobado' ? 'secondary' : 'default'}
-              className="w-full sm:w-auto"
-            >
-              {bitacora?.status === 'En Progreso' && 'Marcar Completada'}
-              {bitacora?.status === 'Completado' && 'Marcar Aprobada'}
-              {bitacora?.status === 'Aprobado' && 'Volver a En Progreso'}
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full sm:w-auto dark:text-sidebar-foreground"
-              onClick={() => setIsEditOpen(true)}
-            >
-              <PenBoxIcon className="mr-2 h-4 w-4" />
-              Editar
-            </Button>
-            <Button 
-              variant="destructive" 
-              className="w-full sm:w-auto"
-              onClick={() => setIsDeleteOpen(true)}
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Borrar
-            </Button>
-            {bitacora?.status === 'Aprobado' && (
+            {bitacora?.status === 'En Progreso' && (user?.roles?.some((role) => role?.name === 'Administrador')  || user?.id === bitacora.user_id) && (
+              <Button 
+                onClick={() => setIsCompleteConfirmOpen(true)}
+                variant="default"
+                className="w-full sm:w-auto"
+              >
+                Marcar Completada
+              </Button>
+            )}
+            {bitacora?.status === 'Completado' && (user?.roles?.some((role) => role?.name === 'Administrador' || role?.name === 'Coordinador')) && (
+              <Button 
+                onClick={() => setIsApproveConfirmOpen(true)}
+                variant="default"
+                className="w-full sm:w-auto"
+              >
+                Marcar Aprobada
+              </Button>
+            )}
+            {bitacora?.status === 'Aprobado' && (user?.roles?.some((role) => role?.name === 'Administrador' || role?.name === 'Coordinador')) && (
+              <Button 
+                onClick={() => setIsReopenConfirmOpen(true)}
+                variant="secondary"
+                className="w-full sm:w-auto"
+              >
+                Volver a En Progreso
+              </Button>
+            )}
+            {(user?.roles?.some((role) => role?.name === 'Administrador') || (user?.id === bitacora?.user_id && bitacora?.status === 'En Progreso')) && (
+              <>
+                  <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto dark:text-sidebar-foreground"
+                  onClick={() => setIsEditOpen(true)}
+                >
+                  <PenBoxIcon className="mr-2 h-4 w-4" />
+                  Editar
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  className="w-full sm:w-auto"
+                  onClick={() => setIsDeleteOpen(true)}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Borrar
+                </Button>
+              </>
+            )}
+            {bitacora?.status === 'Aprobado' && (user?.roles?.some((role) => role?.name === 'Administrador' || role?.name === 'Coordinador')) && (
               <Button 
               variant="default" 
               className="w-full sm:w-auto"
@@ -146,7 +167,7 @@ export default function BitacoraDetailsView() {
         </div>
 
         {/* Activities Section */}
-        {id && <ActivityTable bitacoraId={parseInt(id)} />}
+        {user && bitacora && <ActivityTable bitacora={bitacora} user={user} />}
 
         </div>
 
@@ -175,6 +196,22 @@ export default function BitacoraDetailsView() {
             description={`¿Estás seguro de que deseas reabrir la bitácora ${getPeriod(bitacora.month)}?\n Esta acción cambiara el estado de la bitacora a 'En Progreso'.`}
           >
             <ReopenBitacoraModal handleStatusChange={handleStatusChange} setIsOpen={setIsReopenConfirmOpen} isOpen={isReopenConfirmOpen} />
+          </ResponsiveDialog>
+          <ResponsiveDialog
+            isOpen={isCompleteConfirmOpen}
+            setIsOpen={setIsCompleteConfirmOpen}
+            title={`Completar la bitácora ${getPeriod(bitacora.month)}`}
+            description={`¿Estás seguro de que deseas marcar la bitácora ${getPeriod(bitacora.month)} como completada?\n Después de esta acción, no podrás realizar cambios en la bitácora ni en sus actividades.`}
+          >
+            <ReopenBitacoraModal handleStatusChange={() => handleStatusChange('Completado')} setIsOpen={setIsCompleteConfirmOpen} isOpen={isCompleteConfirmOpen} />
+          </ResponsiveDialog>
+          <ResponsiveDialog
+            isOpen={isApproveConfirmOpen}
+            setIsOpen={setIsApproveConfirmOpen}
+            title={`Aprobar la bitácora ${getPeriod(bitacora.month)}`}
+            description={`¿Estás seguro de que deseas marcar como aprobada la bitácora ${getPeriod(bitacora.month)}?\n Esta acción cambiara el estado de la bitacora a 'Aprobado'.`}
+          >
+            <ReopenBitacoraModal handleStatusChange={() => handleStatusChange('Aprobado')} setIsOpen={setIsApproveConfirmOpen} isOpen={isApproveConfirmOpen} />
           </ResponsiveDialog>
 
           {isInformeOpen && <div className='hidden'> <Informe bitacora={bitacora}/> </div>}

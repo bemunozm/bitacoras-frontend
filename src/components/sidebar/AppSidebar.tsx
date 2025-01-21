@@ -6,16 +6,14 @@ import {
   Component,
   Frame,
   Home,
-  LifeBuoy,
   Map,
   PieChart,
-  Send,
   Settings2,
   Users,
 } from "lucide-react"
 
 import { NavMain } from "@/components/sidebar/NavMain"
-import { NavProjects } from "@/components/sidebar/NavProjects"
+import { NavAdmin } from "@/components/sidebar/NavAdmin"
 import { NavSecondary } from "@/components/sidebar/NavSecondary"
 import { NavUser } from "@/components/sidebar/NavUser"
 
@@ -34,7 +32,7 @@ import { Navigate } from "react-router-dom"
 const data = {
   navMain: [
     {
-      title: "Inicio",
+      title: "Escritorio",
       url: "/",
       icon: Home,
     },
@@ -105,41 +103,41 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Soporte",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
+    // {
+    //   title: "Soporte",
+    //   url: "#",
+    //   icon: LifeBuoy,
+    // },
+    // {
+    //   title: "Feedback",
+    //   url: "#",
+    //   icon: Send,
+    // },
   ],
-  projects: [
+  admin: [
     {
       name: "Programas",
-      url: "/programs",
+      url: "/administracion/programas",
       icon: PieChart,
     },
     {
       name: "Categorias",
-      url: "/categories",
+      url: "/administracion/categorias",
       icon: Frame,
     },
     {
       name: "Residencias",
-      url: "/residences",
+      url: "/administracion/residencias",
       icon: Map,
     },
     {
       name: "Usuarios",
-      url: "/users",
+      url: "/administracion/usuarios",
       icon: Users,
     },
     {
       name: "Roles",
-      url: "/roles",
+      url: "/administracion/roles",
       icon: Component,
     }
   ],
@@ -147,9 +145,8 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-  const {data: user, isLoading, isError} = useAuth()
+  const {data: user, isError} = useAuth()
 
-  if (isLoading) return <div>Loading...</div>
   if (isError) return <Navigate to="/auth/login" />
   return (
     <Sidebar variant="inset" {...props}>
@@ -172,7 +169,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        {user?.roles?.some((role) => role?.name === 'Administrador') && <NavAdmin items={data.admin} />}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

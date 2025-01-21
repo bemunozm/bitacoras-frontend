@@ -40,7 +40,7 @@ export default function UsersView() {
                 placeholder="Buscar usuarios..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
+                className="pl-8 dark:text-sidebar-foreground dark:placeholder-sidebar-foreground/50"
               />
             </div>
           </div>
