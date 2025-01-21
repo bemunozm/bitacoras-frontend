@@ -54,7 +54,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
 
   const handleCreate = (formData: any) => {
     const date = new Date(formData.date);
-    
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
+
     mutate({ ...formData, date, attachments: selectedAttachments, bitacora_id: id, category_id: selectedCategory });
   };
 

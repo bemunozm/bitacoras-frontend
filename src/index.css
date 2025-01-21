@@ -12,7 +12,28 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 221.2 83.2% 53.3%; /* Azul oscuro vibrante */
+    --chart-2: 212 95% 68%;       /* Azul medio */
+    --chart-3: 216 92% 60%;       /* Azul real */
+    --chart-4: 210 98% 78%;       /* Azul claro */
+    --chart-5: 212 97% 87%;       /* Azul pastel */
+    --chart-6: 48 93% 68%;        /* Amarillo dorado */
+    --chart-7: 340 85% 66%;       /* Rosa coral */
+    --chart-8: 125 65% 45%;       /* Verde bosque */
+    --chart-9: 28 92% 72%;        /* Naranja cálido */
+    --chart-10: 290 70% 68%;      /* Púrpura suave */
+    --chart-11: 0 85% 58%;       /* Rojo vibrante */
+    --chart-12: 32 95% 66%;      /* Naranja claro */
+    --chart-13: 50 90% 70%;      /* Amarillo suave */
+    --chart-14: 140 75% 55%;     /* Verde esmeralda */
+    --chart-15: 175 80% 60%;     /* Cian brillante */
+    --chart-16: 280 80% 65%;     /* Violeta intenso */
+    --chart-17: 315 85% 68%;     /* Magenta suave */
+    --chart-18: 200 70% 72%;     /* Azul hielo claro */
+    --chart-19: 180 65% 50%;     /* Verde azulado */
+    --chart-20: 220 75% 80%;     /* Azul lavanda pastel */    
+  }
   .dark {
     --custom-background: 240 5.9% 10%;
     --sidebar-background: 240 5.9% 10%;
@@ -22,6 +43,27 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 221.2 83.2% 53.3%; /* Azul oscuro vibrante */
+    --chart-2: 212 95% 68%;       /* Azul medio */
+    --chart-3: 216 92% 60%;       /* Azul real */
+    --chart-4: 210 98% 78%;       /* Azul claro */
+    --chart-5: 212 97% 87%;       /* Azul pastel */
+    --chart-6: 48 93% 68%;        /* Amarillo dorado */
+    --chart-7: 340 85% 66%;       /* Rosa coral */
+    --chart-8: 125 65% 45%;       /* Verde bosque */
+    --chart-9: 28 92% 72%;        /* Naranja cálido */
+    --chart-10: 290 70% 68%;      /* Púrpura suave */   
+    --chart-11: 0 75% 50%;       /* Rojo oscuro */
+    --chart-12: 32 80% 45%;      /* Naranja quemado */
+    --chart-13: 50 80% 50%;      /* Amarillo dorado oscuro */
+    --chart-14: 140 65% 40%;     /* Verde bosque oscuro */
+    --chart-15: 175 70% 50%;     /* Cian oscuro */
+    --chart-16: 280 65% 50%;     /* Violeta profundo */
+    --chart-17: 315 70% 55%;     /* Magenta oscuro */
+    --chart-18: 200 60% 60%;     /* Azul hielo oscuro */
+    --chart-19: 180 55% 40%;     /* Verde azulado profundo */
+    --chart-20: 220 65% 65%;     /* Azul lavanda suave */
+
   }
 }

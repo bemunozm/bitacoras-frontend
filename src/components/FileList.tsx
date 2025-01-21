@@ -12,6 +12,12 @@ export default function FileList({ files, existingFiles, onRemove }: FileListPro
     // Filtrar archivos duplicados
     const uniqueFiles = files.filter(file => !existingFiles.some(existingFile => existingFile.image === file.preview));
 
+    const truncateFileName = (name: string, maxLength: number) => {
+        if (name.length <= maxLength) return name;
+        const ext = name.split('.').pop() || '';
+        return `${name.slice(0, maxLength - ext.length - 3)}...${ext}`;
+    };
+
     return (
         <ul className="mt-4 space-y-2">
           {existingFiles.map((file) => (
@@ -23,7 +29,7 @@ export default function FileList({ files, existingFiles, onRemove }: FileListPro
                   <span className="text-xs text-sidebar-foreground dark:text-white">{file.image.split('.').pop()}</span>
                 </div>
               )}
-              <span className="flex-1 truncate text-sidebar-foreground">{file.image.split('/').pop()}</span>
+              <span className="flex-1 truncate text-sidebar-foreground">{truncateFileName(file.image?.split('/').pop() || '', 20)}</span>
               <button onClick={() => onRemove(file)} className="text-red-500 hover:text-red-700">
                 <X size={16} />
               </button>
@@ -38,7 +44,7 @@ export default function FileList({ files, existingFiles, onRemove }: FileListPro
                   <span className="text-xs text-sidebar-foreground dark:text-white">{file.name.split('.').pop()}</span>
                 </div>
               )}
-              <span className="flex-1 truncate text-sidebar-foreground">{file.name || file.id}</span>
+              <span className="flex-1 truncate text-sidebar-foreground">{truncateFileName(file.name, 20)}</span>
               <button onClick={() => onRemove(file)} className="text-red-500 hover:text-red-700">
                 <X size={16} />
               </button>

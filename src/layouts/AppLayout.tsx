@@ -15,11 +15,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/useAuth"
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet, useLocation } from "react-router-dom"
 
 export default function AppLayout() {
 
   const {isLoading, isError} = useAuth()
+  const location = useLocation()
+  const pathnames = location.pathname.split("/").filter((x) => x)
+
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
   if (isLoading) return <LoadingSpinner/>
   if (isError) return <Navigate to="/auth/login" />
 
@@ -34,14 +41,25 @@ export default function AppLayout() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
+                  <BreadcrumbLink href="/">
+                    Escritorio
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {pathnames.length > 0 && <BreadcrumbSeparator className="hidden md:block" />}
+                {pathnames.map((value, index) => {
+                  const to = `/${pathnames.slice(0, index + 1).join("/")}`
+                  const isLast = index === pathnames.length - 1
+                  return (
+                    <BreadcrumbItem key={to}>
+                      {isLast ? (
+                        <BreadcrumbPage>{capitalizeFirstLetter(value)}</BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink href={to}>{capitalizeFirstLetter(value)}</BreadcrumbLink>
+                      )}
+                      {!isLast && <BreadcrumbSeparator />}
+                    </BreadcrumbItem>
+                  )
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>

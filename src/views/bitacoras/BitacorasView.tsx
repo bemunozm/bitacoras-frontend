@@ -46,7 +46,7 @@ export default function BitacorasView() {
               placeholder="Buscar bitácoras..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
+              className="pl-8 dark:text-sidebar-foreground dark:placeholder-sidebar-foreground/50"
             />
           </div>
         </div>

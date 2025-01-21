@@ -32,6 +32,21 @@ export async function getBitacoras() {
     }
 }
 
+export async function getBitacorasByPeriod(period: string) {
+    try {
+        const url = `/bitacoras/get-by-period/${period}`
+        const { data } = await api.get(url)
+        const response = bitacoraSchema.array().safeParse(data)
+        if(response.success) {
+            return response.data
+        }
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
 export async function getBitacora(id: number) {
     try {
         const url = `/bitacoras/get/${id}`
