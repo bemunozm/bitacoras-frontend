@@ -88,12 +88,12 @@ export default function ForgotPasswordView({
                 >
                     ¿Ya tienes cuenta? Iniciar Sesión
                 </Link>
-                <Link
+                {/* <Link
                     to='/auth/register'
                     className="text-center text-gray-400 hover:text-gray-500 font-normal"
                 >
                     ¿No tienes cuenta? Crea una
-                </Link>
+                </Link> */}
             </nav>
         </Card>
     </div>

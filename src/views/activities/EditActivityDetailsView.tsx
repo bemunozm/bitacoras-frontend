@@ -192,11 +192,7 @@ export default function EditActivityDetailsView() {
               <img src={attachment.image} alt={attachment.image.split('/').pop()} className="w-full h-auto" />
             </div>
           ))}
-          {selectedAttachments.map(attachment => (
-            <div key={attachment.id || attachment.name} className="relative">
-              <img src={attachment.preview} alt={attachment.name} className="w-full h-auto" />
-            </div>
-          ))}
+
         </div>
       </div>
     </div>

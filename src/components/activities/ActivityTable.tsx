@@ -16,6 +16,7 @@ import { getActivitiesByBitacoraId } from '@/api/ActivityAPI';
 import { formatDate } from '@/helpers';
 import { useNavigate } from "react-router-dom";
 import { useTheme } from '../theme-provider';
+import { Badge } from "@/components/ui/badge";
 
 type ActivityTableProps = {
     bitacora: Bitacora;
@@ -125,6 +126,7 @@ createTheme(
       selector: (row: Activity) => row.attachments.length,
       sortable: true,
       width: '12rem',
+      cell: (row: Activity) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring">{row.attachments.length}</Badge>,
     },
     ...(user.roles?.some((role) => role?.name === 'Administrador') || user.id === bitacora.user_id ? [{
       name: 'Acciones',
