@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from '../theme-provider';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm: string, filter: string, user: User }) {
   const { data, isLoading } = useQuery({
@@ -106,14 +107,18 @@ createTheme(
       sortable: true,
     },
     {
-      name: 'Número de actividades',
+      name: 'Actividades',
       selector: (row: Bitacora) => row.activities?.length || 0,
       sortable: true,
+      width: '6rem',
+      cell: (row: Bitacora) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring">{row.activities?.length || 0}</Badge>,
     },
     {
-      name: 'Número de fotos',
+      name: 'Fotos',
       selector: (row: Bitacora) => row.activities?.reduce((acc, activity) => acc + activity.attachments.length, 0) || 0,
       sortable: true,
+      width: '6rem',
+      cell: (row: Bitacora) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring">{row.activities?.reduce((acc, activity) => acc + activity.attachments.length, 0) || 0}</Badge>,
     },
     {
       name: 'Programa',

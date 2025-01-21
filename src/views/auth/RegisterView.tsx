@@ -136,10 +136,10 @@ export default function RegisterView({
                   type="password"
                   required
                   {...register("password", {
-                    required: "El Password es obligatorio",
+                    required: "La contraseña es obligatoria",
                     minLength: {
                       value: 8,
-                      message: 'El Password debe ser mínimo de 8 caracteres'
+                      message: 'La contraseña debe ser mínimo de 8 caracteres'
                     }
                   })}
                 />
