@@ -3,7 +3,6 @@ import { useTheme } from '../theme-provider';
 import { formatDate } from '@/helpers';
 import { Activity } from '@/types';
 import { useQuery } from '@tanstack/react-query';
-import { getActivities } from '@/api/ActivityAPI';
 import { getBitacorasByPeriod } from '@/api/BitacoraAPI';
 
 export default function ExampleTable() {
