@@ -183,11 +183,11 @@ createTheme(
           <h3 className="text-2xl font-bold tracking-tight dark:text-sidebar-foreground">
             Actividades
           </h3>
-          { user.roles?.some((role) => role?.name === 'Administrador') || (user.id === bitacora.user_id && bitacora.status === 'En Progreso') && (
+          {(user.roles?.some((role) => role?.name === 'Administrador') || (user.id === bitacora.user_id && bitacora.status === 'En Progreso')) && (
             <Button
             onClick={() => setIsCreateOpen(true)}
             className="flex items-center space-x-1"
-          >
+            >
             <Plus className="mr-2 h-4 w-4" />
             Actividad
           </Button>
