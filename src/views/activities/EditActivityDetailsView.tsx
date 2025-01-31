@@ -15,6 +15,8 @@ import { toast } from "@/hooks/use-toast"
 import { getPeriod } from '@/helpers'
 import { useParams } from 'react-router-dom'
 import type { Attachment } from '@/types'
+import { useBreadcrumb } from '@/contexts/BreadcrumbContext'
+import NotFound from '../NotFound'
 
 export default function EditActivityDetailsView() {
   const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([])
@@ -24,13 +26,13 @@ export default function EditActivityDetailsView() {
 
   const activityId = useParams().id
 
-  const { data: activity, isLoading: isLoadingActivity } = useQuery({
+  const { data: activity, isLoading: isLoadingActivity, isError } = useQuery({
     queryKey: ['activity', activityId],
     queryFn: () => getActivity(+activityId!),
     enabled: !!activityId
   })
 
-  const { data: categories, isLoading: isLoadingCategories } = useQuery({
+  const { data: categories, isLoading: isLoadingCategories, isError:isCategoryError } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories,
   })
@@ -100,7 +102,25 @@ export default function EditActivityDetailsView() {
     setSelectedCategory(parseInt(selected))
   }
 
+  const {setBreadcrumbItems} = useBreadcrumb()
+
+  useEffect(() => {
+    const routes = [
+      {label: 'Escritorio', to: '/'},
+      {label: 'Bitácoras', to: '/bitacoras'},
+      {label: 'Actividades', to: `/bitacoras/${activity?.bitacora_id}/actividades`},
+      {label: 'Editar Actividad', to: `/bitacoras/${activity?.bitacora_id}/actividades/${activityId}/editar`}
+    ]
+
+    setBreadcrumbItems(routes)
+
+    if (activity) {
+      setBreadcrumbItems([...routes, {label: `Actividad de la bitácora ${getPeriod(activity.date)}`}])
+    }
+  }, [activity, activityId, setBreadcrumbItems])
+
   if (isLoadingActivity || isLoadingCategories || !attachmentsLoaded) return <LoadingSpinner/>
+  if (isError || isCategoryError) return <NotFound title="¡Rayos!" description="Hubo un problema al obtener la información de la actividad." />
 
   return (
     <div className="p-6 space-y-6">
@@ -160,7 +180,7 @@ export default function EditActivityDetailsView() {
                   <Textarea
                     id="description"
                     placeholder="Descripción de la actividad"
-                    className="col-span-3 dark:text-sidebar-foreground min-h-[120px]"
+                    className="col-span-3 dark:text-sidebar-foreground min-h-40"
                     {...register('description', { required: 'Este campo es requerido' })}
                   />
                   {errors.description && <p className="col-start-2 col-end-4 text-red-500">{errors.description.message}</p>}

@@ -1,21 +1,24 @@
-import * as React from "react"
+import * as React from "react";
 import {
+  Biohazard,
   BookOpen,
   Bot,
   Command,
   Component,
   Frame,
   Home,
+  LayoutDashboard,
   Map,
+  MapPinned,
   PieChart,
   Settings2,
   Users,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/sidebar/NavMain"
-import { NavAdmin } from "@/components/sidebar/NavAdmin"
-import { NavSecondary } from "@/components/sidebar/NavSecondary"
-import { NavUser } from "@/components/sidebar/NavUser"
+import { NavMain } from "@/components/sidebar/NavMain";
+import { NavAdmin } from "@/components/sidebar/NavAdmin";
+import { NavSecondary } from "@/components/sidebar/NavSecondary";
+import { NavUser } from "@/components/sidebar/NavUser";
 
 import {
   Sidebar,
@@ -25,79 +28,55 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { useAuth } from "@/hooks/useAuth"
-import { Navigate } from "react-router-dom"
+} from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigate } from "react-router-dom";
 
 const data = {
   navMain: [
     {
       title: "Escritorio",
       url: "/",
-      icon: Home,
+      icon: LayoutDashboard,
     },
     {
       title: "Bitácoras",
       url: "/bitacoras",
       icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
     },
     {
       title: "Participantes",
-      url: "#",
+      url: "/participantes",
       icon: Bot,
+    },
+    {
+      title: "Ruta Social",
+      url: "/ruta-social",
+      icon: MapPinned,
+    },
+    {
+      title: "Prestaciones",
+      url: "/prestaciones",
+      icon: Settings2,
       items: [
         {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
+          title: "Categorías de Prestaciones",
+          url: "/categorias-prestaciones",
         },
       ],
     },
     {
-      title: "Insumos",
-      url: "#",
-      icon: Settings2,
+      title: "Residencias",
+      url: "/residencias",
+      icon: Home,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Ingreso a Residencia",
+          url: "/residencias/ingreso-residencia",
         },
         {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Salida de Residencia",
+          url: "/residencias/salida-residencia",
         },
       ],
     },
@@ -117,37 +96,41 @@ const data = {
   admin: [
     {
       name: "Programas",
-      url: "/administracion/programas",
+      url: "/programas",
       icon: PieChart,
     },
     {
-      name: "Categorias",
-      url: "/administracion/categorias",
+      name: "Categorías",
+      url: "/categorias",
       icon: Frame,
     },
     {
       name: "Residencias",
-      url: "/administracion/residencias",
+      url: "/residencias",
       icon: Map,
     },
     {
       name: "Usuarios",
-      url: "/administracion/usuarios",
+      url: "/usuarios",
       icon: Users,
     },
     {
       name: "Roles",
-      url: "/administracion/roles",
+      url: "/roles",
       icon: Component,
+    },
+    {
+      name: 'Enfermedades',
+      url: '/enfermedades',
+      icon: Biohazard,
     }
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: user, isError } = useAuth();
 
-  const {data: user, isError} = useAuth()
-
-  if (isError) return <Navigate to="/auth/login" />
+  if (isError) return <Navigate to="/auth/login" />;
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -159,8 +142,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">FTU - Bitacoras</span>
-                  <span className="truncate text-xs">Residencia: Jose Joaquin Perez</span>
+                  <span className="truncate font-semibold">
+                    FTU - Bitacoras
+                  </span>
+                  <span className="truncate text-xs">
+                    Residencia: Jose Joaquin Perez
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -169,12 +156,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {user?.roles?.some((role) => role?.name === 'Administrador') && <NavAdmin items={data.admin} />}
+        {user?.roles?.some((role) => role?.name === "Administrador") && (
+          <NavAdmin items={data.admin} />
+        )}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-        {user && <NavUser user={user} />}
-      </SidebarFooter>
+      <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>
     </Sidebar>
-  )
+  );
 }

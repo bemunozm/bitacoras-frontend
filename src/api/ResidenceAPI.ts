@@ -18,10 +18,7 @@ export async function getResidences() {
     try {
         const url = '/residences/get'
         const { data } = await api.get(url)
-        const response = residenceSchema.array().safeParse(data)
-        if(response.success) {
-            return response.data
-        }
+        return data
 
     } catch (error) {
         if(isAxiosError(error) && error.response) {
@@ -62,6 +59,54 @@ export async function deleteResidence(id: Residence['id']) {
     try {
         const url = `/residences/delete/${id}`
         const { data } = await api.delete<string>(url)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function participantEntrance(formData: any) {
+    try {
+        const url = '/residences/participant-entrance'
+        const { data } = await api.post<string>(url, formData)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function participantDeparture(formData: any) {
+    try {
+        const url = '/residences/participant-departure'
+        const { data } = await api.post<string>(url, formData)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function getActiveParticipants() {
+    try {
+        const url = '/residences/active-participants'
+        const { data } = await api.get(url)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function getParticipantsByResidence(id: Residence['id']) {
+    try {
+        const url = `/residences/get-participants/${id}`
+        const { data } = await api.get(url)
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response) {

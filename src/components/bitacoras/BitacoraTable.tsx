@@ -111,14 +111,14 @@ createTheme(
       selector: (row: Bitacora) => row.activities?.length || 0,
       sortable: true,
       width: '6rem',
-      cell: (row: Bitacora) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring">{row.activities?.length || 0}</Badge>,
+      cell: (row: Bitacora) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring hover:bg-sidebar-ring/90 dark:hover:bg-sidebar-ring/90">{row.activities?.length || 0}</Badge>,
     },
     {
       name: 'Fotos',
       selector: (row: Bitacora) => row.activities?.reduce((acc, activity) => acc + activity.attachments.length, 0) || 0,
       sortable: true,
       width: '6rem',
-      cell: (row: Bitacora) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring">{row.activities?.reduce((acc, activity) => acc + activity.attachments.length, 0) || 0}</Badge>,
+      cell: (row: Bitacora) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring hover:bg-sidebar-ring/90 dark:hover:bg-sidebar-ring/90">{row.activities?.reduce((acc, activity) => acc + activity.attachments.length, 0) || 0}</Badge>,
     },
     {
       name: 'Programa',
@@ -132,7 +132,7 @@ createTheme(
     },
     {
       name: 'Terminado?',
-      cell: (row: Bitacora) => row.status === 'Completado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/>,
+      cell: (row: Bitacora) => row.status === 'Completado' || row.status === 'Aprobado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/>,
     },
     {
       name: 'Aprobado?',
@@ -141,7 +141,7 @@ createTheme(
     ...(user.roles?.some((role) => role?.name === 'Administrador') || filter === 'mine' ? [{
       name: 'Acciones',
       cell: (row: Bitacora) => (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <MoreVertical className="h-4 w-4" />

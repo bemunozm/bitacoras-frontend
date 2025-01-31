@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { RoleForm } from "@/components/roles/RoleForm";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import RoleTable from "@/components/roles/RoleTable";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 
 export default function RolesView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const {setBreadcrumbItems} = useBreadcrumb()
+  
+    useEffect(() => {
+      const route = [
+          {label: 'Escritorio', to: '/'},
+          {label: 'Administración', to: undefined},
+          {label: 'Roles', to: undefined}
+      ]
+      setBreadcrumbItems(route)
+      }, [setBreadcrumbItems])
+  
 
   return (
     <>

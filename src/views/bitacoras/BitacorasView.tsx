@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,21 @@ import BitacoraTable from "@/components/bitacoras/BitacoraTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BitacoraForm } from "@/components/bitacoras/BitacoraForm";
 import { useAuth } from "@/hooks/useAuth";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 
 export default function BitacorasView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [tab, setTab] = useState("all");
+
+  const {setBreadcrumbItems} = useBreadcrumb();
+
+  useEffect(() => {
+    setBreadcrumbItems([
+      {label: "Escritorio", to: "/"},
+      {label: "Bitácoras", to: undefined},
+    ]);
+  }, []);
 
   const {data} = useAuth();
 

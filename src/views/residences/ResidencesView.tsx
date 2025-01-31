@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ResidenceForm } from "@/components/residences/ResidenceForm";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import ResidenceTable from "@/components/residences/ResidenceTable";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 
 export default function ResidencesView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const {setBreadcrumbItems} = useBreadcrumb()
+    
+      useEffect(() => {
+        const route = [
+            {label: 'Escritorio', to: '/'},
+            {label: 'Administración', to: undefined},
+            {label: 'Residencias', to: undefined}
+        ]
+        setBreadcrumbItems(route)
+        }, [setBreadcrumbItems])
   return (
     <>
       <ResponsiveDialog

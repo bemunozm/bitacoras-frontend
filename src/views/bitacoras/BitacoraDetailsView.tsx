@@ -12,20 +12,35 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import EditBitacoraModal from '@/components/bitacoras/EditBitacoraModal'
 import DeleteBitacoraModal from '@/components/bitacoras/DeleteBitacoraModal'
 import { ResponsiveDialog } from '@/components/responsive-dialog'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Informe from '@/components/pdfs/Informe'
 import ReopenBitacoraModal from '@/components/bitacoras/ReopenBitacoraModal'
 import { useAuth } from '@/hooks/useAuth'
+import { useBreadcrumb } from '@/contexts/BreadcrumbContext'
+import NotFound from '../NotFound'
 
 export default function BitacoraDetailsView() {
 
   const {id} = useParams()
 
-  const {data: bitacora, isLoading} = useQuery({
+  const {data: bitacora, isLoading, isError} = useQuery({
     queryKey: ['bitacora', id],
     queryFn: () => getBitacora(parseInt(id!)),
     enabled: !!id
   })
+
+  const {setBreadcrumbItems} = useBreadcrumb()
+
+  useEffect(() => {
+    const rutas = [
+      {label: 'Escritorio', to: '/'},
+      {label: 'Bitácoras', to: '/bitacoras'},
+    ]
+    setBreadcrumbItems(rutas)
+    if (bitacora) {
+      setBreadcrumbItems([...rutas, {label: `Bitácora ${getPeriod(bitacora.month)}`, to: undefined}])
+    }
+  }, [bitacora, setBreadcrumbItems])
 
   const queryClient = useQueryClient()
 
@@ -62,6 +77,10 @@ export default function BitacoraDetailsView() {
 
   if (isLoading || isUserLoading) {
     return <LoadingSpinner />
+  }
+
+  if (isError) {
+    return <NotFound title="Ohhh!" description="Hubo un problema al obtener la información de la bitácora." />
   }
 
   return (

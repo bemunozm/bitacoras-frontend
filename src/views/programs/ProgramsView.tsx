@@ -1,14 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ProgramForm } from "@/components/programs/ProgramForm";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import ProgramTable from "@/components/programs/ProgramTable";
+import { useBreadcrumb } from '@/contexts/BreadcrumbContext';
 
 export default function ProgramsView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const {setBreadcrumbItems} = useBreadcrumb()
+    
+      useEffect(() => {
+        const route = [
+            {label: 'Escritorio', to: '/'},
+            {label: 'Administración', to: undefined},
+            {label: 'Programas', to: undefined}
+        ]
+        setBreadcrumbItems(route)
+        }, [setBreadcrumbItems])
 
   return (
     <>

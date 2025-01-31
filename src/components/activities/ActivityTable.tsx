@@ -126,12 +126,12 @@ createTheme(
       selector: (row: Activity) => row.attachments.length,
       sortable: true,
       width: '12rem',
-      cell: (row: Activity) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring">{row.attachments.length}</Badge>,
+      cell: (row: Activity) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring hover:bg-sidebar-ring/90 dark:hover:bg-sidebar-ring/90">{row.attachments.length}</Badge>,
     },
     ...(user.roles?.some((role) => role?.name === 'Administrador') || user.id === bitacora.user_id ? [{
       name: 'Acciones',
       cell: (row: Activity) => (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <MoreVertical className="h-4 w-4" />

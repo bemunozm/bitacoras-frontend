@@ -133,7 +133,7 @@ export default function UserTable({searchTerm}: {searchTerm: string}) {
         {
             name: 'Acciones',
             cell: (row: User) => (
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                             <MoreVertical className="h-4 w-4" />

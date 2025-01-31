@@ -11,6 +11,7 @@ import DeleteResidenceModal from "@/components/residences/DeleteResidenceModal";
 import { useTheme } from '../theme-provider';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 
 export default function ResidenceTable({ searchTerm }: { searchTerm: string }) {
   const { data, isLoading } = useQuery({
@@ -21,6 +22,12 @@ export default function ResidenceTable({ searchTerm }: { searchTerm: string }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedResidence, setSelectedResidence] = useState<Residence | null>(null);
+
+  const navigate = useNavigate();
+
+  const handleRowClick = (row: Residence) => {
+    navigate(`/residencias/${row.id}`);
+  };
 
   const filteredResidences = data?.filter((residence: Residence) => {
     return residence.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -104,9 +111,14 @@ createTheme(
       sortable: true,
     },
     {
+      name: 'N° de ocupantes',
+      selector: (row: any) => row.participants.filter((participant: any) => participant.status === 'Residencia en Curso' || participant.status === 'Pendiente de Salida').length,
+      sortable: true,
+    },
+    {
       name: 'Acciones',
       cell: (row: Residence) => (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <MoreVertical className="h-4 w-4" />
@@ -150,6 +162,7 @@ createTheme(
         pointerOnHover
         noHeader
         noDataComponent="No hay residencias disponibles"
+        onRowClicked={handleRowClick}
       />
 
       {selectedResidence && (

@@ -1,6 +1,7 @@
 import api from "@/lib/axios";
 import { UserLoginForm, UserRegistrationForm, ConfirmToken, RequestConfirmationCodeForm, ForgotPasswordForm, NewPasswordForm, CheckPasswordForm, userSchema } from "@/types";
 import { isAxiosError } from "axios";
+import { useAuthStore } from "@/contexts/auth-store";
 
 export async function createAccount(formData: UserRegistrationForm) {
     try {
@@ -89,10 +90,11 @@ export async function updatePasswordWithToken({formData, token}: {formData: NewP
 
 export async function getUser() {
     try {
-        const { data } = await api('/auth/user')
+        const { data } = await api('/auth/user')
         console.log(data)
         const response = userSchema.safeParse(data)
         if(response.success) {
+            useAuthStore.getState().setUser(response.data)
             return response.data
         }
     } catch (error) {

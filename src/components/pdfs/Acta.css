@@ -1,0 +1,186 @@
+.full-width-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.acta-container {
+  width: 1122px; /* Ajustar a A4 landscape */
+  max-width: 1122px;
+  height: auto;
+  position: relative;
+  background-color: white;
+  overflow: visible; /* Mantener visible para evitar cortes */
+  padding: 20px; /* Agregar padding */
+  box-sizing: border-box;
+  padding-left: 20px; /* Ajustar padding izquierdo */
+  padding-right: 20px; /* Ajustar padding derecho */
+}
+
+.acta-title {
+  width: 100%;
+  text-align: center;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Inter';
+  margin-top: 20px;
+}
+
+.acta-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+.acta-header {
+  border: 1px solid grey;
+  color: black;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter';
+  padding: 4px;
+}
+
+.acta-data {
+  border: 1px solid grey;
+  color: black;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: 'Inter';
+  padding: 4px;
+}
+
+.acta-logo-ministerio {
+  width: 75px;
+  height: 68px;
+  position: static;
+  float: none;
+  margin: 0 10px;
+}
+
+.acta-logo-fundacion {
+  width: 75px;
+  height: 73px;
+  position: static;
+  float: none;
+  margin: 0 10px;
+  border-radius: 43px;
+}
+
+.acta-table-container {
+  margin-top: 10px;
+  padding: 0 20px;
+}
+
+.acta-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.acta-data-table th,
+.acta-data-table td {
+  border: 1px solid grey;
+  padding: 4px; /* Reducir padding */
+  text-align: center;
+  font-size: 11px; /* Reducir tamaño de fuente */
+  font-family: 'Inter';
+  height: 20px; /* Ajustar altura */
+}
+
+.signature-container {
+  display: flex;
+  justify-content: center; /* Centrar la firma */
+  margin-top: 30px; /* Ajustar margen superior */
+  padding: 0 20px;
+}
+
+.signature-space {
+  text-align: center;
+  width: 50%; /* Ajustar ancho */
+}
+
+.signature-line {
+    border-top: 1px solid black;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.signature-name {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: 'Inter';
+  width: 100%;
+  word-wrap: break-word;
+  text-align: center;
+}
+
+.acta-header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.acta-logos {
+  display: flex;
+  gap: 10px; 
+  justify-content: center; 
+  align-items: center;
+}
+
+.acta-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.acta-prestaciones-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.acta-logo-ministerio-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.acta-logo-fundacion-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.acta-prestaciones-info {
+  font-size: 10px;
+  font-family: 'Inter';
+  margin-top: 10px; /* Agregar margen superior */
+  max-width: 70%; /* Ajustar ancho máximo */
+  word-wrap: break-word; /* Ajustar para evitar desbordamientos */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.acta-prestaciones-info div {
+  margin-top: 5px; /* Agregar margen superior entre categorías */
+}
+
+.acta-fecha-info {
+  font-size: 10px;
+  margin-top: 10px;
+  font-family: 'Inter';
+}
+
+.acta-prestacion-item {
+  display: inline-block;
+}

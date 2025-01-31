@@ -1,15 +1,20 @@
 import {Button} from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 
-export default function NotFound() {
+type NotFoundProps = {
+  title?: string
+  description?: string
+}
+
+export default function NotFound({title, description}: NotFoundProps) {
     const navigate = useNavigate()
 
   return (
     <div className="flex items-center min-h-screen px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <div className="w-full space-y-6 text-center">
         <div className="space-y-3">
-          <h1 className="text-4xl text-sidebar-foreground font-bold tracking-tighter sm:text-5xl animate-bounce">404</h1>
-          <p className="text-sidebar-foreground">¡Ups! Te has adentrado en una zona no disponible.</p>
+          <h1 className="text-4xl text-sidebar-foreground font-bold tracking-tighter sm:text-5xl animate-bounce">{title ? title : '404'}</h1>
+          <p className="text-sidebar-foreground">{description ? description : '¡Ups! Te has adentrado en una zona no disponible.'}</p>
         </div>
         <Button
           onClick={() => navigate('/')}

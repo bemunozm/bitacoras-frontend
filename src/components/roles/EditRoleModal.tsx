@@ -88,7 +88,7 @@ export function EditRoleModal({id, setIsOpen}: EditRoleProps) {
                     <Textarea
                         id="description" 
                         placeholder="Tiene acceso a todas las funcionalidades de aseo y bitacora." 
-                        className="col-span-3 dark:text-sidebar-foreground"
+                        className="col-span-3 dark:text-sidebar-foreground h-32"
                         {...register('description')} 
                     />
                 </div>

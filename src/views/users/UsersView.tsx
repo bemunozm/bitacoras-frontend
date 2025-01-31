@@ -3,12 +3,24 @@ import { Input } from "@/components/ui/input"
 import { ResponsiveDialog } from "@/components/responsive-dialog"
 import UserTable from "@/components/users/UserTable"
 import { Plus, Search } from "lucide-react"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserForm } from "@/components/users/UserForm"
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext"
 
 export default function UsersView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const {setBreadcrumbItems} = useBreadcrumb()
+    
+      useEffect(() => {
+        const route = [
+            {label: 'Escritorio', to: '/'},
+            {label: 'Administración', to: undefined},
+            {label: 'Usuarios', to: undefined}
+        ]
+        setBreadcrumbItems(route)
+        }, [setBreadcrumbItems])
   return (
     <>
       <ResponsiveDialog
