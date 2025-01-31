@@ -87,22 +87,22 @@ export default function EditDeliveryBenefitModal({
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="date" className="text-right">Fecha</Label>
+          <Label htmlFor="date" className="text-right dark:text-sidebar-foreground">Fecha</Label>
           <Input
             id="date"
             type="date"
-            className="col-span-3"
+            className="col-span-3 dark:text-sidebar-foreground"
             {...register("date", { required: "Requerido" })}
           />
           {errors.date && <p>{errors.date.message?.toString()}</p>}
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="turn" className="text-right">Turno</Label>
+          <Label htmlFor="turn" className="text-right dark:text-sidebar-foreground">Turno</Label>
           <Select
             value={watch("turn")}
             onValueChange={(val) => setValue("turn", val)}
           >
-            <SelectTrigger className="col-span-3">
+            <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Selecciona turno" />
             </SelectTrigger>
             <SelectContent>
@@ -113,13 +113,13 @@ export default function EditDeliveryBenefitModal({
           {errors.turn && <p>{errors.turn.message?.toString()}</p>}
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="provision_id" className="text-right">Beneficio</Label>
+          <Label htmlFor="provision_id" className="text-right dark:text-sidebar-foreground">Beneficio</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
-                className="col-span-3 w-full justify-between"
+                className="col-span-3 w-full justify-between dark:text-sidebar-foreground"
               >
                 {provisions?.find((prov: any) => prov.id === +watch("provision_id"))?.name || "Seleccione un beneficio"}
                 <ChevronsUpDown className="opacity-50" />
@@ -127,7 +127,7 @@ export default function EditDeliveryBenefitModal({
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
               <Command>
-                <CommandInput placeholder="Buscar beneficio..." className="h-9" />
+                <CommandInput placeholder="Buscar beneficio..." className="h-9 " />
                 <CommandList>
                   <CommandEmpty>No se encontraron beneficios.</CommandEmpty>
                   <CommandGroup>
@@ -155,7 +155,7 @@ export default function EditDeliveryBenefitModal({
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="dark:text-sidebar-foreground">
           Cancelar
         </Button>
         <Button type="submit">Guardar</Button>

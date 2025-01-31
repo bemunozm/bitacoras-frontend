@@ -11,6 +11,7 @@ import { UserLoginForm } from '@/types'
 import { authenticateUser } from '@/api/AuthAPI'
 import ErrorMessage from '@/components/ErrorMessage'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginView({
     className,
@@ -18,6 +19,7 @@ export default function LoginView({
   }: React.ComponentPropsWithoutRef<"div">) {
 
     const {toast} = useToast()
+    const {refetch} = useAuth()
 
     const initialValues: UserLoginForm = {
         email: '',
@@ -41,6 +43,7 @@ export default function LoginView({
               description: 'Inicio de sesion exitoso',
             })
             reset()
+            refetch()
             navigate('/')
         }
       })

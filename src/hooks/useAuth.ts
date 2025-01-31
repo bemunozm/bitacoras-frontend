@@ -5,7 +5,7 @@ import { useAuthStore } from "@/contexts/auth-store";
 export const useAuth = () => {
   const { user, clearUser } = useAuthStore();
 
-  const { data, isError, isLoading } = useQuery({
+  const { data, isError, isLoading, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: getUser,
     retry: 1,
@@ -14,5 +14,5 @@ export const useAuth = () => {
     gcTime: 1000 * 60 * 60 * 24, // Define el tiempo de vida de la cache, lo que quiere decir que si no se ha hecho un refetch en 24 horas, se limpiará la cache
   });
 
-  return { data: user ?? data, isError, isLoading, clearUser };
+  return { data: user ?? data, isError, isLoading, clearUser, refetch };
 };
