@@ -10,6 +10,7 @@ import ErrorMessage from "@/components/ErrorMessage"
 import { createProvision } from "@/api/ProvisionAPI"
 import { getProvisionCategories } from "@/api/ProvisionCategoryAPI"
 import LoadingSpinner from "../LoadingSpinner"
+import { useState } from 'react'
 
 type ProvisionFormProps = {
   setIsOpen: (isOpen: boolean) => void
@@ -35,6 +36,7 @@ export function ProvisionForm({setIsOpen}: ProvisionFormProps) {
     const {mutate} = useMutation({
         mutationFn: createProvision,
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -42,6 +44,7 @@ export function ProvisionForm({setIsOpen}: ProvisionFormProps) {
             })
         },
         onSuccess: (data) => {
+          setIsSaving(false);
           toast({
             title: '🎉Prestación creada!',
             description: data,
@@ -53,9 +56,11 @@ export function ProvisionForm({setIsOpen}: ProvisionFormProps) {
     })
     
     const handleCreate = (formData: any) => {
-        console.log(formData)
+        setIsSaving(true);
         mutate(formData)
     }
+
+    const [isSaving, setIsSaving] = useState(false);
 
     if (isLoadingCategories) return <LoadingSpinner className="h-10"/>
 
@@ -110,7 +115,9 @@ export function ProvisionForm({setIsOpen}: ProvisionFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
   )

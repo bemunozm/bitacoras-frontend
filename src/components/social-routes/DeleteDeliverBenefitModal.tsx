@@ -23,6 +23,7 @@ export default function DeleteDeliverBenefitModal({
   const { mutate } = useMutation({
     mutationFn: () => deleteDeliveredBenefits(benefits),
     onSuccess: (response) => {
+      setIsLoading(false);
       toast({ title: "Beneficio eliminado", description: response });
       queryClient.invalidateQueries({ queryKey: ["provisions"] });
       queryClient.invalidateQueries({ queryKey: ["deliveredBenefit"] });
@@ -30,6 +31,7 @@ export default function DeleteDeliverBenefitModal({
       setIsLoading(false);
     },
     onError: (error: any) => {
+      setIsLoading(false);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       setIsLoading(false);
     }
@@ -48,7 +50,7 @@ export default function DeleteDeliverBenefitModal({
           size="lg"
           variant="outline"
           disabled={isLoading}
-          className="w-full hidden sm:block dark:bg-sidebar-accent"
+          className="w-full hidden sm:block dark:text-sidebar-foreground"
           type="button"
           onClick={() => setIsOpen(false)}
         >

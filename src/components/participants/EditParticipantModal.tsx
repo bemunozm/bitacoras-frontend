@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import ErrorMessage from "@/components/ErrorMessage"
 import { updateParticipant, getParticipant } from "@/api/ParticipantAPI"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import LoadingSpinner from "../LoadingSpinner"
 
 type EditParticipantFormProps = {
@@ -69,10 +69,12 @@ export function EditParticipantModal({ id, setIsOpen }: EditParticipantFormProps
   
 
   const queryClient = useQueryClient()
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: updateParticipant,
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -80,6 +82,7 @@ export function EditParticipantModal({ id, setIsOpen }: EditParticipantFormProps
       })
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Participante actualizado!',
         description: data,
@@ -93,6 +96,7 @@ export function EditParticipantModal({ id, setIsOpen }: EditParticipantFormProps
   })
 
   const handleUpdate = (formData: any) => {
+    setIsSaving(true);
     if (formData.birthdate) {
       formData.birthdate = new Date(formData.birthdate).toISOString();
     }
@@ -187,7 +191,9 @@ export function EditParticipantModal({ id, setIsOpen }: EditParticipantFormProps
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   )

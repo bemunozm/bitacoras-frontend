@@ -11,6 +11,7 @@ import ErrorMessage from "@/components/ErrorMessage";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LoadingSpinner from "../LoadingSpinner";
+import { useState } from 'react';
 
 type EventFormProps = {
     setIsOpen: (isOpen: boolean) => void;
@@ -35,9 +36,12 @@ export default function EventForm({ setIsOpen, selectedParticipant }: EventFormP
         queryFn: getParticipants
     });
 
+    const [isSaving, setIsSaving] = useState(false);
+
     const { mutate } = useMutation({
         mutationFn: createEvent,
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -45,6 +49,7 @@ export default function EventForm({ setIsOpen, selectedParticipant }: EventFormP
             });
         },
         onSuccess: (data) => {
+            setIsSaving(false);
             toast({
                 title: '🎉Evento creado!',
                 description: data,
@@ -56,6 +61,7 @@ export default function EventForm({ setIsOpen, selectedParticipant }: EventFormP
     });
 
     const handleCreate = (formData: EventForm) => {
+        setIsSaving(true);
         const date = new Date(formData.date).toISOString();	
         mutate({ ...formData, date});
     };
@@ -136,7 +142,9 @@ export default function EventForm({ setIsOpen, selectedParticipant }: EventFormP
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
     );

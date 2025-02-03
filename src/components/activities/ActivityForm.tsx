@@ -31,10 +31,12 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: initialValues });
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   const { mutate } = useMutation({
     mutationFn: createActivity,
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -42,6 +44,7 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Actividad creada!',
         description: data,
@@ -53,6 +56,7 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
   });
 
   const handleCreate = (formData: any) => {
+    setIsSaving(true); // Activar estado de carga
     const date = new Date(formData.date);
     date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
 
@@ -140,7 +144,9 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
           />
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );

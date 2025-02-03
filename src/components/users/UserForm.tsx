@@ -37,9 +37,12 @@ export function UserForm({setIsOpen}: UserFormProps) {
 
     const queryClient = useQueryClient()
 
+    const [isSaving, setIsSaving] = useState(false);
+
     const {mutate} = useMutation({
         mutationFn: createUser,
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -47,6 +50,7 @@ export function UserForm({setIsOpen}: UserFormProps) {
             })
         },
         onSuccess: (data) => {
+          setIsSaving(false);
           toast({
             title: '🎉Usuario creado!',
             description: data,
@@ -58,6 +62,7 @@ export function UserForm({setIsOpen}: UserFormProps) {
     })
     
     const handleCreate = (formData: any) => {
+        setIsSaving(true);
         mutate({...formData, roles: selectedRoles, profile_image: selectedImage})
     }
 
@@ -234,7 +239,9 @@ export function UserForm({setIsOpen}: UserFormProps) {
                 
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
   )

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,10 +37,12 @@ export default function EditResidenceModal({ id, setIsOpen }: EditResidenceProps
   }, [residence, setValue]);
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: (data: ResidenceForm) => updateResidence({ id: residence!.id, ...data }),
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -48,6 +50,7 @@ export default function EditResidenceModal({ id, setIsOpen }: EditResidenceProps
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Residencia actualizada!',
         description: data,
@@ -59,6 +62,7 @@ export default function EditResidenceModal({ id, setIsOpen }: EditResidenceProps
   });
 
   const handleEdit = (formData: ResidenceForm) => {
+    setIsSaving(true);
     mutate({ ...formData, capacity: parseInt(formData.capacity.toString()) });
   };
 
@@ -104,7 +108,9 @@ export default function EditResidenceModal({ id, setIsOpen }: EditResidenceProps
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );

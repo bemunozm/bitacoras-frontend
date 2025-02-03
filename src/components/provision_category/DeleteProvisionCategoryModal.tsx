@@ -48,7 +48,7 @@ export default function DeleteProvisionCategoryModal({ id, setIsOpen }: DeletePr
           size="lg"
           variant="outline"
           disabled={isLoading}
-          className="w-full hidden sm:block dark:bg-sidebar-accent"
+          className="w-full hidden sm:block dark:text-sidebar-foreground"
           type="button"
           onClick={() => setIsOpen(false)}
         >

@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import type { ResidenceForm } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
+import { useState } from 'react';
 
 type ResidenceFormProps = {
   setIsOpen: (isOpen: boolean) => void;
@@ -22,10 +23,12 @@ export function ResidenceForm({ setIsOpen }: ResidenceFormProps) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: initialValues });
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: createResidence,
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -33,6 +36,7 @@ export function ResidenceForm({ setIsOpen }: ResidenceFormProps) {
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Residencia creada!',
         description: data,
@@ -44,6 +48,7 @@ export function ResidenceForm({ setIsOpen }: ResidenceFormProps) {
   });
 
   const handleCreate = (formData: ResidenceForm) => {
+    setIsSaving(true);
     mutate({ ...formData, capacity: parseInt(formData.capacity.toString()) });
   };
 
@@ -87,7 +92,9 @@ export function ResidenceForm({ setIsOpen }: ResidenceFormProps) {
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );

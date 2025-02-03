@@ -52,9 +52,12 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
 
   const queryClient = useQueryClient();
 
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
+
   const { mutate } = useMutation({
     mutationFn: updateActivity,
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -62,6 +65,7 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Actividad actualizada!',
         description: data,
@@ -74,6 +78,7 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
   });
 
   const handleUpdate = (formData: any) => {
+    setIsSaving(true); // Activar estado de carga
     const date = new Date(formData.date);
     date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
 
@@ -176,7 +181,9 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
           />
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );

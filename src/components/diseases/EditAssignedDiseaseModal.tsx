@@ -48,6 +48,7 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({ defaultValues: initialValues });
 
   const [selectedTreatmentStatus, setSelectedTreatmentStatus] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   useEffect(() => {
     if (assignedDisease) {
@@ -64,6 +65,7 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
   const { mutate } = useMutation({
     mutationFn: (data: any) => updateAssignedDisease({ id, ...data }),
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -71,6 +73,7 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Enfermedad actualizada!',
         description: data,
@@ -87,6 +90,7 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
   });
 
   const handleUpdate = (formData: any) => {
+    setIsSaving(true); // Activar estado de carga
     const date = new Date(formData.date).toISOString();
     const dataToSend = {
       ...formData,
@@ -192,10 +196,12 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="dark:text-sidebar-foreground">
           Cancelar
         </Button>
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   );

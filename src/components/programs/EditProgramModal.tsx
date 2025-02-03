@@ -50,6 +50,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
   });
 
   const [selectedResidences, setSelectedResidences] = useState<number[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setValue('name', program?.name || '');
@@ -66,6 +67,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
   const { mutate } = useMutation({
     mutationFn: (data: ProgramForm) => updateProgram({ id: program!.id, ...data }),
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -73,6 +75,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Programa actualizado!',
         description: data,
@@ -84,6 +87,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
   });
 
   const handleEdit = (formData: ProgramForm) => {
+    setIsSaving(true);
     mutate({ ...formData, residences: selectedResidences });
   };
 
@@ -229,7 +233,9 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
         </div>
       </div>
       <div className="flex justify-end">
-        <Button type="submit">Actualizar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Actualizar'}
+        </Button>
       </div>
     </form>
   );

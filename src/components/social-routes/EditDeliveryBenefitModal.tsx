@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,7 @@ export default function EditDeliveryBenefitModal({
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     defaultValues: initialValues
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: currentBenefit, isLoading } = useQuery({
     queryKey: ["deliveredBenefit", benefitId],
@@ -56,12 +57,14 @@ export default function EditDeliveryBenefitModal({
   const { mutate } = useMutation({
     mutationFn: (data: any) => updateDeliveredBenefits(benefitId, data),
     onSuccess: (response) => {
+      setIsSaving(false);
       toast({ title: "Beneficio editado", description: response });
         queryClient.invalidateQueries({ queryKey: ["provisions"] });
       queryClient.invalidateQueries({ queryKey: ["deliveredBenefit", +benefitId!] });
       setIsOpen(false);
     },
     onError: (error: any) => {
+      setIsSaving(false);
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   });
@@ -75,6 +78,7 @@ export default function EditDeliveryBenefitModal({
   }, [currentBenefit, setValue]);
 
   const onSubmit = (formData: any) => {
+    setIsSaving(true);
     const date = new Date(formData.date)
     date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
     mutate({ ...formData, date });
@@ -158,7 +162,9 @@ export default function EditDeliveryBenefitModal({
         <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="dark:text-sidebar-foreground">
           Cancelar
         </Button>
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   );

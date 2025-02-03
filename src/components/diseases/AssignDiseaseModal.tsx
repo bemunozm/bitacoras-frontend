@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import LoadingSpinner from "../LoadingSpinner";
+import { useState } from "react";
 
 type AssignDiseaseModalProps = {
     participant_id: number;
@@ -41,10 +42,12 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({ defaultValues: initialValues });
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   const { mutate } = useMutation({
     mutationFn: (data: any) => assingDiseaseToParticipant({ participant_id, ...data }),
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -52,6 +55,7 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Enfermedad asignada!',
         description: data,
@@ -68,6 +72,7 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
   });
 
   const handleAssign = (formData: any) => {
+    setIsSaving(true); // Activar estado de carga
     const date = new Date(formData.date).toISOString();
     const dataToSend = {
       ...formData,
@@ -169,10 +174,12 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="dark:text-sidebar-foreground">
           Cancelar
         </Button>
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   );

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Edit, Printer } from "lucide-react"
+import { ArrowLeft, Edit, Trash } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import ParticipantInformation from "@/components/participants/ParticipantInformation"
 import ProvisionTracking from "@/components/participants/ProvisionTracking"
@@ -71,8 +71,8 @@ export default function ParticipantDetailsView() {
           <Button variant="outline" className="flex-1 sm:flex-initial text-sidebar-foreground" onClick={() => setIsEditOpen(true)}>
             <Edit className="mr-2 h-4 w-4" /> Editar
           </Button>
-          <Button variant="outline" className="flex-1 sm:flex-initial text-sidebar-foreground">
-            <Printer className="mr-2 h-4 w-4" /> Imprimir
+          <Button variant="destructive" className="flex-1 sm:flex-initial text-sidebar-foreground">
+            <Trash className="mr-2 h-4 w-4" /> Eliminar
           </Button>
         </div>
       </div>

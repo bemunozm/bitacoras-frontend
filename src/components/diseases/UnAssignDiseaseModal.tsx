@@ -13,12 +13,12 @@ type UnAssignDiseaseModalProps = {
 export default function UnAssignDiseaseModal({ id, setIsOpen }: UnAssignDiseaseModalProps) {
   const queryClient = useQueryClient();
   const { handleSubmit } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   const { mutate } = useMutation({
     mutationFn: () => deleteAssignedDisease(+id!),
     onError: (error) => {
-      setIsLoading(false);
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -26,7 +26,7 @@ export default function UnAssignDiseaseModal({ id, setIsOpen }: UnAssignDiseaseM
       });
     },
     onSuccess: (data) => {
-      setIsLoading(false);
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       setIsOpen(false);
       toast({
         title: '🎉Enfermedad desasignada!',
@@ -38,7 +38,7 @@ export default function UnAssignDiseaseModal({ id, setIsOpen }: UnAssignDiseaseM
   });
 
   const handleUnassign = () => {
-    setIsLoading(true);
+    setIsSaving(true); // Activar estado de carga
     mutate();
   };
 
@@ -48,8 +48,8 @@ export default function UnAssignDiseaseModal({ id, setIsOpen }: UnAssignDiseaseM
         <Button
           size="lg"
           variant="outline"
-          disabled={isLoading}
-          className="w-full hidden sm:block dark:bg-sidebar-accent"
+          disabled={isSaving}
+          className="w-full hidden sm:block dark:text-sidebar-foreground"
           type="button"
           onClick={() => setIsOpen(false)}
         >
@@ -58,10 +58,10 @@ export default function UnAssignDiseaseModal({ id, setIsOpen }: UnAssignDiseaseM
         <Button
           size="lg"
           type="submit"
-          disabled={isLoading}
+          disabled={isSaving}
           className="w-full bg-red-500 dark:bg-red-500 dark:hover:bg-red-400 hover:bg-red-400"
         >
-          {isLoading ? (
+          {isSaving ? (
             <div className="flex items-center justify-center">
               Desasignando...
             </div>

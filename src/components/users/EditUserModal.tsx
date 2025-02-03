@@ -53,10 +53,12 @@ export function EditUserModal({ id, setIsOpen }: EditUserModalProps) {
   }, [user, setValue])
 
   const queryClient = useQueryClient()
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: updateUser,
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -64,6 +66,7 @@ export function EditUserModal({ id, setIsOpen }: EditUserModalProps) {
       })
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Usuario actualizado!',
         description: data,
@@ -75,6 +78,7 @@ export function EditUserModal({ id, setIsOpen }: EditUserModalProps) {
   })
 
   const handleUpdate = (formData: any) => {
+    setIsSaving(true);
     mutate({ ...formData, roles: selectedRoles, id: id, profile_image: selectedImage })
   }
 
@@ -248,7 +252,9 @@ export function EditUserModal({ id, setIsOpen }: EditUserModalProps) {
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   )

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import type { ParticipantForm } from "@/types"
 import ErrorMessage from "@/components/ErrorMessage"
 import { createParticipant } from "@/api/ParticipantAPI"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 type ParticipantFormProps = {
   setIsOpen: (isOpen: boolean) => void
@@ -45,10 +45,12 @@ export function ParticipantForm({setIsOpen}: ParticipantFormProps) {
     }, [watch, setValue]);
 
     const queryClient = useQueryClient()
+    const [isSaving, setIsSaving] = useState(false);
 
     const {mutate} = useMutation({
         mutationFn: createParticipant,
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -56,17 +58,19 @@ export function ParticipantForm({setIsOpen}: ParticipantFormProps) {
             })
         },
         onSuccess: (data) => {
-          toast({
-            title: '🎉Participante creado!',
-            description: data,
-          })
-          setIsOpen(false)
+            setIsSaving(false);
+            toast({
+                title: '🎉Participante creado!',
+                description: data,
+            })
+            setIsOpen(false)
             reset()
             queryClient.invalidateQueries({queryKey: ['participants']})
         }
     })
     
     const handleCreate = (formData: any) => {
+        setIsSaving(true);
         if (formData.birthdate) {
             formData.birthdate = new Date(formData.birthdate).toISOString();
         }
@@ -159,7 +163,9 @@ export function ParticipantForm({setIsOpen}: ParticipantFormProps) {
                 
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
   )

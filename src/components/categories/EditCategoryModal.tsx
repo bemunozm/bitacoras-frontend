@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,10 +35,12 @@ export default function EditCategoryModal({ id, setIsOpen }: EditCategoryProps) 
   }, [category, setValue]);
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   const { mutate } = useMutation({
     mutationFn: (data: CategoryForm) => updateCategory({ id: category!.id, ...data }),
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -46,6 +48,7 @@ export default function EditCategoryModal({ id, setIsOpen }: EditCategoryProps) 
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Categoría actualizada!',
         description: data,
@@ -57,6 +60,7 @@ export default function EditCategoryModal({ id, setIsOpen }: EditCategoryProps) 
   });
 
   const handleEdit = (formData: CategoryForm) => {
+    setIsSaving(true); // Activar estado de carga
     mutate(formData);
   };
 
@@ -90,7 +94,9 @@ export default function EditCategoryModal({ id, setIsOpen }: EditCategoryProps) 
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );

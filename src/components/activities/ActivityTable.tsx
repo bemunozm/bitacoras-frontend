@@ -11,7 +11,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import EditActivityModal from "@/components/activities/EditActivityModal";
 import DeleteActivityModal from "@/components/activities/DeleteActivityModal";
 import { ActivityForm } from './ActivityForm';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { getActivitiesByBitacoraId } from '@/api/ActivityAPI';
 import { formatDate } from '@/helpers';
 import { useNavigate } from "react-router-dom";
@@ -34,7 +34,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
-  const { data: activities, isLoading } = useQuery({
+  const { data: activities, isLoading } = useSuspenseQuery({
     queryKey: ['activities', bitacora.id],
     queryFn: () => getActivitiesByBitacoraId(bitacora.id)
   });

@@ -10,6 +10,7 @@ import ErrorMessage from "@/components/ErrorMessage";
 import { getPrograms } from "@/api/ProgramAPI";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LoadingSpinner from "../LoadingSpinner";
+import { useState } from "react";
 
 type BitacoraFormProps = {
     setIsOpen: (isOpen: boolean) => void;
@@ -49,9 +50,12 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
 
     const lastThreeMonths = getLastThreeMonths();
 
+    const [isSaving, setIsSaving] = useState(false); // Nuevo estado
+
     const { mutate } = useMutation({
         mutationFn: createBitacora,
         onError: (error) => {
+            setIsSaving(false); // Desactivar estado de carga en caso de error
             toast({
                 title: 'Error',
                 description: error.message,
@@ -59,6 +63,7 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
             });
         },
         onSuccess: (data) => {
+            setIsSaving(false); // Desactivar estado de carga en caso de éxito
             toast({
                 title: '🎉Bitácora creada!',
                 description: data,
@@ -70,6 +75,7 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
     });
 
     const handleCreate = (formData: BitacoraForm) => {
+        setIsSaving(true); // Activar estado de carga
         console.log(formData.month);
         mutate({ ...formData, user_id: user.id });
     };
@@ -131,7 +137,9 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
     );

@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import type { RoleForm } from "@/types"
 import ErrorMessage from "@/components/ErrorMessage"
+import { useState } from 'react';
 
 type RoleFormProps = {
   setIsOpen: (isOpen: boolean) => void
@@ -24,9 +25,12 @@ export function RoleForm({setIsOpen}: RoleFormProps) {
 
     const queryClient = useQueryClient()
 
+    const [isSaving, setIsSaving] = useState(false);
+
     const {mutate} = useMutation({
         mutationFn: createRole,
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -34,17 +38,19 @@ export function RoleForm({setIsOpen}: RoleFormProps) {
             })
         },
         onSuccess: (data) => {
-          toast({
-            title: '🎉Rol creado!',
-            description: data,
-          })
-          setIsOpen(false)
+            setIsSaving(false);
+            toast({
+                title: '🎉Rol creado!',
+                description: data,
+            })
+            setIsOpen(false)
             reset()
             queryClient.invalidateQueries({queryKey: ['roles']})
         }
     })
     
     const handleCreate = (formData: RoleForm) => {
+        setIsSaving(true);
         mutate(formData)
     }
 
@@ -76,7 +82,9 @@ export function RoleForm({setIsOpen}: RoleFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
   )

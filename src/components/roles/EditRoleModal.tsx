@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-
+import { useState } from 'react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -39,10 +39,12 @@ export function EditRoleModal({id, setIsOpen}: EditRoleProps) {
 
     const queryClient = useQueryClient()
     
+    const [isSaving, setIsSaving] = useState(false);
 
     const {mutate} = useMutation({
         mutationFn: (data: RoleForm) => updateRole({id: role!.id, ...data}),
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -50,6 +52,7 @@ export function EditRoleModal({id, setIsOpen}: EditRoleProps) {
             })
         },
         onSuccess: (data) => {
+            setIsSaving(false);
             toast({
                 title: '🎉Rol creado!',
                 description: data,
@@ -61,6 +64,7 @@ export function EditRoleModal({id, setIsOpen}: EditRoleProps) {
     })
     
     const handleEdit = (formData: RoleForm) => {
+        setIsSaving(true);
         mutate(formData)
     }
 
@@ -94,7 +98,9 @@ export function EditRoleModal({id, setIsOpen}: EditRoleProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
   )

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,10 +78,12 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
   }, [bitacora, reset]);
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   const { mutate } = useMutation({
     mutationFn: (data: BitacoraForm) => updateBitacora({ id: bitacora!.id, ...data }),
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -89,6 +91,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Bitácora actualizada!',
         description: data,
@@ -101,6 +104,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
   });
 
   const handleEdit = (formData: BitacoraForm) => {
+    setIsSaving(true); // Activar estado de carga
     mutate(formData);
   };
 
@@ -167,7 +171,9 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
         </div>
       </div>
       <div className="flex justify-end">
-        <Button type="submit">Actualizar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Actualizar'}
+        </Button>
       </div>
     </form>
   );

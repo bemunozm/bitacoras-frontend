@@ -60,9 +60,12 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
     queryFn: () => getProvisions(),
   });
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const { mutate } = useMutation({
     mutationFn: (data: any) => deliverBenefits(data),
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -70,6 +73,7 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Beneficio entregado!',
         description: data,
@@ -82,6 +86,7 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
   });
 
   const handleDeliver = (formData: any) => {
+    setIsSaving(true);
     date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
     const dataToSend = {
       ...formData,
@@ -301,10 +306,12 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
             </div>
           </div>
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className='dark:text-sidebar-foreground'>
               Cancelar
             </Button>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? 'Guardando...' : 'Guardar'}
+            </Button>
           </div>
         </form>
       ) : (

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,10 +50,12 @@ export default function EditEventModal({ id, setIsOpen }: EditEventProps) {
   }, [event, setValue]);
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: (data: EventForm) => updateEvent({ id: event!.id, ...data }),
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -61,6 +63,7 @@ export default function EditEventModal({ id, setIsOpen }: EditEventProps) {
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Evento actualizado!',
         description: data,
@@ -73,6 +76,7 @@ export default function EditEventModal({ id, setIsOpen }: EditEventProps) {
   });
 
   const handleEdit = (formData: EventForm) => {
+    setIsSaving(true);
     const date = new Date(formData.date).toISOString();
     mutate({ ...formData, date });
   };
@@ -154,10 +158,12 @@ export default function EditEventModal({ id, setIsOpen }: EditEventProps) {
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className='dark:text-sidebar-foreground'>
           Cancelar
         </Button>
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   );

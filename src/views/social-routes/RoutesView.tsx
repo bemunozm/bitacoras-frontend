@@ -24,6 +24,8 @@ export default function RoutesView() {
   const [isAddParticipantModalOpen, setIsAddParticipantModalOpen] = useState(false)
   const [isParticipantFormOpen, setIsParticipantFormOpen] = useState(false)
   const [isActaOpen, setIsActaOpen] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [actaKey, setActaKey] = useState(Date.now()); // Estado para la clave del componente Acta
 
   const {setBreadcrumbItems} = useBreadcrumb()
 
@@ -43,7 +45,7 @@ export default function RoutesView() {
   const handleGuardar = async () => {
     setIsLoading(true)
     // Simular guardado
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 3000))
     setIsLoading(false)
   }
 
@@ -57,8 +59,15 @@ export default function RoutesView() {
     refetch()
   }, [date, turn, refetch])
 
-  const handleDescargarPDF = () => {
-    setIsActaOpen(true);
+  const handleDescargarPDF = async () => {
+    setIsDownloadingPDF(true);
+    setIsActaOpen(false); // Cerrar el componente Acta
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Esperar un momento para asegurarse de que se cierre
+    setActaKey(Date.now()); // Cambiar la clave del componente Acta
+    setIsActaOpen(true); // Abrir el componente Acta nuevamente
+    // Simular descarga
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsDownloadingPDF(false);
   };
 
   if (isDataLoading) return <LoadingSpinner/>
@@ -125,9 +134,14 @@ export default function RoutesView() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="outline" className="w-full md:w-auto" onClick={handleDescargarPDF}>
+                      <Button
+                        variant="outline"
+                        className="w-full md:w-auto"
+                        onClick={handleDescargarPDF}
+                        disabled={isDownloadingPDF}
+                      >
                         <Download className="mr-2 h-4 w-4" />
-                        Descargar PDF
+                        {isDownloadingPDF ? "Descargando..." : "Descargar PDF"}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -192,7 +206,7 @@ export default function RoutesView() {
         <RouteTable data={data} />
       </div>
 
-      {isActaOpen && <div className='hidden'> <Acta data={data} date={date.toISOString().split("T")[0]} turn={turn} /> </div>}
+      {isActaOpen && <div className='hidden'> <Acta key={actaKey} data={data} date={date.toISOString().split("T")[0]} turn={turn} /> </div>}
     </>
   )
 }

@@ -9,10 +9,21 @@ import type { DiseaseForm } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "../ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"; // Assuming you have a Select component
+import { useState } from "react";
 
 type DiseaseFormProps = {
     setIsOpen: (isOpen: boolean) => void;
 };
+
+const diseaseTypes = [
+  "Viral", "Bacteriana", "Parasitaria", "Micótica", "Autoinmune", "Metabólica", "Crónica", "Respiratoria", 
+  "Dermatológica", "Infecciosa", "Alergia", "Ambiental", "Nutricional", "Neurológica", "Hematológica", 
+  "Digestiva", "Psicológica", "Sistémica", "Reumática", "Cardiovascular", "Endocrina", "Genética", 
+  "Degenerativa", "Oncológica", "Inmunológica", "Renal", "Oftalmológica", "Osteomuscular", 
+  "Infecciosa respiratoria", "Infecciosa gastrointestinal", "Tropical", "Venérea", "Congénita", 
+  "Traumática", "Neoplásica", "Toxica", "Inflamatoria", "Inmunodeficiencia", "Psiquiátrica"
+];
 
 export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
 
@@ -28,10 +39,12 @@ export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
     const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({ defaultValues: initialValues });
 
     const queryClient = useQueryClient();
+    const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
     const { mutate } = useMutation({
         mutationFn: createDisease,
         onError: (error) => {
+            setIsSaving(false); // Desactivar estado de carga en caso de error
             toast({
                 title: 'Error',
                 description: error.message,
@@ -39,6 +52,7 @@ export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
             });
         },
         onSuccess: (data) => {
+            setIsSaving(false); // Desactivar estado de carga en caso de éxito
             toast({
                 title: '🎉Enfermedad creada!',
                 description: data,
@@ -50,6 +64,7 @@ export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
     });
 
     const handleCreate = (formData: DiseaseForm) => {
+        setIsSaving(true); // Activar estado de carga
         mutate(formData);
     };
 
@@ -83,12 +98,19 @@ export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
                     <Label htmlFor="type" className="text-right dark:text-sidebar-foreground">
                         Tipo
                     </Label>
-                    <Input
-                        id="type"
-                        placeholder="Tipo de enfermedad"
-                        className="col-span-3 dark:text-sidebar-foreground"
+                    <Select
                         {...register('type', { required: 'Este campo es requerido' })}
-                    />
+                        onValueChange={(value) => setValue('type', value)} // Opcional: maneja el cambio de valor
+                    >
+                        <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
+                            <SelectValue placeholder="Seleccione un tipo de enfermedad" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {diseaseTypes.map((type) => (
+                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     {errors.type && <ErrorMessage className=" col-start-2 col-end-4">{errors.type.message}</ErrorMessage>}
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -126,7 +148,9 @@ export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
     );

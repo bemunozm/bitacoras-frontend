@@ -54,7 +54,7 @@ export default function DeleteRoleModal({id, setIsOpen}: DeleteRoleModalProps) {
             size="lg"
             variant="outline"
             disabled={isLoading}
-            className="w-full hidden sm:block dark:bg-sidebar-accent"
+            className="w-full hidden sm:block dark:text-sidebar-foreground"
             type="button"
             onClick={() => setIsOpen(false)}
           >

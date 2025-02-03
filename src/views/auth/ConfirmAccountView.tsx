@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { PinInput, PinInputField } from '@chakra-ui/pin-input'
 import { useMutation } from '@tanstack/react-query'
 import { ConfirmToken } from "@/types/index";
@@ -13,9 +13,9 @@ export default function ConfirmAccountView({
     ...props
   }: React.ComponentPropsWithoutRef<"div">) {
     const [token, setToken] = useState<ConfirmToken['token']>('')
+    const [searchParams] = useSearchParams()
 
     const {toast} = useToast()
-
     const navigate = useNavigate()
     const { mutate } = useMutation({
         mutationFn: confirmAccount,
@@ -34,6 +34,14 @@ export default function ConfirmAccountView({
             navigate('/auth/login')
         }
     })
+
+    useEffect(() => {
+        const urlToken = searchParams.get('token')
+        if (urlToken) {
+            setToken(urlToken)
+            mutate({ token: urlToken })
+        }
+    }, [searchParams, mutate])
 
     const handleChange = (token : ConfirmToken['token']) => {
         setToken(token)

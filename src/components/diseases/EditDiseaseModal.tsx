@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,11 +11,21 @@ import ErrorMessage from "@/components/ErrorMessage";
 import LoadingSpinner from "../LoadingSpinner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from '@headlessui/react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"; // Assuming you have a Select component
 
 type EditDiseaseProps = {
   id: Disease['id'];
   setIsOpen: (isOpen: boolean) => void;
 };
+
+const diseaseTypes = [
+  "Viral", "Bacteriana", "Parasitaria", "Micótica", "Autoinmune", "Metabólica", "Crónica", "Respiratoria", 
+  "Dermatológica", "Infecciosa", "Alergia", "Ambiental", "Nutricional", "Neurológica", "Hematológica", 
+  "Digestiva", "Psicológica", "Sistémica", "Reumática", "Cardiovascular", "Endocrina", "Genética", 
+  "Degenerativa", "Oncológica", "Inmunológica", "Renal", "Oftalmológica", "Osteomuscular", 
+  "Infecciosa respiratoria", "Infecciosa gastrointestinal", "Tropical", "Venérea", "Congénita", 
+  "Traumática", "Neoplásica", "Toxica", "Inflamatoria", "Inmunodeficiencia", "Psiquiátrica"
+];
 
 export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
   const { data: disease, isLoading } = useQuery({
@@ -45,10 +55,12 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
   }, [disease, setValue]);
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: (data: DiseaseForm) => updateDisease({ id: disease!.id, ...data }),
     onError: (error) => {
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -56,6 +68,7 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false);
       toast({
         title: '🎉Enfermedad actualizada!',
         description: data,
@@ -67,6 +80,7 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
   });
 
   const handleEdit = (formData: DiseaseForm) => {
+    setIsSaving(true);
     console.log(formData);
     mutate(formData);
   };
@@ -103,12 +117,19 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
           <Label htmlFor="type" className="text-right dark:text-sidebar-foreground">
             Tipo
           </Label>
-          <Input
-            id="type"
-            placeholder="Tipo de enfermedad"
-            className="col-span-3 dark:text-sidebar-foreground"
+          <Select
             {...register('type', { required: 'Este campo es requerido' })}
-          />
+            onValueChange={(value) => setValue('type', value)} // Opcional: maneja el cambio de valor
+          >
+            <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
+              <SelectValue placeholder="Seleccione un tipo de enfermedad" />
+            </SelectTrigger>
+            <SelectContent>
+              {diseaseTypes.map((type) => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.type && <ErrorMessage className=" col-start-2 col-end-4">{errors.type.message}</ErrorMessage>}
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
@@ -148,10 +169,12 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className='dark:text-sidebar-foreground'>
           Cancelar
         </Button>
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   );

@@ -72,6 +72,8 @@ export default function BitacoraDetailsView() {
   const [isReopenConfirmOpen, setIsReopenConfirmOpen] = useState(false); // Nuevo estado para el modal de confirmación
   const [isCompleteConfirmOpen, setIsCompleteConfirmOpen] = useState(false); // Nuevo estado para el modal de confirmación de completar
   const [isApproveConfirmOpen, setIsApproveConfirmOpen] = useState(false); // Nuevo estado para el modal de confirmación de aprobar
+  const [isDownloadingInforme, setIsDownloadingInforme] = useState(false);
+  const [informeKey, setInformeKey] = useState(Date.now()); // Estado para la clave del componente Informe
 
   const {data: user, isLoading: isUserLoading} = useAuth()
 
@@ -82,6 +84,17 @@ export default function BitacoraDetailsView() {
   if (isError) {
     return <NotFound title="Ohhh!" description="Hubo un problema al obtener la información de la bitácora." />
   }
+
+  const handleGenerarInforme = async () => {
+    setIsDownloadingInforme(true);
+    setIsInformeOpen(false); // Cerrar el componente Informe
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Esperar un momento para asegurarse de que se cierre
+    setInformeKey(Date.now()); // Cambiar la clave del componente Informe
+    setIsInformeOpen(true); // Abrir el componente Informe nuevamente
+    // Simular generación de informe
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    setIsDownloadingInforme(false);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -146,7 +159,7 @@ export default function BitacoraDetailsView() {
                   onClick={() => setIsDeleteOpen(true)}
                 >
                   <Trash className="mr-2 h-4 w-4" />
-                  Borrar
+                  Eliminar
                 </Button>
               </>
             )}
@@ -154,10 +167,11 @@ export default function BitacoraDetailsView() {
               <Button 
               variant="default" 
               className="w-full sm:w-auto"
-              onClick={() => setIsInformeOpen(true)}
+              onClick={handleGenerarInforme}
+              disabled={isDownloadingInforme}
             >
               <FileText className="mr-2 h-4 w-4" />
-              Generar Informe
+              {isDownloadingInforme ? "Descargando..." : "Generar Informe"}
             </Button>
             )}
           </div>
@@ -233,7 +247,7 @@ export default function BitacoraDetailsView() {
             <ReopenBitacoraModal handleStatusChange={() => handleStatusChange('Aprobado')} setIsOpen={setIsApproveConfirmOpen} isOpen={isApproveConfirmOpen} />
           </ResponsiveDialog>
 
-          {isInformeOpen && <div className='hidden'> <Informe bitacora={bitacora}/> </div>}
+          {isInformeOpen && <div className='hidden'> <Informe key={informeKey} bitacora={bitacora}/> </div>}
           
         </>
       )}

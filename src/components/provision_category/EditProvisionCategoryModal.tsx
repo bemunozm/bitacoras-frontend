@@ -6,7 +6,7 @@ import { toast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import ErrorMessage from "@/components/ErrorMessage"
 import { updateProvisionCategory, getProvisionCategory } from "@/api/ProvisionCategoryAPI"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import LoadingSpinner from "../LoadingSpinner"
 
 type EditProvisionCategoryModalProps = {
@@ -34,10 +34,12 @@ export default function EditProvisionCategoryModal({ id, setIsOpen }: EditProvis
   }, [category, setValue])
 
   const queryClient = useQueryClient()
+  const [isSaving, setIsSaving] = useState(false)
 
   const { mutate } = useMutation({
     mutationFn: updateProvisionCategory,
     onError: (error) => {
+      setIsSaving(false)
       toast({
         title: 'Error',
         description: error.message,
@@ -45,6 +47,7 @@ export default function EditProvisionCategoryModal({ id, setIsOpen }: EditProvis
       })
     },
     onSuccess: (data) => {
+      setIsSaving(false)
       toast({
         title: '🎉Categoría actualizada!',
         description: data,
@@ -56,6 +59,7 @@ export default function EditProvisionCategoryModal({ id, setIsOpen }: EditProvis
   })
 
   const handleUpdate = (formData: any) => {
+    setIsSaving(true)
     mutate({ ...formData, id: id })
   }
 
@@ -78,7 +82,9 @@ export default function EditProvisionCategoryModal({ id, setIsOpen }: EditProvis
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   )

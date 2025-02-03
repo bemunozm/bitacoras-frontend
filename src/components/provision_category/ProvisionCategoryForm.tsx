@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import ErrorMessage from "@/components/ErrorMessage"
 import { createProvisionCategory } from "@/api/ProvisionCategoryAPI"
+import { useState } from 'react'
 
 type ProvisionCategoryFormProps = {
   setIsOpen: (isOpen: boolean) => void
@@ -21,9 +22,12 @@ export default function ProvisionCategoryForm({ setIsOpen }: ProvisionCategoryFo
 
   const queryClient = useQueryClient()
 
+  const [isSaving, setIsSaving] = useState(false)
+
   const { mutate } = useMutation({
     mutationFn: createProvisionCategory,
     onError: (error) => {
+      setIsSaving(false)
       toast({
         title: 'Error',
         description: error.message,
@@ -31,6 +35,7 @@ export default function ProvisionCategoryForm({ setIsOpen }: ProvisionCategoryFo
       })
     },
     onSuccess: (data) => {
+      setIsSaving(false)
       toast({
         title: '🎉Categoría creada!',
         description: data,
@@ -42,6 +47,7 @@ export default function ProvisionCategoryForm({ setIsOpen }: ProvisionCategoryFo
   })
 
   const handleCreate = (formData: any) => {
+    setIsSaving(true)
     mutate(formData)
   }
 
@@ -62,7 +68,9 @@ export default function ProvisionCategoryForm({ setIsOpen }: ProvisionCategoryFo
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   )

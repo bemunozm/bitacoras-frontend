@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import ErrorMessage from "@/components/ErrorMessage"
 import { updateProvision, getProvision } from "@/api/ProvisionAPI"
 import { getProvisionCategories } from "@/api/ProvisionCategoryAPI"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import LoadingSpinner from "../LoadingSpinner"
 
 type EditProvisionFormProps = {
@@ -45,10 +45,12 @@ export function EditProvisionModal({ id, setIsOpen }: EditProvisionFormProps) {
   }, [provision, setValue])
 
   const queryClient = useQueryClient()
+  const [isSaving, setIsSaving] = useState(false)
 
   const { mutate } = useMutation({
     mutationFn: updateProvision,
     onError: (error) => {
+      setIsSaving(false)
       toast({
         title: 'Error',
         description: error.message,
@@ -56,6 +58,7 @@ export function EditProvisionModal({ id, setIsOpen }: EditProvisionFormProps) {
       })
     },
     onSuccess: (data) => {
+      setIsSaving(false)
       toast({
         title: '🎉Prestación actualizada!',
         description: data,
@@ -67,6 +70,7 @@ export function EditProvisionModal({ id, setIsOpen }: EditProvisionFormProps) {
   })
 
   const handleUpdate = (formData: any) => {
+    setIsSaving(true)
     mutate({ ...formData, id: id })
   }
 
@@ -130,7 +134,9 @@ export function EditProvisionModal({ id, setIsOpen }: EditProvisionFormProps) {
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="submit">Guardar</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar'}
+        </Button>
       </div>
     </form>
   )

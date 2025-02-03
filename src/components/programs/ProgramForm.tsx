@@ -23,6 +23,7 @@ type ProgramFormProps = {
 export function ProgramForm({ setIsOpen }: ProgramFormProps) {
 
     const [selectedResidences, setSelectedResidences] = useState<number[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
 
     const initialValues = {
         name: '',
@@ -50,6 +51,7 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
     const { mutate } = useMutation({
         mutationFn: createProgram,
         onError: (error) => {
+            setIsSaving(false);
             toast({
                 title: 'Error',
                 description: error.message,
@@ -57,6 +59,7 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
             });
         },
         onSuccess: (data) => {
+            setIsSaving(false);
             toast({
                 title: '🎉Programa creado!',
                 description: data,
@@ -68,6 +71,7 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
     });
 
     const handleCreate = (formData: ProgramForm) => {
+        setIsSaving(true);
         console.log('creando')
         mutate({...formData, residences: selectedResidences});
     };
@@ -212,7 +216,9 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit">Guardar cambios</Button>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                </Button>
             </div>
         </form>
     );

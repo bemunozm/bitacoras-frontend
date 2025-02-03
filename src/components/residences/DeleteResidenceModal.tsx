@@ -48,7 +48,7 @@ export default function DeleteResidenceModal({ id, setIsOpen }: DeleteResidenceM
           size="lg"
           variant="outline"
           disabled={isLoading}
-          className="w-full hidden sm:block dark:bg-sidebar-accent"
+          className="w-full hidden sm:block dark:text-sidebar-foreground"
           type="button"
           onClick={() => setIsOpen(false)}
         >

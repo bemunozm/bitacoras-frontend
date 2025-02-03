@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import type { CategoryForm } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
+import { useState } from "react";
 
 type CategoryFormProps = {
   setIsOpen: (isOpen: boolean) => void;
@@ -21,10 +22,12 @@ export function CategoryForm({ setIsOpen }: CategoryFormProps) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: initialValues });
 
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
   const { mutate } = useMutation({
     mutationFn: createCategory,
     onError: (error) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de error
       toast({
         title: 'Error',
         description: error.message,
@@ -32,6 +35,7 @@ export function CategoryForm({ setIsOpen }: CategoryFormProps) {
       });
     },
     onSuccess: (data) => {
+      setIsSaving(false); // Desactivar estado de carga en caso de éxito
       toast({
         title: '🎉Categoría creada!',
         description: data,
@@ -43,6 +47,7 @@ export function CategoryForm({ setIsOpen }: CategoryFormProps) {
   });
 
   const handleCreate = (formData: CategoryForm) => {
+    setIsSaving(true); // Activar estado de carga
     mutate(formData);
   };
 
@@ -75,7 +80,9 @@ export function CategoryForm({ setIsOpen }: CategoryFormProps) {
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );
