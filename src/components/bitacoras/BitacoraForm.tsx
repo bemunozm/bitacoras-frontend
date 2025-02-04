@@ -110,7 +110,7 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
                     </Label>
                     <Input
                         id="recipe"
-                        placeholder="Receta de la bitácora"
+                        placeholder="Número de boleta"
                         className="col-span-3 dark:text-sidebar-foreground"
                         {...register('recipe', { required: 'Este campo es requerido' })}
                     />
@@ -137,8 +137,8 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit" disabled={isSaving}>
-                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+                    {isSaving ? 'Guardando...' : 'Guardar'}
                 </Button>
             </div>
         </form>

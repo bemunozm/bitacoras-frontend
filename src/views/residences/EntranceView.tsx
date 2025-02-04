@@ -127,7 +127,7 @@ export default function EntranceView() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="participant_id" className="dark:text-sidebar-foreground">Participante</Label>
-                <Popover>
+                <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" role="combobox" className="w-full justify-between dark:text-sidebar-foreground">
                       {selectedParticipant?.name || "Seleccione un participante"}

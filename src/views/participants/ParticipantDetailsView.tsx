@@ -11,6 +11,7 @@ import { getParticipant } from "@/api/ParticipantAPI"
 import LoadingSpinner from "@/components/LoadingSpinner"
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { EditParticipantModal } from "@/components/participants/EditParticipantModal";
+import { DeleteParticipantModal } from "@/components/participants/DeleteParticipantModal";
 import { useState, useEffect } from "react";
 import NotFound from "../NotFound"
 import { useBreadcrumb } from "@/contexts/BreadcrumbContext"
@@ -50,6 +51,7 @@ export default function ParticipantDetailsView() {
     }, [participant, setBreadcrumbItems])
 
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
     if (isError) {
         return <NotFound title="¡Vaya!" description="Hubo un problema al obtener la información del participante." />
@@ -71,7 +73,7 @@ export default function ParticipantDetailsView() {
           <Button variant="outline" className="flex-1 sm:flex-initial text-sidebar-foreground" onClick={() => setIsEditOpen(true)}>
             <Edit className="mr-2 h-4 w-4" /> Editar
           </Button>
-          <Button variant="destructive" className="flex-1 sm:flex-initial text-sidebar-foreground">
+          <Button variant="destructive" className="flex-1 sm:flex-initial text-sidebar-foreground" onClick={() => setIsDeleteOpen(true)}>
             <Trash className="mr-2 h-4 w-4" /> Eliminar
           </Button>
         </div>
@@ -97,6 +99,15 @@ export default function ParticipantDetailsView() {
         description="Rellena el formulario para editar el participante."
       >
         <EditParticipantModal id={participant.id} setIsOpen={setIsEditOpen} />
+      </ResponsiveDialog>
+
+      <ResponsiveDialog
+        isOpen={isDeleteOpen}
+        setIsOpen={setIsDeleteOpen}
+        title={`Eliminar el participante ${participant.name}`}
+        description="¿Estás seguro de que deseas eliminar este participante?"
+      >
+        <DeleteParticipantModal id={participant.id} setIsOpen={setIsDeleteOpen} />
       </ResponsiveDialog>
     </div>
   )

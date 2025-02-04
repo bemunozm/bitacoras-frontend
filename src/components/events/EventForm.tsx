@@ -79,6 +79,7 @@ export default function EventForm({ setIsOpen, selectedParticipant }: EventFormP
                         {...register('participant_id', { required: 'Este campo es requerido' })}
                         onValueChange={(value) => setValue('participant_id', parseInt(value))}
                         defaultValue={selectedParticipant?.toString() || ''}
+                        disabled
                     >
                         <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
                             <SelectValue placeholder="Seleccione un participante">
@@ -142,8 +143,8 @@ export default function EventForm({ setIsOpen, selectedParticipant }: EventFormP
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit" disabled={isSaving}>
-                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+                    {isSaving ? 'Guardando...' : 'Guardar'}
                 </Button>
             </div>
         </form>

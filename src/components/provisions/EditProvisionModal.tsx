@@ -134,8 +134,8 @@ export function EditProvisionModal({ id, setIsOpen }: EditProvisionFormProps) {
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Guardar'}
+        <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>

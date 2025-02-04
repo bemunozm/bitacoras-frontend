@@ -141,12 +141,13 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
               <Label htmlFor="participant_id" className="text-right dark:text-sidebar-foreground">
                 Participante
               </Label>
-              <Popover>
+              <Popover modal={true}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     className="col-span-3 dark:text-sidebar-foreground w-full justify-between"
+                    disabled={participantId ? true : false}
                   >
                     {participants?.find(participant => participant.id === watch('participant_id'))?.name || "Seleccione un participante"}
                     <ChevronsUpDown className="opacity-50" />
@@ -306,10 +307,7 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
             </div>
           </div>
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className='dark:text-sidebar-foreground'>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isSaving}>
+            <Button type="submit" disabled={isSaving} className='w-full md:w-auto'>
               {isSaving ? 'Guardando...' : 'Guardar'}
             </Button>
           </div>

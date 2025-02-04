@@ -102,7 +102,7 @@ export default function DepartureView() {
                 <Label htmlFor="participant_id" className="dark:text-sidebar-foreground">
                   Participante en Residencia
                 </Label>
-                <Popover>
+                <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"

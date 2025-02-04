@@ -120,7 +120,7 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
           <Label htmlFor="disease_id" className="text-right dark:text-sidebar-foreground">
             Enfermedad
           </Label>
-          <Popover>
+          <Popover modal={true}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -196,11 +196,8 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="dark:text-sidebar-foreground">
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Guardar'}
+        <Button type="submit" disabled={isSaving} className=" w-full md:w-auto">
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>

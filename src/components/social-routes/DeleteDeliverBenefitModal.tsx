@@ -27,6 +27,7 @@ export default function DeleteDeliverBenefitModal({
       toast({ title: "Beneficio eliminado", description: response });
       queryClient.invalidateQueries({ queryKey: ["provisions"] });
       queryClient.invalidateQueries({ queryKey: ["deliveredBenefit"] });
+      queryClient.invalidateQueries({ queryKey: ["provisionsAssigned"] });
       setIsOpen(false);
       setIsLoading(false);
     },

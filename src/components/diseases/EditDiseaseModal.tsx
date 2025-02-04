@@ -119,14 +119,15 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
           </Label>
           <Select
             {...register('type', { required: 'Este campo es requerido' })}
-            onValueChange={(value) => setValue('type', value)} // Opcional: maneja el cambio de valor
+            onValueChange={(value) => setValue('type', value)}
+            defaultValue={disease?.type}
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Seleccione un tipo de enfermedad" />
             </SelectTrigger>
             <SelectContent>
               {diseaseTypes.map((type) => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
+                <SelectItem key={type} value={type} defaultValue={disease?.type}>{type}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -163,17 +164,14 @@ export default function EditDiseaseModal({ id, setIsOpen }: EditDiseaseProps) {
           <Textarea
             id="notes"
             placeholder="Notas adicionales"
-            className="col-span-3 dark:text-sidebar-foreground h-40"
+            className="col-span-3 dark:text-sidebar-foreground bg-transparent border border-sidebar-border p-1 h-40"
             {...register('notes')}
           />
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className='dark:text-sidebar-foreground'>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Guardar'}
+        <Button type="submit" disabled={isSaving} className=' w-full md:w-auto'>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>

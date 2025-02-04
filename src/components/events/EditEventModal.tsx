@@ -94,6 +94,7 @@ export default function EditEventModal({ id, setIsOpen }: EditEventProps) {
             {...register('participant_id', { required: 'Este campo es requerido' })}
             onValueChange={(value) => setValue('participant_id', parseInt(value))}
             defaultValue={event?.participant_id.toString()}
+            disabled
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Seleccione un participante">
@@ -158,11 +159,8 @@ export default function EditEventModal({ id, setIsOpen }: EditEventProps) {
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className='dark:text-sidebar-foreground'>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Guardar'}
+        <Button type="submit" disabled={isSaving} className='w-full md:w-auto'>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>

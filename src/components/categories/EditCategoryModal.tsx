@@ -94,7 +94,7 @@ export default function EditCategoryModal({ id, setIsOpen }: EditCategoryProps) 
         </div>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="submit" disabled={isSaving}>
+        <Button type="submit" disabled={isSaving} className='w-full md:w-auto'>
           {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>

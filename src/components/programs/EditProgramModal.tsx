@@ -233,8 +233,8 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
         </div>
       </div>
       <div className="flex justify-end">
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Actualizar'}
+        <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>

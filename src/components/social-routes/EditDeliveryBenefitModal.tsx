@@ -88,7 +88,7 @@ export default function EditDeliveryBenefitModal({
   if (!currentBenefit) return null;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-6 px-4" noValidate onSubmit={handleSubmit(onSubmit)}>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="date" className="text-right dark:text-sidebar-foreground">Fecha</Label>
@@ -118,7 +118,7 @@ export default function EditDeliveryBenefitModal({
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="provision_id" className="text-right dark:text-sidebar-foreground">Beneficio</Label>
-          <Popover>
+          <Popover modal={true}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -159,11 +159,8 @@ export default function EditDeliveryBenefitModal({
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="dark:text-sidebar-foreground">
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Guardar'}
+        <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>

@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form";
 import type { DiseaseForm } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "../ui/textarea";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"; // Assuming you have a Select component
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useState } from "react";
 
 type DiseaseFormProps = {
@@ -148,8 +148,8 @@ export default function DiseaseForm({ setIsOpen }: DiseaseFormProps) {
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <Button type="submit" disabled={isSaving}>
-                    {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+                    {isSaving ? 'Guardando...' : 'Guardar'}
                 </Button>
             </div>
         </form>

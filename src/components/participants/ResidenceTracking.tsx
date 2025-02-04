@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Home, Plus, Calendar } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Home, Calendar } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Participant } from '@/types'
 import { getParticipantResidences } from "@/api/ParticipantAPI"
@@ -23,9 +22,6 @@ export default function ResidenceTracking({participantId} : ResidenceTrackingPro
           <Home className="mr-2 text-purple-500" />
           Historial de Residencias
         </CardTitle>
-        <Button variant="outline" size="icon" className="bg-white hover:bg-purple-100">
-          <Plus className="h-4 w-4" />
-        </Button>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="space-y-4">

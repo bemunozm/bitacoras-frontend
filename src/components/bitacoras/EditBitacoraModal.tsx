@@ -142,7 +142,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
           </Label>
           <Input
             id="recipe"
-            placeholder="Receta de la bitácora"
+            placeholder="Número de boleta"
             className="col-span-3 dark:text-sidebar-foreground"
             {...register('recipe', { required: 'Este campo es requerido' })}
           />
@@ -171,8 +171,8 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
         </div>
       </div>
       <div className="flex justify-end">
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Actualizar'}
+        <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>
     </form>
