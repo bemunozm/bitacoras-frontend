@@ -143,7 +143,7 @@ export default function EntranceView() {
                     <DrawerContent>
                       <div className="mt-4 border-t">
                         <Command>
-                          <CommandInput placeholder="Buscar participante..." className="h-9" />
+                          <CommandInput placeholder="Buscar participante..." className="h-9 text-base" />
                           <CommandList>
                             <CommandEmpty>
                               <p>No se encontraron participantes.</p>

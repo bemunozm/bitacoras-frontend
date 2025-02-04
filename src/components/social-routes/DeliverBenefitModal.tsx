@@ -161,7 +161,7 @@ export default function DeliverBenefitModal({ setIsOpen, isParticipantFormOpen, 
                   <DrawerContent>
                     <div className="mt-4 border-t">
                       <Command>
-                        <CommandInput placeholder="Buscar participante..." className="h-9" />
+                        <CommandInput placeholder="Buscar participante..." className="h-9 text-base" />
                         <CommandList>
                           <CommandEmpty>
                             No se encontraron participantes.

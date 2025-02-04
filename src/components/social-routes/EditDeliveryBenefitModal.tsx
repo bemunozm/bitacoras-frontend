@@ -137,7 +137,7 @@ export default function EditDeliveryBenefitModal({
               <DrawerContent>
                 <div className="mt-4 border-t">
                   <Command>
-                    <CommandInput placeholder="Buscar beneficio..." className="h-9 " />
+                    <CommandInput placeholder="Buscar beneficio..." className="h-9 text-base" />
                     <CommandList>
                       <CommandEmpty>No se encontraron beneficios.</CommandEmpty>
                       <CommandGroup>
