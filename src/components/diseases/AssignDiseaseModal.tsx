@@ -25,6 +25,8 @@ import {
 import { cn } from "@/lib/utils";
 import LoadingSpinner from "../LoadingSpinner";
 import { useState } from "react";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type AssignDiseaseModalProps = {
     participant_id: number;
@@ -43,6 +45,8 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
 
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false); // Nuevo estado
+  const isMobile = useIsMobile();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: (data: any) => assingDiseaseToParticipant({ participant_id, ...data }),
@@ -102,43 +106,88 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
           <Label htmlFor="disease_id" className="text-right dark:text-sidebar-foreground">
             Enfermedad
           </Label>
-          <Popover modal={true}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className="col-span-3 dark:text-sidebar-foreground w-full justify-between"
-              >
-                {diseasesToAssign?.find(disease => disease.id === watch('disease_id'))?.name || "Seleccione una enfermedad"}
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Buscar enfermedad..." className="h-9" />
-                <CommandList>
-                  <CommandEmpty>No se encontraron enfermedades.</CommandEmpty>
-                  <CommandGroup>
-                    {diseasesToAssign?.map((disease) => (
-                      <CommandItem
-                        value={disease.name}
-                        key={disease.id}
-                        onSelect={() => setValue('disease_id', disease.id)}
-                      >
-                        {disease.name}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            disease.id === watch('disease_id') ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          {isMobile ? (
+            <Drawer open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <DrawerTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="col-span-3 dark:text-sidebar-foreground w-full justify-between"
+                >
+                  {diseasesToAssign?.find(disease => disease.id === watch('disease_id'))?.name || "Seleccione una enfermedad"}
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <div className="mt-4 border-t">
+                  <Command>
+                    <CommandInput placeholder="Buscar enfermedad..." className="h-9" />
+                    <CommandList>
+                      <CommandEmpty>No se encontraron enfermedades.</CommandEmpty>
+                      <CommandGroup>
+                        {diseasesToAssign?.map((disease) => (
+                          <CommandItem
+                            value={disease.name}
+                            key={disease.id}
+                            onSelect={() => {
+                              setValue('disease_id', disease.id);
+                              setIsPopoverOpen(false);
+                            }}
+                          >
+                            {disease.name}
+                            <Check
+                              className={cn(
+                                "ml-auto",
+                                disease.id === watch('disease_id') ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </div>
+              </DrawerContent>
+            </Drawer>
+          ) : (
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="col-span-3 dark:text-sidebar-foreground w-full justify-between"
+                >
+                  {diseasesToAssign?.find(disease => disease.id === watch('disease_id'))?.name || "Seleccione una enfermedad"}
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder="Buscar enfermedad..." className="h-9" />
+                  <CommandList>
+                    <CommandEmpty>No se encontraron enfermedades.</CommandEmpty>
+                    <CommandGroup>
+                      {diseasesToAssign?.map((disease) => (
+                        <CommandItem
+                          value={disease.name}
+                          key={disease.id}
+                          onSelect={() => setValue('disease_id', disease.id)}
+                        >
+                          {disease.name}
+                          <Check
+                            className={cn(
+                              "ml-auto",
+                              disease.id === watch('disease_id') ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
           {errors.disease_id && <ErrorMessage className=" col-start-2 col-end-4">{errors.disease_id.message?.toString()}</ErrorMessage>}
         </div>
         <div className="grid grid-cols-4 items-center gap-4">

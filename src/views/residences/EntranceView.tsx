@@ -22,6 +22,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 export default function EntranceView() {
   const [isParticipantFormOpen, setIsParticipantFormOpen] = useState(false)
@@ -103,6 +105,9 @@ export default function EntranceView() {
     setBreadcrumbItems(route)
   }, [setBreadcrumbItems])
 
+  const isMobile = useIsMobile();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
   if (isLoadingResidences || isLoadingParticipants) {
     return <LoadingSpinner/>
   }
@@ -127,51 +132,104 @@ export default function EntranceView() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="participant_id" className="dark:text-sidebar-foreground">Participante</Label>
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" role="combobox" className="w-full justify-between dark:text-sidebar-foreground">
-                      {selectedParticipant?.name || "Seleccione un participante"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Buscar participante..." className="h-9" />
-                      <CommandList>
-                        <CommandEmpty>
-                          <p>No se encontraron participantes.</p>
-                          <Button
-                            variant="link"
-                            className="font-bold"
-                            onClick={() => {
-                              setIsParticipantFormOpen(true)
-                              setIsSheetOpen(false)
-                            }}
-                          >
-                            Crear nuevo participante
-                          </Button>
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {participants?.map((participant) => (
-                            <CommandItem
-                              value={`${participant.name} (${participant.run})`}
-                              key={participant.id}
-                              onSelect={() => setValue("participant_id", participant.id)}
+                {isMobile ? (
+                  <Drawer open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                    <DrawerTrigger asChild>
+                      <Button variant="outline" role="combobox" className="w-full justify-between dark:text-sidebar-foreground">
+                        {selectedParticipant?.name || "Seleccione un participante"}
+                        <ChevronsUpDown className="opacity-50" />
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <div className="mt-4 border-t">
+                        <Command>
+                          <CommandInput placeholder="Buscar participante..." className="h-9" />
+                          <CommandList>
+                            <CommandEmpty>
+                              <p>No se encontraron participantes.</p>
+                              <Button
+                                variant="link"
+                                className="font-bold"
+                                onClick={() => {
+                                  setIsParticipantFormOpen(true)
+                                  setIsSheetOpen(false)
+                                }}
+                              >
+                                Crear nuevo participante
+                              </Button>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {participants?.map((participant) => (
+                                <CommandItem
+                                  value={`${participant.name} (${participant.run})`}
+                                  key={participant.id}
+                                  onSelect={() => {
+                                    setValue("participant_id", participant.id);
+                                    setIsPopoverOpen(false);
+                                  }}
+                                >
+                                  {participant.name} ({participant.run})
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      participant.id === watch("participant_id") ? "opacity-100" : "opacity-0",
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                ) : (
+                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" role="combobox" className="w-full justify-between dark:text-sidebar-foreground">
+                        {selectedParticipant?.name || "Seleccione un participante"}
+                        <ChevronsUpDown className="opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Buscar participante..." className="h-9" />
+                        <CommandList>
+                          <CommandEmpty>
+                            <p>No se encontraron participantes.</p>
+                            <Button
+                              variant="link"
+                              className="font-bold"
+                              onClick={() => {
+                                setIsParticipantFormOpen(true)
+                                setIsSheetOpen(false)
+                              }}
                             >
-                              {participant.name} ({participant.run})
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  participant.id === watch("participant_id") ? "opacity-100" : "opacity-0",
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                              Crear nuevo participante
+                            </Button>
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {participants?.map((participant) => (
+                              <CommandItem
+                                value={`${participant.name} (${participant.run})`}
+                                key={participant.id}
+                                onSelect={() => setValue("participant_id", participant.id)}
+                              >
+                                {participant.name} ({participant.run})
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    participant.id === watch("participant_id") ? "opacity-100" : "opacity-0",
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
                 {errors.participant_id && <ErrorMessage>{errors.participant_id.message}</ErrorMessage>}
               </div>
 

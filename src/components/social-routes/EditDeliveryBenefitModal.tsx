@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/command";
 import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 type EditDeliveryBenefitModalProps = {
   benefitId: number;
@@ -45,6 +47,8 @@ export default function EditDeliveryBenefitModal({
     defaultValues: initialValues
   });
   const [isSaving, setIsSaving] = useState(false);
+  const isMobile = useIsMobile();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const { data: currentBenefit, isLoading } = useQuery({
     queryKey: ["deliveredBenefit", benefitId],
@@ -118,43 +122,88 @@ export default function EditDeliveryBenefitModal({
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="provision_id" className="text-right dark:text-sidebar-foreground">Beneficio</Label>
-          <Popover modal={true}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className="col-span-3 w-full justify-between dark:text-sidebar-foreground"
-              >
-                {provisions?.find((prov: any) => prov.id === +watch("provision_id"))?.name || "Seleccione un beneficio"}
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Buscar beneficio..." className="h-9 " />
-                <CommandList>
-                  <CommandEmpty>No se encontraron beneficios.</CommandEmpty>
-                  <CommandGroup>
-                    {provisions?.map((prov: any) => (
-                      <CommandItem
-                        key={prov.id}
-                        value={prov.name}
-                        onSelect={() => setValue("provision_id", String(prov.id))}
-                      >
-                        {prov.name}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            String(prov.id) === watch("provision_id") ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          {isMobile ? (
+            <Drawer open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <DrawerTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="col-span-3 w-full justify-between dark:text-sidebar-foreground"
+                >
+                  {provisions?.find((prov: any) => prov.id === +watch("provision_id"))?.name || "Seleccione un beneficio"}
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <div className="mt-4 border-t">
+                  <Command>
+                    <CommandInput placeholder="Buscar beneficio..." className="h-9 " />
+                    <CommandList>
+                      <CommandEmpty>No se encontraron beneficios.</CommandEmpty>
+                      <CommandGroup>
+                        {provisions?.map((prov: any) => (
+                          <CommandItem
+                            key={prov.id}
+                            value={prov.name}
+                            onSelect={() => {
+                              setValue("provision_id", String(prov.id));
+                              setIsPopoverOpen(false);
+                            }}
+                          >
+                            {prov.name}
+                            <Check
+                              className={cn(
+                                "ml-auto",
+                                String(prov.id) === watch("provision_id") ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </div>
+              </DrawerContent>
+            </Drawer>
+          ) : (
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="col-span-3 w-full justify-between dark:text-sidebar-foreground"
+                >
+                  {provisions?.find((prov: any) => prov.id === +watch("provision_id"))?.name || "Seleccione un beneficio"}
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder="Buscar beneficio..." className="h-9 " />
+                  <CommandList>
+                    <CommandEmpty>No se encontraron beneficios.</CommandEmpty>
+                    <CommandGroup>
+                      {provisions?.map((prov: any) => (
+                        <CommandItem
+                          key={prov.id}
+                          value={prov.name}
+                          onSelect={() => setValue("provision_id", String(prov.id))}
+                        >
+                          {prov.name}
+                          <Check
+                            className={cn(
+                              "ml-auto",
+                              String(prov.id) === watch("provision_id") ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
           {errors.provision_id && <p>{errors.provision_id.message?.toString()}</p>}
         </div>
       </div>

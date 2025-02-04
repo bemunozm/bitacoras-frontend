@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,6 +27,8 @@ import { useBreadcrumb } from "@/contexts/BreadcrumbContext"
 import { getActiveParticipants } from "@/api/ResidenceAPI"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 export default function DepartureView() {
   const navigate = useNavigate()
@@ -88,6 +90,9 @@ export default function DepartureView() {
         )
       }
 
+  const isMobile = useIsMobile();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
   return (
     <div className="container max-w-3xl mx-auto p-6 space-y-4">
           <div className="flex justify-between items-center">
@@ -102,51 +107,102 @@ export default function DepartureView() {
                 <Label htmlFor="participant_id" className="dark:text-sidebar-foreground">
                   Participante en Residencia
                 </Label>
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className="w-full justify-between dark:text-sidebar-foreground"
-                    >
-                      {participants?.find((participant: any) => participant.participant.id === watch('participant_id'))?.participant.name || 
-                      "Seleccione un participante"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Buscar participante..." className="h-9" />
-                      <CommandList>
-                        <CommandEmpty>
-                          <p>No hay participantes en residencia.</p>
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {participants?.map((participant: any) => (
-                            <CommandItem
-                              value={`${participant.participant.name} (${participant.participant.run})`}
-                              key={participant.id}
-                              onSelect={() => {
-                                setValue('participant_id', participant.participant.id)
-                                setValue('residence_id', participant.residence.id)
-                                setValue('admission_date', new Date(participant.admission_date).toISOString().split('T')[0])
-                                setValue('departure_date', new Date(participant.departure_date).toISOString().split('T')[0] || new Date().toISOString().split('T')[0])
-                              }}
-                            >
-                              {participant.participant.name} ({participant.participant.run})
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  participant.participant.id === watch('participant_id') ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                {isMobile ? (
+                  <Drawer open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                    <DrawerTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between dark:text-sidebar-foreground"
+                      >
+                        {participants?.find((participant: any) => participant.participant.id === watch('participant_id'))?.participant.name || 
+                        "Seleccione un participante"}
+                        <ChevronsUpDown className="opacity-50" />
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <div className="mt-4 border-t">
+                        <Command>
+                          <CommandInput placeholder="Buscar participante..." className="h-9" />
+                          <CommandList>
+                            <CommandEmpty>
+                              <p>No hay participantes en residencia.</p>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {participants?.map((participant: any) => (
+                                <CommandItem
+                                  value={`${participant.participant.name} (${participant.participant.run})`}
+                                  key={participant.id}
+                                  onSelect={() => {
+                                    setValue('participant_id', participant.participant.id)
+                                    setValue('residence_id', participant.residence.id)
+                                    setValue('admission_date', new Date(participant.admission_date).toISOString().split('T')[0])
+                                    setValue('departure_date', new Date(participant.departure_date).toISOString().split('T')[0] || new Date().toISOString().split('T')[0])
+                                    setIsPopoverOpen(false);
+                                  }}
+                                >
+                                  {participant.participant.name} ({participant.participant.run})
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      participant.participant.id === watch('participant_id') ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                ) : (
+                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between dark:text-sidebar-foreground"
+                      >
+                        {participants?.find((participant: any) => participant.participant.id === watch('participant_id'))?.participant.name || 
+                        "Seleccione un participante"}
+                        <ChevronsUpDown className="opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Buscar participante..." className="h-9" />
+                        <CommandList>
+                          <CommandEmpty>
+                            <p>No hay participantes en residencia.</p>
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {participants?.map((participant: any) => (
+                              <CommandItem
+                                value={`${participant.participant.name} (${participant.participant.run})`}
+                                key={participant.id}
+                                onSelect={() => {
+                                  setValue('participant_id', participant.participant.id)
+                                  setValue('residence_id', participant.residence.id)
+                                  setValue('admission_date', new Date(participant.admission_date).toISOString().split('T')[0])
+                                  setValue('departure_date', new Date(participant.departure_date).toISOString().split('T')[0] || new Date().toISOString().split('T')[0])
+                                }}
+                              >
+                                {participant.participant.name} ({participant.participant.run})
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    participant.participant.id === watch('participant_id') ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
                 {errors.participant_id && <ErrorMessage>{errors.participant_id.message}</ErrorMessage>}
               </div>
 
