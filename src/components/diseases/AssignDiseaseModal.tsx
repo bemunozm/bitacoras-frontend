@@ -121,7 +121,7 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
               <DrawerContent>
                 <div className="mt-4 border-t">
                   <Command>
-                    <CommandInput placeholder="Buscar enfermedad..." className="h-9" />
+                    <CommandInput placeholder="Buscar enfermedad..." className="h-9 text-base" />
                     <CommandList>
                       <CommandEmpty>No se encontraron enfermedades.</CommandEmpty>
                       <CommandGroup>
