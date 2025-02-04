@@ -100,7 +100,18 @@ export default function EditDeliveryBenefitModal({
             id="date"
             type="date"
             className="col-span-3 dark:text-sidebar-foreground"
-            {...register("date", { required: "Requerido" })}
+            {...register("date", { required: "Requerido", validate: (value) => {
+              if (value) {
+                  const selectedDate = new Date(value);
+                  const today = new Date();
+                  
+                  // Setear la hora a 00:00:00 para que solo se compare la fecha
+                  selectedDate.setHours(0, 0, 0, 0);
+                  today.setHours(0, 0, 0, 0);
+
+                  return selectedDate < today || 'Ingrese una fecha válida';
+              }
+              } })}
           />
           {errors.date && <p>{errors.date.message?.toString()}</p>}
         </div>

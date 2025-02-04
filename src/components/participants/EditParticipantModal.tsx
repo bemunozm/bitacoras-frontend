@@ -175,8 +175,22 @@ export function EditParticipantModal({ id, setIsOpen }: EditParticipantFormProps
             id="birthdate"
             type="date"
             className="col-span-3 dark:text-sidebar-foreground"
-            {...register('birthdate')}
+            {...register('birthdate', { 
+              validate: (value) => {
+                if (value) {
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    
+                    // Setear la hora a 00:00:00 para que solo se compare la fecha
+                    selectedDate.setHours(0, 0, 0, 0);
+                    today.setHours(0, 0, 0, 0);
+
+                    return selectedDate < today || 'Ingrese una fecha válida';
+                }
+                }
+            })}
           />
+          {errors.birthdate && <ErrorMessage className=" col-start-2 col-end-4">{errors.birthdate.message?.toString()}</ErrorMessage>}
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="nationality" className="text-right dark:text-sidebar-foreground">

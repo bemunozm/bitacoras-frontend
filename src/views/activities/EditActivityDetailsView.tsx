@@ -140,7 +140,18 @@ export default function EditActivityDetailsView() {
                     id="date"
                     type="date"
                     className="col-span-3 dark:text-sidebar-foreground"
-                    {...register('date', { required: 'Este campo es requerido' })}
+                    {...register('date', { required: 'Este campo es requerido', validate: (value) => {
+                      if (value) {
+                          const selectedDate = new Date(value);
+                          const today = new Date();
+                          
+                          // Setear la hora a 00:00:00 para que solo se compare la fecha
+                          selectedDate.setHours(0, 0, 0, 0);
+                          today.setHours(0, 0, 0, 0);
+      
+                          return selectedDate < today || 'Ingrese una fecha válida';
+                      }
+                      } })}
                   />
                   {errors.date && <p className="col-start-2 col-end-4 text-red-500">{errors.date.message}</p>}
                 </div>

@@ -238,7 +238,18 @@ export default function DepartureView() {
                 </Label>
                 <Input 
                   type="date" 
-                  {...register('admission_date', { required: 'Este campo es requerido' })}
+                  {...register('admission_date', { required: 'Este campo es requerido', validate: (value) => {
+                    if (value) {
+                        const selectedDate = new Date(value);
+                        const today = new Date();
+                        
+                        // Setear la hora a 00:00:00 para que solo se compare la fecha
+                        selectedDate.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+    
+                        return selectedDate < today || 'Ingrese una fecha válida';
+                    }
+                    } })}
                   readOnly
                   className="dark:text-sidebar-foreground"
                 />
