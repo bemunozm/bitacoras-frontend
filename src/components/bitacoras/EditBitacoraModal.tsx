@@ -28,25 +28,6 @@ const getLastThreeMonths = (referenceDate: string) => {
       value: lastDayOfMonth.toISOString()
     });
   }
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-  const startMonth = date.getMonth();
-  const startYear = date.getFullYear();
-
-  for (let year = startYear; year <= currentYear; year++) {
-    const monthStart = year === startYear ? startMonth + 1 : 0;
-    const monthEnd = year === currentYear ? currentMonth : 11;
-
-    for (let month = monthStart; month <= monthEnd; month++) {
-      const monthDate = new Date(year, month, 1);
-      const lastDayOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
-      months.push({
-        display: monthDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }),
-        value: lastDayOfMonth.toISOString()
-      });
-    }
-  }
   return months;
 };
 
@@ -108,7 +89,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
     mutate(formData);
   };
 
-  const lastThreeMonths = bitacora ? getLastThreeMonths(bitacora.month) : [];
+  const lastThreeMonths = bitacora ? getLastThreeMonths(bitacora.created_at) : [];
 
   if (isLoading || isLoadingPrograms) return <LoadingSpinner className="h-10" />;
 

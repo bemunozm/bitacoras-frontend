@@ -184,7 +184,7 @@ export default function EntranceView() {
                     </DrawerContent>
                   </Drawer>
                 ) : (
-                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={true}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" role="combobox" className="w-full justify-between dark:text-sidebar-foreground">
                         {selectedParticipant?.name || "Seleccione un participante"}

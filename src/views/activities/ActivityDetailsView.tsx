@@ -34,7 +34,7 @@ export default function ActivityDetailsView() {
         {label: 'Escritorio', to: '/'},
         {label: 'Bitácoras', to: '/bitacoras'},
         {label: 'Actividades', to: `/bitacoras/${activity?.bitacora_id}/actividades`},
-        {label: 'Editar Actividad', to: `/bitacoras/${activity?.bitacora_id}/actividades/${activityId}/editar`}
+        {label: 'Ver Actividad', to: `/bitacoras/${activity?.bitacora_id}/actividades/${activityId}/editar`}
       ]
   
       setBreadcrumbItems(routes)

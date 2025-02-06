@@ -161,7 +161,7 @@ export default function AssignDiseaseModal({ participant_id, setIsOpen }: Assign
               </DrawerContent>
             </Drawer>
           ) : (
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={true}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"

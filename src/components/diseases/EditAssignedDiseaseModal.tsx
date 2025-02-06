@@ -179,7 +179,7 @@ export default function EditAssignedDiseaseModal({ id, setIsOpen }: EditAssigned
               </DrawerContent>
             </Drawer>
           ) : (
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={true}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
