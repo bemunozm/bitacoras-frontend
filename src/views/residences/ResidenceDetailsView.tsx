@@ -142,6 +142,7 @@ const filteredParticipants = participants?.filter((participant: any) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Todos">Todos</SelectItem>
+              <SelectItem value="Pendiente de Salida">Pendiente de Salida</SelectItem>
               <SelectItem value="Pendiente de Admision">Pendiente de Admision</SelectItem>
               <SelectItem value="Residencia en Curso">Residencia en Curso</SelectItem>
               <SelectItem value="Finalizado">Finalizado</SelectItem>
