@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon, Download, Plus, Save, FileText, Users, Clock } from "lucide-react"
+import { CalendarIcon, Download, Plus, FileText, Users, Clock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ResponsiveDialog } from "@/components/responsive-dialog"
 import DeliverBenefitModal from "@/components/social-routes/DeliverBenefitModal"
@@ -20,7 +20,6 @@ import Acta from '@/components/pdfs/Acta';
 export default function RoutesView() {
   const [date, setDate] = useState<Date>(new Date())
   const [turn, setTurn] = useState<string>("AM")
-  const [isLoading, setIsLoading] = useState(false)
   const [isAddParticipantModalOpen, setIsAddParticipantModalOpen] = useState(false)
   const [isParticipantFormOpen, setIsParticipantFormOpen] = useState(false)
   const [isActaOpen, setIsActaOpen] = useState(false);
@@ -42,12 +41,6 @@ export default function RoutesView() {
     }
   }, []);
 
-  const handleGuardar = async () => {
-    setIsLoading(true)
-    // Simular guardado
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setIsLoading(false)
-  }
 
 
   const { data, isLoading: isDataLoading, refetch , isError} = useQuery({
