@@ -99,7 +99,7 @@ export default function EntranceView() {
   useEffect(() => {
     const route = [
       { label: "Escritorio", to: "/" },
-      { label: "Residencias", to: "/residences" },
+      { label: "Residencias", to: "/residencias" },
       { label: "Ingreso", to: undefined },
     ]
     setBreadcrumbItems(route)

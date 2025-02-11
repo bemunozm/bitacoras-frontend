@@ -9,6 +9,25 @@ import type { ParticipantForm } from "@/types"
 import ErrorMessage from "@/components/ErrorMessage"
 import { createParticipant } from "@/api/ParticipantAPI"
 import { useEffect, useState } from "react"
+import { validarIdentificacion } from "@/helpers"
+import { countries } from "@/data/countries";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Check, ChevronsUpDown } from "lucide-react"
 
 type ParticipantFormProps = {
   setIsOpen: (isOpen: boolean) => void
@@ -46,6 +65,8 @@ export function ParticipantForm({setIsOpen}: ParticipantFormProps) {
 
     const queryClient = useQueryClient()
     const [isSaving, setIsSaving] = useState(false);
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const isMobile = useIsMobile();
 
     const {mutate} = useMutation({
         mutationFn: createParticipant,
@@ -101,7 +122,13 @@ export function ParticipantForm({setIsOpen}: ParticipantFormProps) {
                         id="run"
                         placeholder="12.345.678-9" 
                         className="col-span-3 dark:text-sidebar-foreground"
-                        {...register('run', {required: 'Este campo es requerido'})}	
+                        {...register('run', {
+                            required: 'Este campo es requerido',
+                            validate: (value) => {
+                                if (value) {
+                                    return validarIdentificacion(value) || 'Ingrese un RUN válido';
+                                }
+                        }})}	
                     />
                     {errors.run && <ErrorMessage className=" col-start-2 col-end-4">{errors.run.message}</ErrorMessage>}
                 </div>
@@ -168,12 +195,92 @@ export function ParticipantForm({setIsOpen}: ParticipantFormProps) {
                     <Label htmlFor="nationality" className="text-right dark:text-sidebar-foreground">
                     Nacionalidad
                     </Label>
-                    <Input
-                        id="nationality"
-                        placeholder="Chilena" 
-                        className="col-span-3 dark:text-sidebar-foreground"
-                        {...register('nationality')}
-                    />
+                    {isMobile ? (
+                        <Drawer open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                        <DrawerTrigger asChild>
+                            <Button
+                            variant="outline"
+                            role="combobox"
+                            className="col-span-3 dark:text-sidebar-foreground w-full justify-between"
+                            >
+                            {watch('nationality') || "Seleccione una nacionalidad"}
+                            <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                            <div className="mt-4 border-t">
+                            <Command>
+                                <CommandInput placeholder="Buscar nacionalidad..." className="h-9 text-base" />
+                                <CommandList>
+                                <CommandEmpty>
+                                    No se encontraron nacionalidades.
+                                </CommandEmpty>
+                                <CommandGroup>
+                                    {countries.map((country) => (
+                                    <CommandItem
+                                        value={country}
+                                        key={country}
+                                        onSelect={() => {
+                                        setValue('nationality', country);
+                                        setIsPopoverOpen(false);
+                                        }}
+                                    >
+                                        {country}
+                                        <Check
+                                        className={cn(
+                                            "ml-auto",
+                                            country === watch('nationality') ? "opacity-100" : "opacity-0"
+                                        )}
+                                        />
+                                    </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                                </CommandList>
+                            </Command>
+                            </div>
+                        </DrawerContent>
+                        </Drawer>
+                    ) : (
+                        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={true}>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant="outline"
+                            role="combobox"
+                            className="col-span-3 dark:text-sidebar-foreground w-full justify-between"
+                            >
+                            {watch('nationality') || "Seleccione una nacionalidad"}
+                            <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                            <Command>
+                            <CommandInput placeholder="Buscar nacionalidad..." className="h-9" />
+                            <CommandList>
+                                <CommandEmpty>
+                                No se encontraron nacionalidades.
+                                </CommandEmpty>
+                                <CommandGroup>
+                                {countries.map((country) => (
+                                    <CommandItem
+                                    value={country}
+                                    key={country}
+                                    onSelect={() => setValue('nationality', country)}
+                                    >
+                                    {country}
+                                    <Check
+                                        className={cn(
+                                        "ml-auto",
+                                        country === watch('nationality') ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    </CommandItem>
+                                ))}
+                                </CommandGroup>
+                            </CommandList>
+                            </Command>
+                        </PopoverContent>
+                        </Popover>
+                    )}
                 </div>
                 
             </div>

@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { themes } from "@/utils/theme";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ResidenceTable({ searchTerm }: { searchTerm: string }) {
   const { data, isLoading } = useQuery({
@@ -25,6 +26,7 @@ export default function ResidenceTable({ searchTerm }: { searchTerm: string }) {
   const [selectedResidence, setSelectedResidence] = useState<Residence | null>(null);
 
   const navigate = useNavigate();
+  const { data: user } = useAuth(); // Obtener el usuario del contexto de autenticación
 
   const handleRowClick = (row: Residence) => {
     navigate(`/residencias/${row.id}`);
@@ -78,8 +80,8 @@ export default function ResidenceTable({ searchTerm }: { searchTerm: string }) {
         </DropdownMenu>
       ),
       ignoreRowClick: true,
-      
-      button: true
+      button: true,
+      omit: !user?.roles?.some(role => role?.name === "Administrador") // Omitir la columna si el usuario no es administrador
     }
   ];
 

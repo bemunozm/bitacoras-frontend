@@ -105,7 +105,7 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
                         id="company"
                         placeholder="Ministerio de Desarrollo Social y Familia"
                         className="col-span-3 dark:text-sidebar-foreground"
-                        {...register('company', { required: 'Este campo es requerido' })}
+                        {...register('company')}
                     />
                     {errors.company && <ErrorMessage className=" col-start-2 col-end-4">{errors.company.message}</ErrorMessage>}
                 </div>
@@ -117,7 +117,7 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
                         id="address"
                         placeholder="Pedro Lagos 1027"
                         className="col-span-3 dark:text-sidebar-foreground"
-                        {...register('address', { required: 'Este campo es requerido' })}
+                        {...register('address')}
                     />
                     {errors.address && <ErrorMessage className=" col-start-2 col-end-4">{errors.address.message}</ErrorMessage>}
                 </div>

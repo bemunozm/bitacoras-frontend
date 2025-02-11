@@ -116,32 +116,13 @@ export default function RoutesView() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        variant="default"
-                        className="w-full md:w-auto bg-blue-500 hover:bg-blue-600"
-                        onClick={handleGuardar}
-                        disabled={isLoading}
-                      >
-                        <Save className="mr-2 h-4 w-4" />
-                        {isLoading ? "Guardando..." : "Guardar Acta"}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Guardar el acta en el sistema</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
                         variant="outline"
                         className="w-full md:w-auto"
                         onClick={handleDescargarPDF}
                         disabled={isDownloadingPDF}
                       >
                         <Download className="mr-2 h-4 w-4" />
-                        {isDownloadingPDF ? "Descargando..." : "Descargar PDF"}
+                        {isDownloadingPDF ? "Descargando..." : "Descargar Acta"}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -161,7 +142,16 @@ export default function RoutesView() {
                 <Input
                   type="date"
                   value={date.toISOString().split("T")[0]}
-                  onChange={(e) => setDate(new Date(e.target.value))}
+                  onChange={(e) => {
+                    const selectedDate = new Date(e.target.value);
+                    const today = new Date();
+                    if (selectedDate <= today) {
+                      setDate(selectedDate);
+                    } else {
+                      setDate(today);
+                    }
+                  }}
+                  max={new Date().toISOString().split("T")[0]} // Establecer la fecha máxima permitida
                   className="w-full"
                 />
               </div>

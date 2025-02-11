@@ -69,7 +69,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
       width: '12rem',
       cell: (row: Activity) => <Badge className="bg-sidebar-ring dark:bg-sidebar-ring hover:bg-sidebar-ring/90 dark:hover:bg-sidebar-ring/90">{row.attachments.length}</Badge>,
     },
-    ...(user.roles?.some((role) => role?.name === 'Administrador') || user.id === bitacora.user_id ? [{
+    ...(user.roles?.some((role) => role?.name === 'Administrador') || (user.id === bitacora.user_id && bitacora.status === 'En Progreso') ? [{
       name: 'Acciones',
       cell: (row: Activity) => (
         <DropdownMenu modal={false}>
@@ -81,7 +81,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem 
               onClick={() => { setSelectedActivity(row); setIsEditOpen(true); }} 
-              disabled={row.status !== 'En Progreso' && !user.roles?.some((role) => role?.name === 'Administrador')}
+              disabled={!(user.roles?.some((role) => role?.name === 'Administrador') || (user.id === bitacora.user_id && bitacora.status === 'En Progreso'))}
             >
               <SquarePen className="h-4 w-4 mr-2" />
               <span>Editar</span>
@@ -90,7 +90,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
             <DropdownMenuItem 
               onClick={() => { setSelectedActivity(row); setIsDeleteOpen(true); }} 
               className="text-red-500" 
-              disabled={row.status !== 'En Progreso' && !user.roles?.some((role) => role?.name === 'Administrador')}
+              disabled={!(user.roles?.some((role) => role?.name === 'Administrador') || (user.id === bitacora.user_id && bitacora.status === 'En Progreso'))}
             >
               <Trash2 className="h-4 w-4 mr-2" />
               <span>Eliminar</span>

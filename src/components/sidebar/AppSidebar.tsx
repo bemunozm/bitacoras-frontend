@@ -55,17 +55,6 @@ const data = {
       icon: MapPinned,
     },
     {
-      title: "Prestaciones",
-      url: "/prestaciones",
-      icon: Settings2,
-      items: [
-        {
-          title: "Categorías de Prestaciones",
-          url: "/categorias-prestaciones",
-        },
-      ],
-    },
-    {
       title: "Residencias",
       url: "/residencias",
       icon: Home,
@@ -77,6 +66,17 @@ const data = {
         {
           title: "Salida de Residencia",
           url: "/residencias/salida-residencia",
+        },
+      ],
+    },
+    {
+      title: "Prestaciones",
+      url: "/prestaciones",
+      icon: Settings2,
+      items: [
+        {
+          title: "Categorías de Prestaciones",
+          url: "/categorias-prestaciones",
         },
       ],
     },
@@ -131,6 +131,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user, isError } = useAuth();
 
   if (isError) return <Navigate to="/auth/login" />;
+
+  const filteredNavMain = data.navMain.filter((item) => {
+    if (["/participantes", "/ruta-social", "/residencias", "/prestaciones"].includes(item.url)) {
+      return user?.roles?.some((role) => role?.name === "Administrador" || role?.name === "Monitor");
+    }
+    return true;
+  });
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -145,9 +153,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate font-semibold">
                     FTU - Bitacoras
                   </span>
-                  <span className="truncate text-xs">
-                    Residencia: Jose Joaquin Perez
-                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -155,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={filteredNavMain} />
         {user?.roles?.some((role) => role?.name === "Administrador") && (
           <NavAdmin items={data.admin} />
         )}

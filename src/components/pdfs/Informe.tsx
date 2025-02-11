@@ -16,7 +16,7 @@ const Informe = ({ bitacora } : any) => {
   
   const getWeekFromDate = (date: string) => {
     const d = new Date(date);
-    const start = new Date(d.getFullYear(), 0, 1);
+    const start = new Date(d.getFullYear(), d.getMonth(), 1);
     const diff = (d.getTime() - start.getTime()) + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60 * 1000);
     const oneWeek = 1000 * 60 * 60 * 24 * 7;
     const week = Math.floor(diff / oneWeek);
@@ -141,10 +141,12 @@ const Informe = ({ bitacora } : any) => {
           <div className="signature-space">
             <hr className="signature-line" />
             <div className="signature-name">Firma Coordinador General</div>
+            <div className="signature-name">Mario Cortés Castillo</div>
           </div>
           <div className="signature-space">
             <hr className="signature-line" />
-            <div className="signature-name">{`Firma ${bitacora.users.name}`}</div>
+            <div className="signature-name">{`Firma ${bitacora.users.job_position}`}</div>
+            <div className="signature-name">{bitacora.users.name}</div>
           </div>
         </div>
       </div>

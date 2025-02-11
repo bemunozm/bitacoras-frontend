@@ -21,7 +21,7 @@ export default function ExampleTable() {
       },
       {
         name: 'Descripcion',
-        selector: (row: any) => row.description,
+        selector: (row: any) => row.description.length > 50 ? row.description.substring(0, 50) + '...' : row.description,
       },
     ]
 

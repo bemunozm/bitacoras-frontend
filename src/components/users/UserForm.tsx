@@ -16,6 +16,7 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import LoadingSpinner from "../LoadingSpinner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Camera, User } from 'lucide-react'
+import { validarIdentificacion } from "@/helpers"
 
 type UserFormProps = {
   setIsOpen: (isOpen: boolean) => void
@@ -129,7 +130,13 @@ export function UserForm({setIsOpen}: UserFormProps) {
                         id="run"
                         placeholder="12.345.678-9" 
                         className="col-span-3 dark:text-sidebar-foreground"
-                        {...register('run', {required: 'Este campo es requerido'})}	
+                        {...register('run', {
+                            required: 'Este campo es requerido',
+                            validate: (value) => {
+                                if (value) {
+                                    return validarIdentificacion(value) || 'Ingrese un RUN válido';
+                                }
+                        }})}	
                     />
                     {errors.run && <ErrorMessage className=" col-start-2 col-end-4">{errors.run.message}</ErrorMessage>}
                 </div>

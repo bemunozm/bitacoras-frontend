@@ -11,6 +11,7 @@ import { UserRegistrationForm } from '@/types'
 import { createAccount } from '@/api/AuthAPI'
 import ErrorMessage from '@/components/ErrorMessage'
 import { useToast } from '@/hooks/use-toast'
+import { validarIdentificacion } from '@/helpers'
 
 export default function RegisterView({
     className,
@@ -72,15 +73,13 @@ export default function RegisterView({
                   type="text"
                   placeholder="12.345.678-9"
                   required
-                  {...register('run', { 
-                    required: true,
-                    pattern: {
-                        value: /^\d{1,2}\.\d{3}\.\d{3}-[0-9kK]$/,
-                        message: "RUT no cumple formato válido 12.345.678-9",
-                    } 
-                    })}
-                    
-                  
+                  {...register('run', {
+                      required: 'Este campo es requerido',
+                      validate: (value) => {
+                          if (value) {
+                              return validarIdentificacion(value) || 'Ingrese un RUN válido';
+                          }
+                  }})}	 
                 />
                 {errors.run && <ErrorMessage>{errors.run.message}</ErrorMessage>}
               </div>

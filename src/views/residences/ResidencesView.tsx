@@ -6,12 +6,14 @@ import { ResidenceForm } from "@/components/residences/ResidenceForm";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import ResidenceTable from "@/components/residences/ResidenceTable";
 import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ResidencesView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const {setBreadcrumbItems} = useBreadcrumb()
+  const { data: user } = useAuth(); // Obtener el usuario del contexto de autenticación
     
       useEffect(() => {
         const route = [
@@ -36,13 +38,15 @@ export default function ResidencesView() {
           <h2 className="text-3xl text-center font-bold tracking-tight dark:text-sidebar-foreground">
             Residencias
           </h2>
-          <Button
-            onClick={() => setIsCreateOpen(true)}
-            className="flex items-center space-x-1"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Residencia
-          </Button>
+          {user?.roles?.some(role => role?.name === "Administrador") && ( // Mostrar el botón solo si el usuario es administrador
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="flex items-center space-x-1"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Residencia
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center justify-between">

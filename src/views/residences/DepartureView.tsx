@@ -32,6 +32,8 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 export default function DepartureView() {
   const navigate = useNavigate()
+  const isMobile = useIsMobile();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       departure_date: '',
@@ -78,7 +80,7 @@ export default function DepartureView() {
     useEffect(() => {
       const route = [
           {label: 'Escritorio', to: '/'},
-          {label: 'Residencias', to: '/residences'},
+          {label: 'Residencias', to: '/residencias'},
           {label: 'Salida', to: undefined}
       ]
       setBreadcrumbItems(route)
@@ -89,9 +91,6 @@ export default function DepartureView() {
             <LoadingSpinner />
         )
       }
-
-  const isMobile = useIsMobile();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   return (
     <div className="container max-w-3xl mx-auto p-6 space-y-4">
@@ -272,9 +271,11 @@ export default function DepartureView() {
                 <Label htmlFor="status" className="dark:text-sidebar-foreground">
                   Estado
                 </Label>
-                <Select onValueChange={(value) => setValue("status", value)} defaultValue="Finalizado">
+                <Select onValueChange={(value) => setValue("status", value)} defaultValue={participants?.find((participant: any) => participant.participant.id === watch('participant_id'))?.current_status || "Finalizado"}>
                   <SelectTrigger className="dark:text-sidebar-foreground">
-                    <SelectValue placeholder="Seleccione un estado" />
+                    <SelectValue placeholder="Seleccione un estado">
+                      {participants?.find((participant: any) => participant.participant.id === watch('participant_id'))?.current_status || "Seleccione un estado"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Finalizado">Finalizado</SelectItem>
