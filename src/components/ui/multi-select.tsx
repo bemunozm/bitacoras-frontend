@@ -49,14 +49,6 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
     }
   }, [updateScrollButtonsVisibility])
 
-  const handleScroll = (direction: "up" | "down") => {
-    const scrollArea = scrollAreaRef.current
-    if (scrollArea) {
-      const scrollAmount = direction === "up" ? -100 : 100
-      scrollArea.scrollBy({ top: scrollAmount, behavior: "smooth" })
-    }
-  }
-
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const scrollArea = scrollAreaRef.current
     if (scrollArea) {
@@ -99,7 +91,6 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
           {showScrollUpButton && (
             <div
               className="flex items-center justify-center h-7 bg-white z-10 cursor-pointer"
-              onClick={() => handleScroll("up")}
             >
               <ChevronUp className="h-4 w-4" />
             </div>
@@ -144,7 +135,6 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
           {showScrollDownButton && (
             <div
               className="flex items-center justify-center h-7 bg-white z-10 cursor-pointer"
-              onClick={() => handleScroll("down")}
             >
               <ChevronDown className="h-4 w-4" />
             </div>
