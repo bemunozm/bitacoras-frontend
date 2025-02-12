@@ -49,6 +49,12 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
     }
   }, [updateScrollButtonsVisibility])
 
+  React.useEffect(() => {
+    if (open) {
+      setTimeout(updateScrollButtonsVisibility, 0)
+    }
+  }, [open, updateScrollButtonsVisibility])
+
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const scrollArea = scrollAreaRef.current
     if (scrollArea) {
@@ -77,7 +83,12 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen)
+      if (isOpen) {
+        setTimeout(updateScrollButtonsVisibility, 0)
+      }
+    }}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
           <span className="truncate">
@@ -90,7 +101,7 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
         <Command>
           {showScrollUpButton && (
             <div
-              className="flex items-center justify-center h-7 bg-white z-10 cursor-pointer"
+              className={`flex items-center justify-center h-7 bg-white z-10 cursor-pointer transition-opacity duration-300 ${showScrollUpButton ? 'opacity-100' : 'opacity-0'}`}
             >
               <ChevronUp className="h-4 w-4" />
             </div>
@@ -106,10 +117,11 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
               onWheel={handleWheel}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
+              onScroll={updateScrollButtonsVisibility}
             >
               <CommandList>
                 <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup onScroll={updateScrollButtonsVisibility}>
                   {options.map((option) => (
                     <CommandItem
                       key={option.value}
@@ -119,7 +131,6 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
                             ? selected.filter((item) => item !== option.value)
                             : [...selected, option.value],
                         )
-                        updateScrollButtonsVisibility()
                       }}
                     >
                       <Check
@@ -134,7 +145,7 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
           </div>
           {showScrollDownButton && (
             <div
-              className="flex items-center justify-center h-7 bg-white z-10 cursor-pointer"
+              className={`flex items-center justify-center h-7 bg-white z-10 cursor-pointer transition-opacity duration-300 ${showScrollDownButton ? 'opacity-100' : 'opacity-0'}`}
             >
               <ChevronDown className="h-4 w-4" />
             </div>
