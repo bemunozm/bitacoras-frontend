@@ -96,15 +96,15 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
+          {showScrollUpButton && (
+            <div
+              className="flex items-center justify-center h-7 bg-white z-10 cursor-pointer"
+              onClick={() => handleScroll("up")}
+            >
+              <ChevronUp className="h-4 w-4" />
+            </div>
+          )}
           <div className="relative">
-            {showScrollUpButton && (
-              <div
-                className="absolute top-0 left-0 right-0 flex items-center justify-center h-7 bg-gradient-to-b from-white to-transparent z-10 cursor-pointer"
-                onClick={() => handleScroll("up")}
-              >
-                <ChevronUp className="h-4 w-4" />
-              </div>
-            )}
             <div
               ref={scrollAreaRef}
               className="max-h-[200px] overflow-auto"
@@ -140,15 +140,15 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
                 </CommandGroup>
               </CommandList>
             </div>
-            {showScrollDownButton && (
-              <div
-                className="absolute bottom-0 left-0 right-0 flex items-center justify-center h-7 bg-gradient-to-t from-white to-transparent z-10 cursor-pointer"
-                onClick={() => handleScroll("down")}
-              >
-                <ChevronDown className="h-4 w-4" />
-              </div>
-            )}
           </div>
+          {showScrollDownButton && (
+            <div
+              className="flex items-center justify-center h-7 bg-white z-10 cursor-pointer"
+              onClick={() => handleScroll("down")}
+            >
+              <ChevronDown className="h-4 w-4" />
+            </div>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
