@@ -12,9 +12,8 @@ import LoadingSpinner from "../LoadingSpinner";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { getCoordinators } from "@/api/UserAPI";
 import { getResidences } from "@/api/ResidenceAPI";
-import { ChevronsUpDown, Check } from 'lucide-react';
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
 import { states } from '@/data/states';
+import { MultiSelect } from "@/components/ui/multi-select";
 
 type EditProgramProps = {
   id: Program['id'];
@@ -90,11 +89,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
     setIsSaving(true);
     mutate({ ...formData, residences: selectedResidences });
   };
-
-  const handleResidenceChange = (value: number[]) => {
-    setSelectedResidences(value);
-  };
-
+  
   if (isLoading || isLoadingResidences || isLoadingCoordinators) return <LoadingSpinner className="h-10" />;
 
   return (
@@ -184,49 +179,15 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
           </Label>
           <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
             {residences && (
-              <Listbox value={selectedResidences} onChange={handleResidenceChange} multiple>
-                <div className="relative">
-                  <ListboxButton className="w-full cursor-default rounded-md py-1.5 pl-3 pr-10 text-left text-gray-900 dark:text-sidebar-foreground shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-sidebar-border focus:outline-none focus:ring-2 focus:ring-sidebar-accent sm:text-sm sm:leading-6">
-                    <span className="block truncate">
-                      {selectedResidences.length > 0
-                        ? selectedResidences
-                            .map((id) => residences!.find((residence: Residence) => residence.id === id)?.name)
-                            .filter(Boolean)
-                            .join(', ')
-                        : 'Selecciona uno o más roles'}
-                    </span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <ChevronsUpDown aria-hidden="true" className="h-5 w-5 text-gray-400" />
-                    </span>
-                  </ListboxButton>
-                  <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black dark:ring-sidebar-border ring-opacity-5 focus:outline-none sm:text-sm">
-                    {residences!.map((residence: Residence) => (
-                      <ListboxOption
-                        key={residence.id}
-                        value={residence.id}
-                        className={({ active, selected }) =>
-                          `relative cursor-default select-none py-2 pl-8 pr-4 ${
-                            active ? 'bg-sidebar-accent text-sidebar-foreground' : 'text-gray-900 dark:text-sidebar-foreground'
-                          } ${selected ? 'font-semibold' : 'font-normal'}`
-                        }
-                      >
-                        {({ selected }) => (
-                          <>
-                            <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-                              {residence.name}
-                            </span>
-                            {selected && (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-1.5 text-sidebar-ring">
-                                <Check aria-hidden="true" className="h-5 w-5" />
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </ListboxOption>
-                    ))}
-                  </ListboxOptions>
-                </div>
-              </Listbox>
+              <MultiSelect
+                options={residences!.map((residence: Residence) => ({
+                  label: residence.name,
+                  value: residence.id.toString(),
+                }))}
+                selected={selectedResidences.map(String)}
+                onChange={(selected) => setSelectedResidences(selected.map(Number))}
+                placeholder="Selecciona una o más residencias"
+              />
             )}
           </div>
           {errors.residences && <ErrorMessage className=" col-start-2 col-end-4">{errors.residences.message}</ErrorMessage>}
