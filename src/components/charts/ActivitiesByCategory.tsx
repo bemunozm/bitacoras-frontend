@@ -1,5 +1,3 @@
-"use client"
-
 import { Pie, PieChart } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
@@ -73,7 +71,7 @@ export default function ActivitiesByCategory({activities, period}: ActivitiesByC
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Pie data={chartData} dataKey="value" nameKey="name" />
-            <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+            <ChartLegend content={<ChartLegendContent nameKey="name" className="flex flex-wrap text-xs md:text-sm" />} />
           </PieChart>
         </ChartContainer>
       </CardContent>

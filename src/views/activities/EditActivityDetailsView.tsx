@@ -17,6 +17,7 @@ import { useParams } from 'react-router-dom'
 import type { Attachment } from '@/types'
 import { useBreadcrumb } from '@/contexts/BreadcrumbContext'
 import NotFound from '../NotFound'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 export default function EditActivityDetailsView() {
   const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([])
@@ -119,83 +120,174 @@ export default function EditActivityDetailsView() {
     }
   }, [activity, activityId, setBreadcrumbItems])
 
+  const isMobile = useIsMobile()
+
   if (isLoadingActivity || isLoadingCategories || !attachmentsLoaded) return <LoadingSpinner/>
   if (isError || isCategoryError) return <NotFound title="¡Rayos!" description="Hubo un problema al obtener la información de la actividad." />
 
   return (
     <div className="p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{'Actividad de la bitácora ' + getPeriod(activity.date)}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form noValidate onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="date" className="text-right dark:text-sidebar-foreground">
-                    Fecha
-                  </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    className="col-span-3 dark:text-sidebar-foreground"
-                    {...register('date', { required: 'Este campo es requerido', validate: (value) => {
-                      if (value) {
-                          const selectedDate = new Date(value);
-                          const today = new Date();
-                          
-                          // Setear la hora a 00:00:00 para que solo se compare la fecha
-                          selectedDate.setHours(0, 0, 0, 0);
-                          today.setHours(0, 0, 0, 0);
-      
-                          return selectedDate < today || 'Ingrese una fecha válida';
-                      }
-                      } })}
-                  />
-                  {errors.date && <p className="col-start-2 col-end-4 text-red-500">{errors.date.message}</p>}
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="category_id" className="text-right dark:text-sidebar-foreground">
-                    Categoría
-                  </Label>
-                  <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
-                    {isLoadingCategories ? (
-                      <p>Cargando Categorías</p>
-                    ) : (
-                      <Select
-                        value={selectedCategory?.toString() || ''}
-                        onValueChange={handleCategoryChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecciona una categoría">
-                            {categories?.find(category => category.id === selectedCategory)?.name}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories!.map((category: any) => (
-                            <SelectItem key={category.id} value={category.id.toString()}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
+      {!isMobile && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{'Actividad de la bitácora ' + getPeriod(activity.date)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form noValidate onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="date" className="text-right dark:text-sidebar-foreground">
+                      Fecha
+                    </Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      className="col-span-3 dark:text-sidebar-foreground"
+                      {...register('date', { required: 'Este campo es requerido', validate: (value) => {
+                        if (value) {
+                            const selectedDate = new Date(value);
+                            const today = new Date();
+                            
+                            // Setear la hora a 00:00:00 para que solo se compare la fecha
+                            selectedDate.setHours(0, 0, 0, 0);
+                            today.setHours(0, 0, 0, 0);
+        
+                            return selectedDate < today || 'Ingrese una fecha válida';
+                        }
+                        } })}
+                    />
+                    {errors.date && <p className="col-start-2 col-end-4 text-red-500">{errors.date.message}</p>}
                   </div>
-                  {errors.category_id && <p className="col-start-2 col-end-4 text-red-500">{errors.category_id.message}</p>}
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="category_id" className="text-right dark:text-sidebar-foreground">
+                      Categoría
+                    </Label>
+                    <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
+                      {isLoadingCategories ? (
+                        <p>Cargando Categorías</p>
+                      ) : (
+                        <Select
+                          value={selectedCategory?.toString() || ''}
+                          onValueChange={handleCategoryChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecciona una categoría">
+                              {categories?.find(category => category.id === selectedCategory)?.name}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories!.map((category: any) => (
+                              <SelectItem key={category.id} value={category.id.toString()}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+                    {errors.category_id && <p className="col-start-2 col-end-4 text-red-500">{errors.category_id.message}</p>}
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="description" className="text-right dark:text-sidebar-foreground">
+                      Descripción
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Descripción de la actividad"
+                      className="col-span-3 dark:text-sidebar-foreground min-h-40"
+                      {...register('description', { required: 'Este campo es requerido' })}
+                    />
+                    {errors.description && <p className="col-start-2 col-end-4 text-red-500">{errors.description.message}</p>}
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right dark:text-sidebar-foreground">
-                    Descripción
-                  </Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Descripción de la actividad"
-                    className="col-span-3 dark:text-sidebar-foreground min-h-40"
-                    {...register('description', { required: 'Este campo es requerido' })}
+                <div className="space-y-4">
+                  <DropZone
+                    onFilesAdded={handleFilesAdded}
+                    onExistingFilesRemoved={handleExistingFilesRemoved}
+                    maxFiles={5}
+                    maxSize={5 * 1024 * 1024}
+                    accept="image/*,application/pdf"
+                    initialFiles={selectedAttachments}
+                    existingFiles={existingAttachments}
                   />
-                  {errors.description && <p className="col-start-2 col-end-4 text-red-500">{errors.description.message}</p>}
                 </div>
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+                <Button type="submit">Guardar cambios</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+      {isMobile && (
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight dark:text-sidebar-foreground my-4">Editar Actividad</h2>
+          <form noValidate onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 items-center gap-4">
+                <Label htmlFor="date" className="dark:text-sidebar-foreground">
+                  Fecha
+                </Label>
+                <Input
+                  id="date"
+                  type="date"
+                  className="dark:text-sidebar-foreground"
+                  {...register('date', { required: 'Este campo es requerido', validate: (value) => {
+                    if (value) {
+                        const selectedDate = new Date(value);
+                        const today = new Date();
+                        
+                        // Setear la hora a 00:00:00 para que solo se compare la fecha
+                        selectedDate.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+
+                        return selectedDate < today || 'Ingrese una fecha válida';
+                    }
+                    } })}
+                />
+                {errors.date && <p className="text-red-500">{errors.date.message}</p>}
+              </div>
+              <div className="grid grid-cols-1 items-center gap-4">
+                <Label htmlFor="category_id" className="dark:text-sidebar-foreground">
+                  Categoría
+                </Label>
+                <div className="mt-2 dark:text-sidebar-foreground">
+                  {isLoadingCategories ? (
+                    <p>Cargando Categorías</p>
+                  ) : (
+                    <Select
+                      value={selectedCategory?.toString() || ''}
+                      onValueChange={handleCategoryChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecciona una categoría">
+                          {categories?.find(category => category.id === selectedCategory)?.name}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories!.map((category: any) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                {errors.category_id && <p className="text-red-500">{errors.category_id.message}</p>}
+              </div>
+              <div className="grid grid-cols-1 items-center gap-4">
+                <Label htmlFor="description" className="dark:text-sidebar-foreground">
+                  Descripción
+                </Label>
+                <Textarea
+                  id="description"
+                  placeholder="Descripción de la actividad"
+                  className="dark:text-sidebar-foreground min-h-40"
+                  {...register('description', { required: 'Este campo es requerido' })}
+                />
+                {errors.description && <p className="text-red-500">{errors.description.message}</p>}
               </div>
               <div className="space-y-4">
                 <DropZone
@@ -213,8 +305,8 @@ export default function EditActivityDetailsView() {
               <Button type="submit">Guardar cambios</Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      )}
       <div>
         <h2 className="text-2xl font-bold tracking-tight dark:text-sidebar-foreground">Previsualización de Anexos o Evidencias</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
@@ -223,7 +315,6 @@ export default function EditActivityDetailsView() {
               <img src={attachment.image} alt={attachment.image.split('/').pop()} className="w-full h-auto" />
             </div>
           ))}
-
         </div>
       </div>
     </div>

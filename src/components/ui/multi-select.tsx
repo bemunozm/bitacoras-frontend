@@ -40,14 +40,44 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
       }
     }
 
+    const handleTouchStart = (e: TouchEvent) => {
+      const scrollArea = scrollAreaRef.current
+      if (scrollArea) {
+        scrollArea.dataset.touchStartY = e.touches[0].clientY.toString()
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const scrollArea = scrollAreaRef.current
+      if (scrollArea) {
+        const touchStartY = parseFloat(scrollArea.dataset.touchStartY || "0")
+        const touchCurrentY = e.touches[0].clientY
+        const delta = touchStartY - touchCurrentY
+        const { scrollTop, scrollHeight, clientHeight } = scrollArea
+        const bottomReached = scrollTop + clientHeight >= scrollHeight
+        const topReached = scrollTop === 0
+
+        if ((bottomReached && delta > 0) || (topReached && delta < 0)) {
+          e.preventDefault()
+        } else {
+          scrollArea.scrollTop += delta
+          scrollArea.dataset.touchStartY = touchCurrentY.toString()
+        }
+      }
+    }
+
     const scrollArea = scrollAreaRef.current
     if (scrollArea) {
       scrollArea.addEventListener("wheel", handleWheel, { passive: false })
+      scrollArea.addEventListener("touchstart", handleTouchStart, { passive: false })
+      scrollArea.addEventListener("touchmove", handleTouchMove, { passive: false })
     }
 
     return () => {
       if (scrollArea) {
         scrollArea.removeEventListener("wheel", handleWheel)
+        scrollArea.removeEventListener("touchstart", handleTouchStart)
+        scrollArea.removeEventListener("touchmove", handleTouchMove)
       }
     }
   }, [])

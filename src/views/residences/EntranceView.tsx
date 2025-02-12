@@ -301,96 +301,98 @@ export default function EntranceView() {
             </form>
           </div>
 
-          <div className="lg:col-span-1 overflow-auto flex flex-col space-y-2">
-            <div className="flex-1 min-h-0 flex flex-col space-y-2 overflow-hidden">
-              <Card className=" h-[calc(50vh-60px)] overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-purple-50 dark:bg-transparent dark:border-b dark:border-sidebar-border">
-                  <CardTitle className="text-lg font-semibold flex items-center text-purple-700 dark:text-purple-500">
-                    <Home className="mr-2 text-purple-500" />
-                    Historial de Residencias
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-full overflow-auto">
-                  {isLoadingParticipantResidences ? (
-                    <p className="text-center text-gray-500">Cargando residencias...</p>
-                  ) : selectedParticipant ? (
-                    <div className="space-y-2">
-                      {(participantResidences?.length ?? 0 > 0) ? (
-                        participantResidences.map((residence: any) => (
-                          <div
-                            key={residence.id}
-                            className="flex items-start space-x-4 p-3 rounded-lg shadow-sm border border-sidebar-border"
-                          >
-                            <div className="flex-1">
-                              <h4 className="font-semibold">{residence.residence.name}</h4>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <Calendar className="h-4 w-4 text-gray-400" />
-                                <span className="text-sm text-gray-500">
-                                  {new Date(residence.admission_date).toLocaleDateString()} -{" "}
-                                  {residence.departure_date
-                                    ? new Date(residence.departure_date).toLocaleDateString()
-                                    : "Presente"}
-                                </span>
-                              </div>
-                            </div>
-                            <Badge
-                              variant={residence.status == 'Finalizado' ? "secondary" : residence.status == 'Expulsado' ? "destructive" : "default"}
-                              className={residence.status == 'Finalizado' ? "bg-blue-500 dark:bg-blue-500 hover:bg-blue-400 dark:hover:bg-blue-400" : residence.status == 'Expulsado' ? "bg-red-500 dark:bg-red-500 hover:bg-red-400 dark:hover:bg-red-400" : residence.status == 'Residencia en Curso' ? "bg-green-500 dark:bg-green-500 hover:bg-green-400 dark:hover:bg-green-400" : "bg-gray-500 dark:bg-gray-500 hover:bg-gray-400 dark:hover:bg-gray-400"}
+          {!isMobile && (
+            <div className="lg:col-span-1 overflow-auto flex flex-col space-y-2">
+              <div className="flex-1 min-h-0 flex flex-col space-y-2 overflow-hidden">
+                <Card className=" h-[calc(50vh-60px)] overflow-hidden">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-purple-50 dark:bg-transparent dark:border-b dark:border-sidebar-border">
+                    <CardTitle className="text-lg font-semibold flex items-center text-purple-700 dark:text-purple-500">
+                      <Home className="mr-2 text-purple-500" />
+                      Historial de Residencias
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-full overflow-auto">
+                    {isLoadingParticipantResidences ? (
+                      <p className="text-center text-gray-500">Cargando residencias...</p>
+                    ) : selectedParticipant ? (
+                      <div className="space-y-2">
+                        {(participantResidences?.length ?? 0 > 0) ? (
+                          participantResidences.map((residence: any) => (
+                            <div
+                              key={residence.id}
+                              className="flex items-start space-x-4 p-3 rounded-lg shadow-sm border border-sidebar-border"
                             >
-                              {residence.status}
-                            </Badge>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-center text-gray-500">No hay registros de residencias.</p>
-                      )}
-                    </div>
-                  ) : (
-                    <p>Seleccione un participante para ver su información.</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card className=" h-[calc(50vh-60px)] overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-green-50 dark:bg-transparent dark:border-b dark:border-sidebar-border">
-                  <CardTitle className="text-lg font-semibold flex items-center text-green-700 dark:text-green-500">
-                    <FileText className="mr-2 text-green-500" />
-                    Eventos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-full overflow-auto">
-                  {isLoadingEvents ? (
-                    <p className="text-center text-gray-500">Cargando eventos...</p>
-                  ) : selectedParticipant ? (
-                    <div className="space-y-2">
-                      {(events ?? []).length > 0 ? (
-                        events?.map((event: any) => (
-                          <div
-                            key={event.id}
-                            className="flex items-start space-x-4 p-3 rounded-lg shadow-sm border border-sidebar-border"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2">
-                                <Badge variant="outline">{event.type}</Badge>
-                                <span className="text-sm text-gray-500">
-                                  {new Date(event.date).toLocaleDateString("es-ES")}
-                                </span>
+                              <div className="flex-1">
+                                <h4 className="font-semibold">{residence.residence.name}</h4>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <Calendar className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm text-gray-500">
+                                    {new Date(residence.admission_date).toLocaleDateString()} -{" "}
+                                    {residence.departure_date
+                                      ? new Date(residence.departure_date).toLocaleDateString()
+                                      : "Presente"}
+                                  </span>
+                                </div>
                               </div>
-                              <p className="mt-1 text-sm">{event.description}</p>
+                              <Badge
+                                variant={residence.status == 'Finalizado' ? "secondary" : residence.status == 'Expulsado' ? "destructive" : "default"}
+                                className={residence.status == 'Finalizado' ? "bg-blue-500 dark:bg-blue-500 hover:bg-blue-400 dark:hover:bg-blue-400" : residence.status == 'Expulsado' ? "bg-red-500 dark:bg-red-500 hover:bg-red-400 dark:hover:bg-red-400" : residence.status == 'Residencia en Curso' ? "bg-green-500 dark:bg-green-500 hover:bg-green-400 dark:hover:bg-green-400" : "bg-gray-500 dark:bg-gray-500 hover:bg-gray-400 dark:hover:bg-gray-400"}
+                              >
+                                {residence.status}
+                              </Badge>
                             </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-center text-gray-500">No hay registros de eventos.</p>
-                      )}
-                    </div>
-                  ) : (
-                    <p>Seleccione un participante para ver su información.</p>
-                  )}
-                </CardContent>
-              </Card>
+                          ))
+                        ) : (
+                          <p className="text-center text-gray-500">No hay registros de residencias.</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p>Seleccione un participante para ver su información.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card className=" h-[calc(50vh-60px)] overflow-hidden">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-green-50 dark:bg-transparent dark:border-b dark:border-sidebar-border">
+                    <CardTitle className="text-lg font-semibold flex items-center text-green-700 dark:text-green-500">
+                      <FileText className="mr-2 text-green-500" />
+                      Eventos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-full overflow-auto">
+                    {isLoadingEvents ? (
+                      <p className="text-center text-gray-500">Cargando eventos...</p>
+                    ) : selectedParticipant ? (
+                      <div className="space-y-2">
+                        {(events ?? []).length > 0 ? (
+                          events?.map((event: any) => (
+                            <div
+                              key={event.id}
+                              className="flex items-start space-x-4 p-3 rounded-lg shadow-sm border border-sidebar-border"
+                            >
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2">
+                                  <Badge variant="outline">{event.type}</Badge>
+                                  <span className="text-sm text-gray-500">
+                                    {new Date(event.date).toLocaleDateString("es-ES")}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-sm">{event.description}</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-center text-gray-500">No hay registros de eventos.</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p>Seleccione un participante para ver su información.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="fixed bottom-4 right-4 z-50 lg:hidden">
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
