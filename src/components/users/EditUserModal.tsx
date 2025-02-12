@@ -88,7 +88,6 @@ export function EditUserModal({ id, setIsOpen }: EditUserModalProps) {
     queryFn: getRoles,
   })
 
-
   const [isHovered, setIsHovered] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
