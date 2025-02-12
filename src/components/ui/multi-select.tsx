@@ -40,17 +40,15 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
       }
     }
 
+    let touchStartY = 0
+
     const handleTouchStart = (e: TouchEvent) => {
-      const scrollArea = scrollAreaRef.current
-      if (scrollArea) {
-        scrollArea.dataset.touchStartY = e.touches[0].clientY.toString()
-      }
+      touchStartY = e.touches[0].clientY
     }
 
     const handleTouchMove = (e: TouchEvent) => {
       const scrollArea = scrollAreaRef.current
       if (scrollArea) {
-        const touchStartY = parseFloat(scrollArea.dataset.touchStartY || "0")
         const touchCurrentY = e.touches[0].clientY
         const delta = touchStartY - touchCurrentY
         const { scrollTop, scrollHeight, clientHeight } = scrollArea
@@ -61,7 +59,7 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
           e.preventDefault()
         } else {
           scrollArea.scrollTop += delta
-          scrollArea.dataset.touchStartY = touchCurrentY.toString()
+          touchStartY = touchCurrentY
         }
       }
     }
