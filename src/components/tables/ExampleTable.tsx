@@ -50,6 +50,9 @@ export default function ExampleTable() {
         paginationComponentOptions={ { rowsPerPageText: 'Filas por página', rangeSeparatorText: 'de', selectAllRowsItem: true, selectAllRowsItemText: 'Todos' } }
         highlightOnHover
         pointerOnHover
+        customStyles={{ noData: { style: {
+          minHeight: '50px', // Establece la altura mínima deseada
+        } } }}
         noDataComponent="No hay actividades registradas"
     />
   )

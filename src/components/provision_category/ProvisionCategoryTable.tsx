@@ -89,6 +89,9 @@ export default function ProvisionCategoryTable({ searchTerm }: { searchTerm: str
                 highlightOnHover
                 pointerOnHover
                 noHeader
+                customStyles={{ noData: { style: {
+                    minHeight: '50px', // Establece la altura mínima deseada
+                  } } }}
                 noDataComponent="No hay categorías disponibles"
             />
 

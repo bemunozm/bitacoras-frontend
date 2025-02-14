@@ -113,6 +113,9 @@ export default function ParticipantTable({searchTerm}: {searchTerm: string}) {
                 highlightOnHover
                 pointerOnHover
                 noHeader
+                customStyles={{ noData: { style: {
+                    minHeight: '50px', // Establece la altura mínima deseada
+                  } } }}
                 noDataComponent="No hay participantes disponibles"
                 onRowClicked={handleRowClick}
             />

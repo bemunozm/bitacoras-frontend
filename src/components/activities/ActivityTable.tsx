@@ -158,6 +158,9 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
             highlightOnHover
             pointerOnHover
             noHeader
+            customStyles={{ noData: { style: {
+              minHeight: '50px', // Establece la altura mínima deseada
+            } } }}
             noDataComponent="No hay actividades disponibles"
             onRowClicked={(row) => user.roles?.some((role) => role?.name === 'Administrador') || (user.id === bitacora.user_id && bitacora.status === 'En Progreso') ? navigate(`/actividad/editar/${row.id}`) : navigate(`/actividad/${row.id}`)}
           />

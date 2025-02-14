@@ -94,6 +94,9 @@ export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
         highlightOnHover
         pointerOnHover
         noHeader
+        customStyles={{ noData: { style: {
+          minHeight: '50px', // Establece la altura mínima deseada
+        } } }}
         noDataComponent="No hay programas disponibles"
       />
 

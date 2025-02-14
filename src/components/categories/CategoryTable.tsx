@@ -88,6 +88,9 @@ export default function CategoryTable({ searchTerm }: { searchTerm: string }) {
         highlightOnHover
         pointerOnHover
         noHeader
+        customStyles={{ noData: { style: {
+          minHeight: '50px', // Establece la altura mínima deseada
+        } } }}
         noDataComponent="No hay categorías disponibles"
       />
 

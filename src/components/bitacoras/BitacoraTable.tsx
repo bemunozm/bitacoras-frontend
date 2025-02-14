@@ -132,6 +132,9 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
         highlightOnHover
         pointerOnHover
         noHeader
+        customStyles={{ noData: { style: {
+          minHeight: '50px', // Establece la altura mínima deseada
+        } } }}
         noDataComponent="No hay bitácoras disponibles"
         onRowClicked={(row) => navigate(`/bitacoras/${row.id}`)}
       />

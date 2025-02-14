@@ -163,6 +163,9 @@ const filteredParticipants = participants?.filter((participant: any) => {
           highlightOnHover
           pointerOnHover
           noHeader
+          customStyles={{ noData: { style: {
+            minHeight: '50px', // Establece la altura mínima deseada
+          } } }}
           noDataComponent="No hay participantes disponibles"
         />
       </div>

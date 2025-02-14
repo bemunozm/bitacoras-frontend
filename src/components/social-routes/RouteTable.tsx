@@ -112,6 +112,9 @@ export default function RouteTable({ data }: RouteTableProps) {
         highlightOnHover
         pointerOnHover
         noHeader
+        customStyles={{ noData: { style: {
+          minHeight: '50px', // Establece la altura mínima deseada
+        } } }}
         noDataComponent="Al parecer no hay prestaciones asignadas para esta fecha y turno."
         onRowClicked={handleRowClick} // Agregar evento onRowClicked
       />
