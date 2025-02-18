@@ -1,6 +1,6 @@
 import { getBitacorasByPeriod } from "@/api/BitacoraAPI";
 import ActivitiesByCategory from "@/components/charts/ActivitiesByCategory";
-import ActivitiesByResidence from "@/components/charts/ActivitiesByResidence";
+import ActivitiesByResidence from "@/components/charts/ActivitiesByProgram";
 import { LastActivities } from "@/components/charts/LastActivities";
 import TopUsers from "@/components/charts/TopUsers";
 import LoadingSpinner from "@/components/LoadingSpinner";

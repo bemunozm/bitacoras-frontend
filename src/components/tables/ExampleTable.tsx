@@ -33,7 +33,7 @@ export default function ExampleTable() {
     const rows = data?.map((bitacora) => 
       bitacora.activities?.map((activity: Activity) => ({
         ...activity,
-        user: bitacora.users.name
+        user: bitacora.user.name
       }))
     ).flat()
 

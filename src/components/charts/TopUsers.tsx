@@ -38,7 +38,7 @@ const formatPeriod = (period: string) => {
 
 export default function TopUsers({ bitacoras, period }: TopUsersProps) {
   const userActivityCount = bitacoras.reduce((acc, bitacora) => {
-    const userName = bitacora.users.name
+    const userName = bitacora.user.name
     acc[userName] = (acc[userName] || 0) + (bitacora.activities?.length || 0)
     return acc
   }, {} as Record<string, number>)
