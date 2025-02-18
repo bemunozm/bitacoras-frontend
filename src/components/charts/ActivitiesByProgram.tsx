@@ -10,35 +10,6 @@ type ActivitiesByResidenceProps = {
     period: string
 }
 
-const {data: programs } = useQuery({
-  queryKey: ['programs'],
-  queryFn: getPrograms
-});
-
-const groupActivitiesByProgram = (bitacoras: Bitacora[]) => {
-  const grouped: { [key: string]: { name: string, actividades: number } } = {}
-
-  // Initialize all programs with 0 activities
-  programs?.forEach(program => {
-  grouped[program.name] = { name: program.name, actividades: 0 }
-  })
-
-  // Count activities for each program
-  bitacoras.forEach(bitacora => {
-    const programName = bitacora.program?.name
-    if (programName && grouped[programName]) {
-      grouped[programName].actividades += bitacora.activities?.length || 0
-    }
-  })
-  
-  return grouped
-}
-
-const generateChartData = (bitacoras: Bitacora[]) => {
-  const groupedActivities = groupActivitiesByProgram(bitacoras)
-  return Object.values(groupedActivities)
-}
-
 const formatPeriod = (period: string) => {
   switch (period) {
     case 'current_month':
@@ -64,6 +35,36 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ActivitiesByResidence({bitacoras, period}: ActivitiesByResidenceProps) {
+
+  const {data: programs } = useQuery({
+    queryKey: ['programs'],
+    queryFn: getPrograms
+  });
+  
+  const groupActivitiesByProgram = (bitacoras: Bitacora[]) => {
+    const grouped: { [key: string]: { name: string, actividades: number } } = {}
+  
+    // Initialize all programs with 0 activities
+    programs?.forEach(program => {
+    grouped[program.name] = { name: program.name, actividades: 0 }
+    })
+  
+    // Count activities for each program
+    bitacoras.forEach(bitacora => {
+      const programName = bitacora.program?.name
+      if (programName && grouped[programName]) {
+        grouped[programName].actividades += bitacora.activities?.length || 0
+      }
+    })
+    
+    return grouped
+  }
+  
+  const generateChartData = (bitacoras: Bitacora[]) => {
+    const groupedActivities = groupActivitiesByProgram(bitacoras)
+    return Object.values(groupedActivities)
+  }
+  
   const chartData = generateChartData(bitacoras)
 
   return (
