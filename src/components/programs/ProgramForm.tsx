@@ -5,15 +5,13 @@ import { createProgram } from "@/api/ProgramAPI";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import type { ProgramForm, Residence } from "@/types";
+import type { ProgramForm } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
 import { getCoordinators } from "@/api/UserAPI";
-import { getResidences } from "@/api/ResidenceAPI";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"; // Assuming you have a Select component
 import { states } from "@/data/states";
 import { useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import { MultiSelect } from "@/components/ui/multi-select"
 
 type ProgramFormProps = {
     setIsOpen: (isOpen: boolean) => void;
@@ -21,7 +19,6 @@ type ProgramFormProps = {
 
 export function ProgramForm({ setIsOpen }: ProgramFormProps) {
 
-    const [selectedResidences, setSelectedResidences] = useState<number[]>([]);
     const [isSaving, setIsSaving] = useState(false);
 
     const initialValues = {
@@ -40,11 +37,6 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
     const {data: coordinators, isLoading: isLoadingCoordinators} = useQuery({
         queryKey: ['coordinators'],
         queryFn: getCoordinators
-    });
-
-    const {data: residences, isLoading: isLoadingResidences} = useQuery({
-        queryKey: ['residences'],
-        queryFn: getResidences
     });
 
     const { mutate } = useMutation({
@@ -72,10 +64,10 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
     const handleCreate = (formData: ProgramForm) => {
         setIsSaving(true);
         console.log('creando')
-        mutate({...formData, residences: selectedResidences});
+        mutate(formData);
     };
 
-    if (isLoadingCoordinators || isLoadingResidences) return <LoadingSpinner className="h-10"/>
+    if (isLoadingCoordinators) return <LoadingSpinner className="h-10"/>
 
     return (
         <form noValidate onSubmit={handleSubmit(handleCreate)} className="space-y-6 px-4">
@@ -155,25 +147,6 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
                         </SelectContent>
                     </Select>
                     {errors.coordinator_id && <ErrorMessage className=" col-start-2 col-end-4">{errors.coordinator_id.message}</ErrorMessage>}
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="residences" className="text-right dark:text-sidebar-foreground">
-                      Residencias
-                    </Label>
-                    <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
-                      {residences && (
-                        <MultiSelect
-                          options={residences!.map((residence: Residence) => ({
-                            label: residence.name,
-                            value: residence.id.toString(),
-                          }))}
-                          selected={selectedResidences.map(String)}
-                          onChange={(selected) => setSelectedResidences(selected.map(Number))}
-                          placeholder="Selecciona una o más residencias"
-                        />
-                      )}
-                    </div>
-                    {errors.residences && <ErrorMessage className=" col-start-2 col-end-4">{errors.residences.message}</ErrorMessage>}
                 </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">

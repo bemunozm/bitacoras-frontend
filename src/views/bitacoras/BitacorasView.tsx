@@ -8,9 +8,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BitacoraForm } from "@/components/bitacoras/BitacoraForm";
 import { useAuth } from "@/hooks/useAuth";
 import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+import { ReplacementBitacoraForm } from "@/components/bitacoras/ReplacementBitacoraForm";
 
 export default function BitacorasView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateOpenReplacement, setIsCreateOpenReplacement] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [tab, setTab] = useState("all");
 
@@ -35,11 +37,22 @@ export default function BitacorasView() {
       >
         {data && <BitacoraForm user={data} setIsOpen={setIsCreateOpen} />}
       </ResponsiveDialog>
+
+      <ResponsiveDialog
+        isOpen={isCreateOpenReplacement}
+        setIsOpen={setIsCreateOpenReplacement}
+        title="Crear una nueva bitácora de reemplazo"
+        description="Rellena el formulario para crear una nueva bitácora de reemplazo."
+      >
+        {data && <ReplacementBitacoraForm user={data} setIsOpen={setIsCreateOpenReplacement}/>}
+      </ResponsiveDialog>
+
       <div className="p-6 space-y-4">
         <div className="flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
           <h2 className="text-3xl text-center font-bold tracking-tight dark:text-sidebar-foreground">
             Bitácoras
           </h2>
+          <div className="flex flex-col gap-2 md:flex-row md:gap-4">
           <Button
             onClick={() => setIsCreateOpen(true)}
             className="flex items-center space-x-1"
@@ -47,6 +60,14 @@ export default function BitacorasView() {
             <Plus className="mr-2 h-4 w-4" />
             Bitácora
           </Button>
+          <Button
+            onClick={() => setIsCreateOpenReplacement(true)}
+            className="flex items-center space-x-1"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Bitácora Remplazo
+          </Button>
+          </div>
         </div>
 
         <div className="flex items-center justify-between">
@@ -67,6 +88,7 @@ export default function BitacorasView() {
                 <TabsList>
                     <TabsTrigger value="all">Todas las bitácoras</TabsTrigger>
                     <TabsTrigger value="mine">Mis bitácoras</TabsTrigger>
+                    {data?.roles?.some((role) => role?.name === 'Coordinador') && <TabsTrigger value="coordinator">Mis programas</TabsTrigger>} 
                 </TabsList>
             </div>
           <TabsContent value="all">
@@ -74,6 +96,9 @@ export default function BitacorasView() {
           </TabsContent>
           <TabsContent value="mine">
             {data && <BitacoraTable user={data} searchTerm={searchTerm} filter="mine" />}
+          </TabsContent>
+          <TabsContent value="coordinator">
+            {data && <BitacoraTable user={data} searchTerm={searchTerm} filter="coordinator" />}
           </TabsContent>
         </Tabs>
       </div>

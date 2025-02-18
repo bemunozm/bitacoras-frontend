@@ -9,7 +9,6 @@ import NewPasswordView from './views/auth/NewPasswordView'
 import RequestNewCodeView from './views/auth/RequestNewCodeView'
 import RolesView from './views/roles/RolesView'
 import UsersView from './views/users/UsersView'
-import ResidencesView from './views/residences/ResidencesView'
 import CategoriesView from './views/categories/CategoriesView'
 import ProgramsView from './views/programs/ProgramsView'
 import BitacorasView from './views/bitacoras/BitacorasView'
@@ -21,16 +20,8 @@ import UnauthorizedView from './views/UnauthorizedView'
 import ProtectedRoute from './layouts/ProtectedRoute'
 import EditActivityDetailsView from './views/activities/EditActivityDetailsView'
 import NotFound from './views/NotFound'
-import ParticipantsView from './views/participants/ParticipantsView'
-import ProvisionsView from './views/provisions/ProvisionsView'
-import ProvisionCategoriesView from './views/provisionCategories/ProvisionCategoriesView'
-import ParticipantDetailsView from './views/participants/ParticipantDetailsView'
-import DiseasesView from './views/diseases/DiseasesView'
-import EventsView from './views/events/EventsView'
-import RoutesView from './views/social-routes/RoutesView'
-import EntranceView from './views/residences/EntranceView'
-import DepartureView from './views/residences/DepartureView'
-import ResidenceDetailsView from './views/residences/ResidenceDetailsView'
+import ProgramDetailsView from './views/programs/ProgramDetailsView'
+import ReplacementsView from './views/replacements/ReplacementsView'
 
 
 
@@ -68,15 +59,13 @@ export default function Router(){
                     {/* Usuarios */}
                     <Route path='/usuarios' element={<ProtectedRoute requiredRoles={['Administrador']}><UsersView/></ProtectedRoute>}/>
 
-                    {/* Residencias */}
-                    <Route path='/residencias' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><ResidencesView/></ProtectedRoute>}/>
-                    <Route path='/residencias/:id' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><ResidenceDetailsView/></ProtectedRoute>}/>
-
                     {/* Categorias */}
                     <Route path='/categorias' element={<ProtectedRoute requiredRoles={['Administrador']}><CategoriesView/></ProtectedRoute>}/>
 
                     {/* Programas */}
-                    <Route path='/programas' element={<ProtectedRoute requiredRoles={['Administrador']}><ProgramsView/></ProtectedRoute>}/>
+                    <Route path='/programas' element={<ProtectedRoute requiredRoles={['Administrador', 'Coordinador']}><ProgramsView/></ProtectedRoute>}/>
+
+                    <Route path='/programas/:id' element={<ProtectedRoute requiredRoles={['Administrador', 'Coordinador']}><ProgramDetailsView/></ProtectedRoute>}/>
 
                     {/* Bitácora */}
                     <Route path='/bitacoras' element={<BitacorasView/>}/>
@@ -86,35 +75,11 @@ export default function Router(){
                      <Route path='/actividad/:id' element={<ActivityDetailsView/>}/>
                      <Route path='/actividad/editar/:id' element={<EditActivityDetailsView/>}/>
 
-                     {/* Participantes */}
-                        <Route path='/participantes/:id' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><ParticipantDetailsView/></ProtectedRoute>}/>
-
-                        <Route path='/participantes' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><ParticipantsView/></ProtectedRoute>}/>
-
-
-                    {/* Prestaciones */}
-                    <Route path='/prestaciones' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><ProvisionsView/></ProtectedRoute>}/>
-
-                    {/* Categorias de Prestaciones */}
-                    <Route path='/categorias-prestaciones' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><ProvisionCategoriesView/></ProtectedRoute>}/>
-
-                    {/* Enfermedades */}
-                    <Route path='/enfermedades' element={<ProtectedRoute requiredRoles={['Administrador']}><DiseasesView/></ProtectedRoute>}/>
-                    
-                    {/* Eventos */}
-                    <Route path='/eventos' element={<ProtectedRoute requiredRoles={['Administrador']}><EventsView/></ProtectedRoute>}/> 
-
-                    {/* Ruta Social */}
-                    <Route path='/ruta-social' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><RoutesView/></ProtectedRoute>}/>
+                     {/* Remplazos */}
+                     <Route path='/remplazos' element={<ProtectedRoute requiredRoles={['Administrador', 'Coordinador']}><ReplacementsView/></ProtectedRoute>}/> 
 
                     {/* Profile  */}
                     <Route path='/perfil' element={<EditProfileView/>}/>
-
-                    {/* Ingreso a residencia */}
-                    <Route path='/residencias/ingreso-residencia' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><EntranceView/></ProtectedRoute>}/>
-
-                    {/* Salida de la residencia */}
-                    <Route path='/residencias/salida-residencia' element={<ProtectedRoute requiredRoles={['Administrador', 'Monitor']}><DepartureView/></ProtectedRoute>}/>
                 </Route>
 
                 <Route path='/informe' element={<Informe/>}/>

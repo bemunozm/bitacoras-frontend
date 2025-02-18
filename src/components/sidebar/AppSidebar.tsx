@@ -1,17 +1,12 @@
 import * as React from "react";
 import {
-  Biohazard,
   BookOpen,
-  Bot,
+  BookUser,
   Command,
   Component,
-  Frame,
-  Home,
   LayoutDashboard,
-  Map,
-  MapPinned,
-  PieChart,
-  Settings2,
+  School2Icon,
+  Tag,
   Users,
 } from "lucide-react";
 
@@ -44,42 +39,6 @@ const data = {
       url: "/bitacoras",
       icon: BookOpen,
     },
-    {
-      title: "Participantes",
-      url: "/participantes",
-      icon: Bot,
-    },
-    {
-      title: "Ruta Social",
-      url: "/ruta-social",
-      icon: MapPinned,
-    },
-    {
-      title: "Residencias",
-      url: "/residencias",
-      icon: Home,
-      items: [
-        {
-          title: "Ingreso a Residencia",
-          url: "/residencias/ingreso-residencia",
-        },
-        {
-          title: "Salida de Residencia",
-          url: "/residencias/salida-residencia",
-        },
-      ],
-    },
-    {
-      title: "Prestaciones",
-      url: "/prestaciones",
-      icon: Settings2,
-      items: [
-        {
-          title: "Categorías de Prestaciones",
-          url: "/categorias-prestaciones",
-        },
-      ],
-    },
   ],
   navSecondary: [
     // {
@@ -95,19 +54,14 @@ const data = {
   ],
   admin: [
     {
-      name: "Programas",
-      url: "/programas",
-      icon: PieChart,
-    },
-    {
       name: "Categorías",
       url: "/categorias",
-      icon: Frame,
+      icon: Tag,
     },
     {
-      name: "Residencias",
-      url: "/residencias",
-      icon: Map,
+      name: "Dispositivo/Programa",
+      url: "/programas",
+      icon: School2Icon,
     },
     {
       name: "Usuarios",
@@ -115,14 +69,14 @@ const data = {
       icon: Users,
     },
     {
+      name: "Remplazos",
+      url: "/remplazos",
+      icon: BookUser,
+    },
+    {
       name: "Roles",
       url: "/roles",
       icon: Component,
-    },
-    {
-      name: 'Enfermedades',
-      url: '/enfermedades',
-      icon: Biohazard,
     }
   ],
 };
@@ -132,11 +86,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   if (isError) return <Navigate to="/auth/login" />;
 
-  const filteredNavMain = data.navMain.filter((item) => {
-    if (["/participantes", "/ruta-social", "/residencias", "/prestaciones"].includes(item.url)) {
-      return user?.roles?.some((role) => role?.name === "Administrador" || role?.name === "Monitor");
+  const adminItems = data.admin.filter((item) => {
+    if (user?.roles?.some((role) => role?.name === "Administrador")) {
+      return true;
     }
-    return true;
+    if (user?.roles?.some((role) => role?.name === "Coordinador")) {
+      return item.url === "/programas" || item.url === "/remplazos";
+    }
+    return false;
   });
 
   return (
@@ -160,10 +117,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={filteredNavMain} />
-        {user?.roles?.some((role) => role?.name === "Administrador") && (
-          <NavAdmin items={data.admin} />
-        )}
+        <NavMain items={data.navMain} />
+        {adminItems.length > 0 && <NavAdmin items={adminItems} />}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>

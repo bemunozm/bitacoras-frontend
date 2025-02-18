@@ -18,6 +18,7 @@ import ReopenBitacoraModal from '@/components/bitacoras/ReopenBitacoraModal'
 import { useAuth } from '@/hooks/useAuth'
 import { useBreadcrumb } from '@/contexts/BreadcrumbContext'
 import NotFound from '../NotFound'
+import InformePerDay from '@/components/pdfs/InformePerDay'
 
 export default function BitacoraDetailsView() {
 
@@ -77,6 +78,11 @@ export default function BitacoraDetailsView() {
 
   const {data: user, isLoading: isUserLoading} = useAuth()
 
+  // Agregar estas variables después de obtener user y bitacora
+  const isAdmin = user?.roles?.some(role => role?.name === 'Administrador')
+  const isCoordinator = bitacora?.program.users?.find((programUser) => programUser.is_coordinator)?.user.id === user?.id
+  const isBitacoraOwner = user?.id === bitacora?.user_id
+  const ownerIsReplacement = bitacora?.user.is_replacement
   if (isLoading || isUserLoading) {
     return <LoadingSpinner />
   }
@@ -116,7 +122,8 @@ export default function BitacoraDetailsView() {
             </Badge>
           </div>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            {bitacora?.status === 'En Progreso' && (user?.roles?.some((role) => role?.name === 'Administrador')  || user?.id === bitacora.user_id) && (
+            {/* En Progreso - Solo admin o dueño de la bitácora */}
+            {bitacora?.status === 'En Progreso' && ((isAdmin || isBitacoraOwner) || ((isAdmin || isCoordinator) && ownerIsReplacement)) && (
               <Button 
                 onClick={() => setIsCompleteConfirmOpen(true)}
                 variant="default"
@@ -125,7 +132,9 @@ export default function BitacoraDetailsView() {
                 Marcar Completada
               </Button>
             )}
-            {bitacora?.status === 'Completado' && (user?.roles?.some((role) => role?.name === 'Administrador' || role?.name === 'Coordinador')) && (
+
+            {/* Completado - Solo admin o coordinador del programa */}
+            {bitacora?.status === 'Completado' && (isAdmin || isCoordinator) && (
               <Button 
                 onClick={() => setIsApproveConfirmOpen(true)}
                 variant="default"
@@ -134,7 +143,9 @@ export default function BitacoraDetailsView() {
                 Marcar Aprobada
               </Button>
             )}
-            {bitacora?.status === 'Aprobado' && (user?.roles?.some((role) => role?.name === 'Administrador' || role?.name === 'Coordinador')) && (
+
+            {/* Aprobado - Solo admin o coordinador del programa */}
+            {bitacora?.status === 'Aprobado' && (isAdmin || isCoordinator) && (
               <Button 
                 onClick={() => setIsReopenConfirmOpen(true)}
                 variant="secondary"
@@ -143,9 +154,11 @@ export default function BitacoraDetailsView() {
                 Volver a En Progreso
               </Button>
             )}
-            {(user?.roles?.some((role) => role?.name === 'Administrador') || (user?.id === bitacora?.user_id && bitacora?.status === 'En Progreso')) && (
+
+            {/* Editar/Eliminar - Solo admin o dueño si está En Progreso */}
+            {(isAdmin || (isBitacoraOwner && bitacora?.status === 'En Progreso') || (isCoordinator && ownerIsReplacement && bitacora.status === 'En Progreso')) && (
               <>
-                  <Button 
+                <Button 
                   variant="outline" 
                   className="w-full sm:w-auto dark:text-sidebar-foreground"
                   onClick={() => setIsEditOpen(true)}
@@ -163,16 +176,18 @@ export default function BitacoraDetailsView() {
                 </Button>
               </>
             )}
-            {bitacora?.status === 'Aprobado' && (user?.roles?.some((role) => role?.name === 'Administrador' || role?.name === 'Coordinador')) && (
+
+            {/* Generar Informe - Solo admin o coordinador del programa cuando está Aprobado */}
+            {bitacora?.status === 'Aprobado' && (isAdmin || isCoordinator) && (
               <Button 
-              variant="default" 
-              className="w-full sm:w-auto"
-              onClick={handleGenerarInforme}
-              disabled={isDownloadingInforme}
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              {isDownloadingInforme ? "Descargando..." : "Generar Informe"}
-            </Button>
+                variant="default" 
+                className="w-full sm:w-auto"
+                onClick={handleGenerarInforme}
+                disabled={isDownloadingInforme}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                {isDownloadingInforme ? "Descargando..." : "Generar Informe"}
+              </Button>
             )}
           </div>
         </div>
@@ -183,11 +198,11 @@ export default function BitacoraDetailsView() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-1">
             <Label className="text-xs dark:text-sidebar-foreground">Usuario</Label>
-            <p className="font-medium dark:text-sidebar-foreground">{bitacora?.users.name}</p>
+            <p className="font-medium dark:text-sidebar-foreground">{bitacora?.user.name}</p>
           </div>
           <div className="space-y-1">
             <Label className="text-xs dark:text-sidebar-foreground">Programa</Label>
-            <p className="font-medium dark:text-sidebar-foreground">{bitacora?.programs.name}</p>
+            <p className="font-medium dark:text-sidebar-foreground">{bitacora?.program.name}</p>
           </div>
           <div className="space-y-1">
             <Label className="text-xs dark:text-sidebar-foreground">Mes</Label>
@@ -247,7 +262,15 @@ export default function BitacoraDetailsView() {
             <ReopenBitacoraModal handleStatusChange={() => handleStatusChange('Aprobado')} setIsOpen={setIsApproveConfirmOpen} isOpen={isApproveConfirmOpen} />
           </ResponsiveDialog>
 
-          {isInformeOpen && <div className='hidden'> <Informe key={informeKey} bitacora={bitacora}/> </div>}
+          {isInformeOpen && (
+            <div className='hidden'>
+              {bitacora.user.roles?.some(role => role?.name === 'Administrativo') ? (
+                <Informe key={informeKey} bitacora={bitacora}/>
+              ) : (
+                <InformePerDay key={informeKey} bitacora={bitacora}/>
+              )}
+            </div>
+          )}
           
         </>
       )}

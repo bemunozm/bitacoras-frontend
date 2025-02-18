@@ -72,7 +72,7 @@ export default function ActivityDetailsView() {
                     <Label htmlFor="category_id" className="text-right dark:text-sidebar-foreground">
                       Categoría
                     </Label>
-                    <p className="col-span-3 dark:text-sidebar-foreground">{activity.categories.name}</p>
+                    <p className="col-span-3 dark:text-sidebar-foreground">{activity.category.name}</p>
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="description" className="text-right dark:text-sidebar-foreground">
@@ -101,7 +101,7 @@ export default function ActivityDetailsView() {
                 <Label htmlFor="category_id" className="dark:text-sidebar-foreground">
                   Categoría
                 </Label>
-                <p className="dark:text-sidebar-foreground">{activity.categories.name}</p>
+                <p className="dark:text-sidebar-foreground">{activity.category.name}</p>
               </div>
               <div className="grid grid-cols-1 items-center gap-4">
                 <Label htmlFor="description" className="dark:text-sidebar-foreground">

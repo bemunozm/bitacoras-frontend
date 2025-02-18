@@ -6,14 +6,12 @@ import { getProgram, updateProgram } from "@/api/ProgramAPI";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import type { Program, ProgramForm, Residence } from "@/types";
+import type { Program, ProgramForm, ProgramUser } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
 import LoadingSpinner from "../LoadingSpinner";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { getCoordinators } from "@/api/UserAPI";
-import { getResidences } from "@/api/ResidenceAPI";
 import { states } from '@/data/states';
-import { MultiSelect } from "@/components/ui/multi-select";
 
 type EditProgramProps = {
   id: Program['id'];
@@ -27,12 +25,14 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
     enabled: !!id
   });
 
+  const coordinator = program?.users?.find((user: ProgramUser) => user.is_coordinator)?.user;
+
   const initialValues = {
     name: program?.name || '',
     company: program?.company || '',
     address: program?.address || '',
     state: program?.state || '',
-    coordinator_id: program?.coordinator_id || 0,
+    coordinator_id: coordinator?.id || 0,
     residences: [],
   };
 
@@ -43,12 +43,6 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
     queryFn: getCoordinators
   });
 
-  const { data: residences, isLoading: isLoadingResidences } = useQuery({
-    queryKey: ['residences'],
-    queryFn: getResidences
-  });
-
-  const [selectedResidences, setSelectedResidences] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -56,9 +50,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
     setValue('company', program?.company || '');
     setValue('address', program?.address || '');
     setValue('state', program?.state || '');
-    setValue('coordinator_id', program?.coordinator_id || 0);
-    const residencesId = program?.residences?.map((residence: Residence) => residence.id) || [];
-    setSelectedResidences(residencesId);
+    setValue('coordinator_id', coordinator?.id || 0);
   }, [program, setValue]);
 
   const queryClient = useQueryClient();
@@ -87,10 +79,10 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
 
   const handleEdit = (formData: ProgramForm) => {
     setIsSaving(true);
-    mutate({ ...formData, residences: selectedResidences });
+    mutate(formData);
   };
   
-  if (isLoading || isLoadingResidences || isLoadingCoordinators) return <LoadingSpinner className="h-10" />;
+  if (isLoading || isLoadingCoordinators) return <LoadingSpinner className="h-10" />;
 
   return (
     <form className="space-y-6 px-4" noValidate onSubmit={handleSubmit(handleEdit)}>
@@ -158,10 +150,10 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
           <Select
             {...register('coordinator_id', { required: 'Este campo es requerido' })}
             onValueChange={(value) => setValue('coordinator_id', parseInt(value))}
-            defaultValue={program?.coordinator.name}
+            defaultValue={coordinator?.name}
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
-              <SelectValue placeholder="Seleccione un coordinador" defaultValue={program?.coordinator.id} >
+              <SelectValue placeholder="Seleccione un coordinador" defaultValue={coordinator?.id} >
                 {coordinators?.find(coordinator => coordinator.id === watch('coordinator_id'))?.name}
               </SelectValue>
             </SelectTrigger>
@@ -172,25 +164,6 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
             </SelectContent>
           </Select>
           {errors.coordinator_id && <ErrorMessage className=" col-start-2 col-end-4">{errors.coordinator_id.message}</ErrorMessage>}
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="residences" className="text-right dark:text-sidebar-foreground">
-            Residencias
-          </Label>
-          <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
-            {residences && (
-              <MultiSelect
-                options={residences!.map((residence: Residence) => ({
-                  label: residence.name,
-                  value: residence.id.toString(),
-                }))}
-                selected={selectedResidences.map(String)}
-                onChange={(selected) => setSelectedResidences(selected.map(Number))}
-                placeholder="Selecciona una o más residencias"
-              />
-            )}
-          </div>
-          {errors.residences && <ErrorMessage className=" col-start-2 col-end-4">{errors.residences.message}</ErrorMessage>}
         </div>
       </div>
       <div className="flex justify-end">

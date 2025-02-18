@@ -100,3 +100,52 @@ export async function getCoordinators() {
         }
     }
 }
+
+export async function createReplacement(formData: UserForm) {
+    try {
+        const url = '/users/create-replacement'
+        const { data } = await api.post<string>(url, formData)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function getReplacements() {
+    try {
+        const url = '/users/get-replacements'
+        const { data } = await api.get(url)
+        console.log('Reemplazos', data)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function getReplacement(id: User['id']) {
+    try {
+        const url = `/users/get-replacement/${id}`
+        const { data } = await api.get(url)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+export async function updateReplacement(formData: UserUpdateForm) {
+    try {
+        const url = `/users/update-replacement/${formData.id}`
+        const { data } = await api.put<string>(url, formData)
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}

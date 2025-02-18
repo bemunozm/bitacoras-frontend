@@ -18,12 +18,17 @@ import type { Attachment } from '@/types'
 import { useBreadcrumb } from '@/contexts/BreadcrumbContext'
 import NotFound from '../NotFound'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { ChevronsUpDown, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export default function EditActivityDetailsView() {
   const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([])
   const [existingAttachments, setExistingAttachments] = useState<Attachment[]>([]) // Nuevo estado
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const activityId = useParams().id
 
@@ -100,7 +105,8 @@ export default function EditActivityDetailsView() {
   }
 
   const handleCategoryChange = (selected: string) => {
-    setSelectedCategory(parseInt(selected))
+    setSelectedCategory(parseInt(selected));
+    setValue('category_id', parseInt(selected)); // Añadir esta línea para actualizar el valor del formulario
   }
 
   const {setBreadcrumbItems} = useBreadcrumb()
@@ -176,10 +182,15 @@ export default function EditActivityDetailsView() {
                               {categories?.find(category => category.id === selectedCategory)?.name}
                             </SelectValue>
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="max-w-[500px]">
                             {categories!.map((category: any) => (
                               <SelectItem key={category.id} value={category.id.toString()}>
-                                {category.name}
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{category.name}</span>
+                                  <span className="text-sm text-gray-500 dark:text-gray-400 break-words px-2">
+                                    {category.description}
+                                  </span>
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -256,23 +267,55 @@ export default function EditActivityDetailsView() {
                   {isLoadingCategories ? (
                     <p>Cargando Categorías</p>
                   ) : (
-                    <Select
-                      value={selectedCategory?.toString() || ''}
-                      onValueChange={handleCategoryChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona una categoría">
-                          {categories?.find(category => category.id === selectedCategory)?.name}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories!.map((category: any) => (
-                          <SelectItem key={category.id} value={category.id.toString()}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                      <DrawerTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className="w-full justify-between"
+                        >
+                          {selectedCategory 
+                            ? categories?.find(cat => cat.id === selectedCategory)?.name 
+                            : "Selecciona una categoría"}
+                          <ChevronsUpDown className="opacity-50" />
+                        </Button>
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="mt-4 border-t">
+                          <Command>
+                            <CommandInput placeholder="Buscar categoría..." className="h-9 text-base" />
+                            <CommandList>
+                              <CommandEmpty>No se encontraron categorías.</CommandEmpty>
+                              <CommandGroup>
+                                {categories!.map((category) => (
+                                  <CommandItem
+                                    value={category.name}
+                                    key={category.id}
+                                    onSelect={() => {
+                                      handleCategoryChange(category.id.toString());
+                                      setIsDrawerOpen(false);
+                                    }}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{category.name}</span>
+                                      <span className="text-sm text-gray-500 dark:text-gray-400 break-words">
+                                        {category.description}
+                                      </span>
+                                    </div>
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        category.id === selectedCategory ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
                   )}
                 </div>
                 {errors.category_id && <p className="text-red-500">{errors.category_id.message}</p>}

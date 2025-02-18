@@ -21,6 +21,7 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
     queryKey: ['bitacoras'],
     queryFn: getBitacoras
   });
+  
 
   const navigate = useNavigate();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -31,9 +32,11 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
     if (filter === "mine") {
       const currentUser = user?.id; // Reemplaza esto con la lógica real
       return bitacora.user_id === currentUser;
+    } else if (filter === 'coordinator') {
+      return bitacora.program?.users?.find((programUser) => programUser.is_coordinator)?.user.id === user.id;
     }
     return bitacora.created_at.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           bitacora.users.name.toLowerCase().includes(searchTerm.toLowerCase());
+           bitacora.user.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const columns = [
@@ -44,7 +47,7 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
     },
     {
       name: 'Usuario',
-      selector: (row: Bitacora) => row.users.name,
+      selector: (row: Bitacora) => row.user.name,
       sortable: true,
     },
     {
@@ -63,12 +66,12 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
     },
     {
       name: 'Programa',
-      selector: (row: Bitacora) => row.programs.name,
+      selector: (row: Bitacora) => row.program.name,
       sortable: true,
     },
     {
       name: 'Coordinador',
-      selector: (row: Bitacora) => row.programs.coordinator.name,
+      selector: (row: Bitacora) => row.program?.users?.find((programUser) => programUser.is_coordinator)?.user.name ?? 'Sin coordinador',
       sortable: true,
     },
     {

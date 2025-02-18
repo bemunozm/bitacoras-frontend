@@ -6,21 +6,24 @@ import { ProgramForm } from "@/components/programs/ProgramForm";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import ProgramTable from "@/components/programs/ProgramTable";
 import { useBreadcrumb } from '@/contexts/BreadcrumbContext';
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProgramsView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const { data: user } = useAuth();
+  const {setBreadcrumbItems} = useBreadcrumb();
 
-  const {setBreadcrumbItems} = useBreadcrumb()
+  const isAdmin = user?.roles?.some((role) => role?.name === "Administrador");
     
-      useEffect(() => {
-        const route = [
-            {label: 'Escritorio', to: '/'},
-            {label: 'Administración', to: undefined},
-            {label: 'Programas', to: undefined}
-        ]
-        setBreadcrumbItems(route)
-        }, [setBreadcrumbItems])
+  useEffect(() => {
+    const route = [
+      {label: 'Escritorio', to: '/'},
+      {label: isAdmin ? 'Administración' : 'Coordinación', to: undefined},
+      {label: 'Programas', to: undefined}
+    ]
+    setBreadcrumbItems(route)
+  }, [setBreadcrumbItems, isAdmin])
 
   return (
     <>
@@ -37,13 +40,15 @@ export default function ProgramsView() {
           <h2 className="text-3xl text-center font-bold tracking-tight dark:text-sidebar-foreground">
             Programas
           </h2>
-          <Button
-            onClick={() => setIsCreateOpen(true)}
-            className="flex items-center space-x-1"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Programa
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="flex items-center space-x-1"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Programa
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center justify-between">

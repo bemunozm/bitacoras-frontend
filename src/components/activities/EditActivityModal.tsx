@@ -13,6 +13,11 @@ import { getCategories } from "@/api/CategoryAPI";
 import type { Attachment, Category } from "@/types";
 import LoadingSpinner from "../LoadingSpinner";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ChevronsUpDown, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type EditActivityModalProps = {
   id: number;
@@ -105,7 +110,11 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
 
   const handleCategoryChange = (selected: string) => {
     setSelectedCategory(parseInt(selected));
+    setValue('category_id', parseInt(selected)); // Añadir esta línea para actualizar el valor del formulario
   };
+
+  const isMobile = useIsMobile();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   if (isLoadingActivity || isLoadingCategories || !attachmentsLoaded) return <LoadingSpinner className="h-10" />;
 
@@ -142,6 +151,56 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
           <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
             {isLoadingCategories ? (
               <p>Cargando Categorías</p>
+            ) : isMobile ? (
+              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {selectedCategory 
+                      ? categories?.find(cat => cat.id === selectedCategory)?.name 
+                      : "Selecciona una categoría"}
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <div className="mt-4 border-t">
+                    <Command>
+                      <CommandInput placeholder="Buscar categoría..." className="h-9 text-base" />
+                      <CommandList>
+                        <CommandEmpty>No se encontraron categorías.</CommandEmpty>
+                        <CommandGroup>
+                          {categories!.map((category) => (
+                            <CommandItem
+                              value={category.name}
+                              key={category.id}
+                              onSelect={() => {
+                                handleCategoryChange(category.id.toString());
+                                setIsDrawerOpen(false);
+                              }}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{category.name}</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400 break-words">
+                                  {category.description}
+                                </span>
+                              </div>
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  category.id === selectedCategory ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             ) : (
               <Select
                 value={selectedCategory?.toString() || ''}
@@ -152,10 +211,15 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
                     {categories?.find(category => category.id === selectedCategory)?.name}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-w-[500px]">
                   {categories!.map((category: Category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
+                      <div className="flex flex-col">
+                        <span className="font-medium">{category.name}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 break-words px-2">
+                          {category.description}
+                        </span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>

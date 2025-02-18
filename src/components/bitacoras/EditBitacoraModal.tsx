@@ -11,6 +11,7 @@ import ErrorMessage from "@/components/ErrorMessage";
 import LoadingSpinner from "../LoadingSpinner";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { getPrograms } from "@/api/ProgramAPI";
+import { useAuth } from '@/hooks/useAuth';
 
 type EditBitacoraProps = {
   id: Bitacora['id'];
@@ -38,6 +39,8 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
     enabled: !!id
   });
 
+  const user = useAuth();
+
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       month: '',
@@ -53,6 +56,12 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
     queryKey: ['programs'],
     queryFn: getPrograms
   });
+
+  const filteredPrograms = user.data?.roles?.some((role) => role?.name === 'Administrador')
+    ? programs
+    : programs?.filter((program: Program) =>
+        program.users?.some((programUser) => programUser.user_id === user.data?.id)
+      );
 
   useEffect(() => {
     if (bitacora) reset(bitacora);
@@ -91,6 +100,8 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
 
   const lastThreeMonths = bitacora ? getLastThreeMonths(bitacora.created_at) : [];
 
+  const isAdmin = user.data?.roles?.some(role => role?.name === 'Administrador');
+
   if (isLoading || isLoadingPrograms) return <LoadingSpinner className="h-10" />;
 
   return (
@@ -103,6 +114,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
           <Select
             value={watch('month')}
             onValueChange={(value) => setValue('month', value)}
+            disabled={!isAdmin}
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Seleccione un mes">
@@ -136,23 +148,30 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
           <Select
             value={watch('program_id').toString()}
             onValueChange={(value) => setValue('program_id', parseInt(value))}
+            {...register('program_id', { required: 'Este campo es requerido' })}
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Seleccione un programa">
-                {programs?.find(program => program.id === watch('program_id'))?.name}
+                {filteredPrograms?.find(program => program.id === watch('program_id'))?.name}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {programs?.map((program: Program) => (
-                <SelectItem key={program.id} value={program.id.toString()}>{program.name}</SelectItem>
-              ))}
+              {filteredPrograms?.length ? (
+                filteredPrograms.map((program: Program) => (
+                  <SelectItem key={program.id} value={program.id.toString()}>{program.name}</SelectItem>
+                ))
+              ) : (
+                <div className="p-2 text-center text-muted-foreground text-sm">
+                  No hay programas disponibles
+                </div>
+              )}
             </SelectContent>
           </Select>
           {errors.program_id && <ErrorMessage className=" col-start-2 col-end-4">{errors.program_id.message}</ErrorMessage>}
         </div>
       </div>
       <div className="flex justify-end">
-        <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
+        <Button type="submit" disabled={isSaving || watch('program_id') === 0} className="w-full md:w-auto">
           {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </div>

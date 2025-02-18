@@ -122,9 +122,10 @@
 }
 
 .informe-actividades-container {
-  margin-top: 250px; /* Reducir margen superior */
-  padding: 0 64px; /* Agregar padding lateral */
-  page-break-after: always; /* Agregar salto de página después de las actividades */
+  position: relative;
+  margin-top: 250px; /* Margen base cuando no hay actividades generales */
+  padding: 0 64px;
+  page-break-after: always;
 }
 
 .informe-anexos-title {
@@ -229,6 +230,39 @@
 
 .totalPages::after {
   content: counter(pages);
+}
+
+.actividades-generales-container {
+  position: relative;
+  margin: 250px 64px 20px 64px;
+  padding: 10px;
+  border: 1px dashed #666;
+  border-radius: 4px;
+}
+
+.actividades-generales-container + .informe-actividades-container {
+  margin-top: 20px; /* Ajusta el margen cuando sí hay actividades generales */
+}
+
+.actividades-generales-title {
+  font-weight: 600;
+  font-size: 9px;
+  font-family: 'Inter';
+  margin-bottom: 8px;
+  color: black;
+}
+
+.actividades-generales-list {
+  list-style-type: disc;
+  margin-left: 15px;
+  font-size: 9px;
+  font-family: 'Inter';
+  color: black;
+}
+
+.actividades-generales-list li {
+  margin-bottom: 4px;
+  font-weight: 400;
 }
 
 /* Agregar la directiva @layer base correctamente */

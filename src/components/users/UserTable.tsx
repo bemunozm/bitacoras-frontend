@@ -31,7 +31,7 @@ export default function UserTable({searchTerm}: {searchTerm: string}) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
     const filteredUsers = data?.filter((user: User) => {
-        return user.name.toLowerCase().includes(searchTerm.toLowerCase());
+        return user.name.toLowerCase().includes(searchTerm.toLowerCase()) && !user.is_replacement;
     });
 
     

@@ -13,6 +13,11 @@ import { getCategories } from "@/api/CategoryAPI";
 import type { Category } from "@/types";
 import LoadingSpinner from "../LoadingSpinner";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ChevronsUpDown, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ActivityFormProps = {
   setIsOpen: (isOpen: boolean) => void;
@@ -32,6 +37,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
 
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false); // Nuevo estado
+  const isMobile = useIsMobile();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: createActivity,
@@ -113,15 +120,72 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
           <div className="col-span-3 mt-2 dark:text-sidebar-foreground">
             {isLoadingCategories ? (
               <p>Cargando Categorías</p>
+            ) : isMobile ? (
+              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {selectedCategory 
+                      ? categories?.find(cat => cat.id === selectedCategory)?.name 
+                      : "Selecciona una categoría"}
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <div className="mt-4 border-t">
+                    <Command>
+                      <CommandInput placeholder="Buscar categoría..." className="h-9 text-base" />
+                      <CommandList>
+                        <CommandEmpty>No se encontraron categorías.</CommandEmpty>
+                        <CommandGroup>
+                          {categories!.map((category) => (
+                            <CommandItem
+                              value={category.name}
+                              key={category.id}
+                              onSelect={() => {
+                                handleCategoryChange(category.id.toString());
+                                setIsDrawerOpen(false);
+                              }}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{category.name}</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400 break-words">
+                                  {category.description}
+                                </span>
+                              </div>
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  category.id === selectedCategory ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             ) : (
               <Select value={selectedCategory?.toString() || ''} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona una categoría" />
+                  <SelectValue placeholder="Selecciona una categoría">
+                    {selectedCategory && categories?.find(cat => cat.id === selectedCategory)?.name}
+                  </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-w-[500px]">
                   {categories!.map((category: Category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
+                      <div className="flex flex-col">
+                        <span className="font-medium">{category.name}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 break-words px-2">
+                          {category.description}
+                        </span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>

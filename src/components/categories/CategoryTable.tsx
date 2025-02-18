@@ -38,6 +38,11 @@ export default function CategoryTable({ searchTerm }: { searchTerm: string }) {
       name: 'Descripción',
       selector: (row: Category) => row.description || '',
       sortable: true,
+      cell: (row: Category) => {
+        const maxLength = 50;
+        const text = row.description || '';
+        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+      },
     },
     {
       name: 'Acciones',

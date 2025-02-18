@@ -1,4 +1,4 @@
-import { getPeriod } from '@/helpers';
+import { getPeriod, formatDate } from '@/helpers';
 import './Informe.css';
 import html2pdf from 'html2pdf.js';
 import { useEffect } from 'react';
@@ -7,47 +7,37 @@ const options = {
   filename: 'my-document.pdf',
   margin: 0,
   image: { type: 'jpeg', quality: 0.98 },
-  html2canvas: { scale: 4, useCORS: true }, // Agregar useCORS: true
+  html2canvas: { scale: 4, useCORS: true },
   jsPDF: { unit: 'px', format: [595, 842], orientation: 'portrait' },
 };
 
-const Informe = ({ bitacora } : any) => {
+const InformePerDay = ({ bitacora } : any) => {
 
-  
-  const getWeekFromDate = (date: string) => {
-    const d = new Date(date);
-    const start = new Date(d.getFullYear(), d.getMonth(), 1);
-    const diff = (d.getTime() - start.getTime()) + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60 * 1000);
-    const oneWeek = 1000 * 60 * 60 * 24 * 7;
-    const week = Math.floor(diff / oneWeek);
-    return `Semana ${week + 1}`;
-  };
-  
-  const groupActivitiesByWeekAndCategory = (activities: any[]) => {
+  const groupActivitiesByDayAndCategory = (activities: any[]) => {
     const grouped: any = {};
-
+  
     activities
-      // Filtrar para excluir las Actividades Generales del agrupamiento por semana
+      // Filtrar para excluir las Actividades Generales del agrupamiento por día
       .filter(activity => activity.category.name !== 'Actividades Generales')
       .forEach((activity) => {
-        const week = getWeekFromDate(activity.date);
+        const day = formatDate(activity.date);
         const category = activity.category.name;
-
-        if (!grouped[week]) {
-          grouped[week] = {};
+    
+        if (!grouped[day]) {
+          grouped[day] = {};
         }
-
-        if (!grouped[week][category]) {
-          grouped[week][category] = []; 
+    
+        if (!grouped[day][category]) {
+          grouped[day][category] = []; 
         }
-
-        grouped[week][category].push(activity);
+    
+        grouped[day][category].push(activity);
       });
-
+  
     return grouped;
   };
 
-  const groupedActivities = groupActivitiesByWeekAndCategory(bitacora.activities);
+  const groupedActivities = groupActivitiesByDayAndCategory(bitacora.activities);
 
   useEffect(() => {
     const element = document.getElementById('informe');
@@ -70,8 +60,6 @@ const Informe = ({ bitacora } : any) => {
     });
   }, [bitacora]);
 
-  console.log('Desde informe',bitacora.activities)
-
   return (
     <div className="full-width-container">
       <div id="informe" className="informe-container">
@@ -83,7 +71,7 @@ const Informe = ({ bitacora } : any) => {
                 <td className="informe-header">Responsable</td>
                 <td className="informe-data">{bitacora?.user.name}</td>
                 <td className="informe-header">Cargo</td>
-                <td className="informe-data">{bitacora?.user.job_position}</td>
+                <td className="informe-data">{bitacora.user.is_replacement ? 'Remplazo' : bitacora.user.job_position || 'Sin información'}</td>
               </tr>
               <tr>
                 <td className="informe-header">Dispositivo</td>
@@ -117,15 +105,15 @@ const Informe = ({ bitacora } : any) => {
         )}
 
         <div className="informe-actividades-container">
-          {Object.keys(groupedActivities).sort().map((week) => (
-            <div key={week}>
-              <div className="informe-actividades-sub-title uppercase">Actividades {week} - {getPeriod(bitacora.created_at)}:</div>
+          {Object.keys(groupedActivities).sort().map((day) => (
+            <div key={day}>
+              <div className="informe-actividades-sub-title uppercase">Actividades {day}:</div>
               <ul className="informe-actividades-list">
-                {Object.keys(groupedActivities[week]).map((category) => (
+                {Object.keys(groupedActivities[day]).map((category) => (
                   <li key={category}>
                     {category}:
                     <ul className="informe-actividades-sublist">
-                      {groupedActivities[week][category].map((activity: any) => (
+                      {groupedActivities[day][category].map((activity: any) => (
                         <li key={activity.id}>{activity.description}</li>
                       ))}
                     </ul>
@@ -174,4 +162,4 @@ const Informe = ({ bitacora } : any) => {
   );
 };
 
-export default Informe;
+export default InformePerDay;

@@ -12,8 +12,13 @@ import { useTheme } from '../theme-provider';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { themes } from "@/utils/theme";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
+  const navigate = useNavigate();
+  const { data: user } = useAuth();
+  const isAdmin = user?.roles?.some((role) => role?.name === "Administrador");
   const { data, isLoading } = useQuery({
     queryKey: ['programs'],
     queryFn: getPrograms
@@ -24,7 +29,14 @@ export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
   const filteredPrograms = data?.filter((program: Program) => {
-    return program.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const isCoordinator = program.users?.find((programUser) => programUser.is_coordinator)?.user.id === user?.id;
+    const matchesSearch = program.name.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (isAdmin) {
+      return matchesSearch;
+    }
+    
+    return isCoordinator && matchesSearch;
   });
 
   const columns = [
@@ -48,7 +60,7 @@ export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
       selector: (row: Program) => row.state,
       sortable: true,
     },
-    {
+    ...(isAdmin ? [{
       name: 'Acciones',
       cell: (row: Program) => (
         <DropdownMenu modal={false}>
@@ -71,9 +83,9 @@ export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
         </DropdownMenu>
       ),
       ignoreRowClick: true,
+      button: true,
       
-      button: true
-    }
+    }] : [])
   ];
 
   const theme = useTheme().theme;
@@ -95,9 +107,10 @@ export default function ProgramTable({ searchTerm }: { searchTerm: string }) {
         pointerOnHover
         noHeader
         customStyles={{ noData: { style: {
-          minHeight: '50px', // Establece la altura mínima deseada
+          minHeight: '50px',
         } } }}
         noDataComponent="No hay programas disponibles"
+        onRowClicked={(row) => navigate(`/programas/${row.id}`)}
       />
 
       {selectedProgram && (
