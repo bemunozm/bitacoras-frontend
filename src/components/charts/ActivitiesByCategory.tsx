@@ -11,12 +11,14 @@ type ActivitiesByCategoryProps = {
 const groupActivitiesByCategory = (activities: Activity[]) => {
    const grouped: { [key: string]: { name: string, value: number } } = {}
 
-    activities.forEach(activity => {
-      if (!grouped[activity.categories.name]) {
-         grouped[activity.categories.name] = { name: activity.categories.name, value: 0 }
-      }
-      grouped[activity.categories.name].value++
-    })
+    activities
+      .filter(activity => activity.category.name !== 'Actividades Generales')
+      .forEach(activity => {
+        if (!grouped[activity.category.name]) {
+           grouped[activity.category.name] = { name: activity.category.name, value: 0 }
+        }
+        grouped[activity.category.name].value++
+      })
 
     return grouped
 }
