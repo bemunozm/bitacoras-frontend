@@ -18,15 +18,22 @@ type EditProgramProps = {
   setIsOpen: (isOpen: boolean) => void;
 };
 
+/**
+ * Modal para editar un programa existente
+ * Permite modificar toda la información del programa y cambiar el coordinador
+ */
 export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
+  // Consulta de datos del programa
   const { data: program, isLoading } = useQuery({
     queryKey: ['program', id],
     queryFn: () => getProgram(id),
     enabled: !!id
   });
 
+  // Identificación del coordinador actual
   const coordinator = program?.users?.find((user: ProgramUser) => user.is_coordinator)?.user;
 
+  // Valores iniciales del formulario con datos existentes
   const initialValues = {
     name: program?.name || '',
     company: program?.company || '',
@@ -36,6 +43,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
     residences: [],
   };
 
+  // Configuración del formulario y consultas
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({ defaultValues: initialValues });
 
   const { data: coordinators, isLoading: isLoadingCoordinators } = useQuery({
@@ -43,8 +51,10 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
     queryFn: getCoordinators
   });
 
+  // Estado para control de guardado
   const [isSaving, setIsSaving] = useState(false);
 
+  // Efecto para actualizar el formulario cuando se cargan los datos
   useEffect(() => {
     setValue('name', program?.name || '');
     setValue('company', program?.company || '');
@@ -55,6 +65,7 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
 
   const queryClient = useQueryClient();
 
+  // Mutación para actualizar programa
   const { mutate } = useMutation({
     mutationFn: (data: ProgramForm) => updateProgram({ id: program!.id, ...data }),
     onError: (error) => {
@@ -85,6 +96,8 @@ export default function EditProgramModal({ id, setIsOpen }: EditProgramProps) {
   if (isLoading || isLoadingCoordinators) return <LoadingSpinner className="h-10" />;
 
   return (
+    // Formulario con los mismos campos que ProgramForm
+    // pero prellenados con la información existente
     <form className="space-y-6 px-4" noValidate onSubmit={handleSubmit(handleEdit)}>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">

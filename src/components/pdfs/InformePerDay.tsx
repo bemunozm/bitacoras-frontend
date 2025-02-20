@@ -3,23 +3,40 @@ import './Informe.css';
 import html2pdf from 'html2pdf.js';
 import { useEffect } from 'react';
 
+
+
+/**
+ * Componente que genera un informe mensual en PDF agrupando las actividades por día
+ * Similar a Informe.tsx pero con diferente agrupación temporal
+ * @param bitacora - Objeto con la información de la bitácora
+ */
+const InformePerDay = ({ bitacora } : any) => {
+
+  // Configuración para la generación del PDF
 const options = {
-  filename: 'my-document.pdf',
+  filename: `Informe ${bitacora.user.name} - ${getPeriod(bitacora.month)}.pdf`,
   margin: 0,
   image: { type: 'jpeg', quality: 0.98 },
   html2canvas: { scale: 4, useCORS: true },
   jsPDF: { unit: 'px', format: [595, 842], orientation: 'portrait' },
 };
 
-const InformePerDay = ({ bitacora } : any) => {
+  const turn = bitacora.program.users ? bitacora.program.users.find((user: any) => user.user_id == bitacora.user_id)?.turn : 'No especificado';
 
+  // Calcula la fecha de emisión (último día del mes del periodo informado)
+  const emisionDate = new Date(bitacora.month);
+  emisionDate.setMonth(emisionDate.getMonth() + 1);
+  emisionDate.setDate(0); // Esto establece la fecha al último día del mes anterior
+
+
+  // Agrupa las actividades por día y categoría, excluyendo las actividades generales
   const groupActivitiesByDayAndCategory = (activities: any[]) => {
     const grouped: any = {};
   
     activities
-      // Filtrar para excluir las Actividades Generales del agrupamiento por día
       .filter(activity => activity.category.name !== 'Actividades Generales')
       .forEach((activity) => {
+        // Usa formatDate para normalizar las fechas
         const day = formatDate(activity.date);
         const category = activity.category.name;
     
@@ -39,6 +56,7 @@ const InformePerDay = ({ bitacora } : any) => {
 
   const groupedActivities = groupActivitiesByDayAndCategory(bitacora.activities);
 
+  // Efecto para manejar la generación del PDF una vez que todas las imágenes están cargadas
   useEffect(() => {
     const element = document.getElementById('informe');
     const images = element?.getElementsByTagName('img');
@@ -63,6 +81,7 @@ const InformePerDay = ({ bitacora } : any) => {
   return (
     <div className="full-width-container">
       <div id="informe" className="informe-container">
+        {/* Cabecera del informe con información general */}
         <div className="informe-header-container">
           <div className="informe-title">Informe Mensual de Gestión</div>
           <table className="informe-table">
@@ -70,14 +89,14 @@ const InformePerDay = ({ bitacora } : any) => {
               <tr>
                 <td className="informe-header">Responsable</td>
                 <td className="informe-data">{bitacora?.user.name}</td>
-                <td className="informe-header">Cargo</td>
-                <td className="informe-data">{bitacora.user.is_replacement ? 'Remplazo' : bitacora.user.job_position || 'Sin información'}</td>
+                <td className="informe-header">Programa</td>
+                <td className="informe-data">{bitacora?.program.name}</td>
               </tr>
               <tr>
-                <td className="informe-header">Dispositivo</td>
-                <td className="informe-data">{bitacora?.program.name}</td>
-                <td className="informe-header">Región</td>
-                <td className="informe-data">{bitacora?.program.state}</td>
+                <td className="informe-header">Cargo</td>
+                <td className="informe-data">{bitacora.user.is_replacement ? 'Remplazo' : bitacora.user.job_position || 'Sin información'}</td>
+                <td className="informe-header">Turno</td>
+                <td className="informe-data">{turn}</td>
               </tr>
               <tr>
                 <td className="informe-header">Periodo Informado</td>
@@ -85,73 +104,101 @@ const InformePerDay = ({ bitacora } : any) => {
                 <td className="informe-header">Número de boleta</td>
                 <td className="informe-data">{bitacora?.recipe}</td>
               </tr>
+              <tr>
+                <td className="informe-header">Fecha de emisión</td>
+                <td className="informe-data">{emisionDate.toLocaleDateString()}</td>
+                <td className="informe-header">Región</td>
+                <td className="informe-data">{bitacora?.program.state}</td>
+              </tr>
             </tbody>
           </table>
           <img className="informe-logo-ministerio" src="/logo-ministerio.png" />
           <img className="informe-logo-fundacion" src="/logo-fundacion.png" />
         </div>
 
-        {bitacora.activities.some((activity: any) => activity.category.name === 'Actividades Generales') && (
-          <div className="actividades-generales-container">
-            <div className="actividades-generales-title">Actividades Generales</div>
-            <ul className="actividades-generales-list">
-              {bitacora.activities
-                .filter((activity: any) => activity.category.name === 'Actividades Generales')
-                .map((activity: any) => (
-                  <li key={activity.id}>{activity.description}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="informe-actividades-container">
-          {Object.keys(groupedActivities).sort().map((day) => (
-            <div key={day}>
-              <div className="informe-actividades-sub-title uppercase">Actividades {day}:</div>
-              <ul className="informe-actividades-list">
-                {Object.keys(groupedActivities[day]).map((category) => (
-                  <li key={category}>
-                    {category}:
-                    <ul className="informe-actividades-sublist">
-                      {groupedActivities[day][category].map((activity: any) => (
-                        <li key={activity.id}>{activity.description}</li>
-                      ))}
-                    </ul>
-                  </li>
+        <div className="informe-content">
+          {/* Sección de actividades generales si existen */}
+          {bitacora.activities.some((activity: any) => activity.category.name === 'Actividades Generales') && (
+            <div className="actividades-generales-container">
+              <div className="actividades-generales-title">Actividades Generales</div>
+              <ul className="actividades-generales-list">
+                {bitacora.activities
+                  .filter((activity: any) => activity.category.name === 'Actividades Generales')
+                  .map((activity: any) => (
+                    <li key={activity.id}>{activity.description}</li>
                 ))}
               </ul>
             </div>
-          ))}
-        </div>
-        <div className="informe-anexos">
-          <div className="informe-anexos-title">Anexos</div>
-          {bitacora?.activities.map((activity: any, index: number) => (
-            activity.attachments && activity.attachments.length > 0 && (
-              <div key={activity.id} className={`informe-anexo-actividad ${index % 2 === 0 ? 'page-break' : ''}`}>
-                <div className="informe-anexo-actividad-title">
-                  <ul className="informe-anexo-actividad-list">
-                    <li>{activity.description}</li>
-                  </ul>
-                </div>
-                <div className="informe-anexo-imagenes">
-                  {activity.attachments.map((attachment: any) => (
-                    <img key={attachment.id} src={attachment.image} alt={`Anexo ${attachment.id + 1}`} className="informe-anexo-imagen" />
+          )}
+
+          <div className="informe-actividades-container">
+            {Object.keys(groupedActivities).sort().map((day) => (
+              <div key={day}>
+                <div className="informe-actividades-sub-title uppercase">Actividades {day}:</div>
+                <ul className="informe-actividades-list">
+                  {Object.keys(groupedActivities[day]).map((category) => (
+                    <li key={category}>
+                      {category}:
+                      <ul className="informe-actividades-sublist">
+                        {groupedActivities[day][category].map((activity: any) => (
+                          <li key={activity.id}>{activity.description}</li>
+                        ))}
+                      </ul>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
-            )
-          ))}
-        </div>
-        <div className="signature-container">
-          <div className="signature-space">
-            <hr className="signature-line" />
-            <div className="signature-name">Firma Coordinador General</div>
-            <div className="signature-name">Mario Cortés Castillo</div>
+            ))}
           </div>
-          <div className="signature-space">
-            <hr className="signature-line" />
-            <div className="signature-name">{`Firma ${bitacora.user.job_position}`}</div>
-            <div className="signature-name">{bitacora.user.name}</div>
+          {/* Sección de anexos modificada */}
+          {bitacora?.activities.some((activity: any) => activity.attachments && activity.attachments.length > 0) && (
+            <div className="informe-anexos">
+              <div className="informe-anexos-title">Anexos</div>
+              {bitacora?.activities.map((activity: any) => {
+                if (!activity.attachments || activity.attachments.length === 0) return null;
+
+                // Dividir los anexos en grupos de 4 imágenes
+                const attachmentGroups = [];
+                for (let i = 0; i < activity.attachments.length; i += 4) {
+                  attachmentGroups.push(activity.attachments.slice(i, i + 4));
+                }
+
+                return attachmentGroups.map((group, groupIndex) => (
+                  <div key={`${activity.id}-${groupIndex}`} className={`informe-anexo-actividad ${groupIndex > 0 ? 'page-break' : ''}`}>
+                    {groupIndex === 0 && (
+                      <div className="informe-anexo-actividad-title">
+                        <ul className="informe-anexo-actividad-list">
+                          <li>{activity.description}</li>
+                        </ul>
+                      </div>
+                    )}
+                    <div className="informe-anexo-imagenes">
+                      {group.map((attachment: any) => (
+                        <img 
+                          key={attachment.id} 
+                          src={attachment.image} 
+                          alt={`Anexo ${attachment.id + 1}`} 
+                          className="informe-anexo-imagen"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })}
+            </div>
+          )}
+
+          <div className="signature-container">
+            <div className="signature-space">
+              <hr className="signature-line" />
+              <div className="signature-name">Firma Coordinador General</div>
+              <div className="signature-name">Mario Cortés Castillo</div>
+            </div>
+            <div className="signature-space">
+              <hr className="signature-line" />
+              <div className="signature-name">{`Firma ${bitacora.user.is_replacement ? 'Remplazo' : bitacora.user.job_position || 'Sin información'}`}</div>
+              <div className="signature-name">{bitacora.user.name}</div>
+            </div>
           </div>
         </div>
       </div>

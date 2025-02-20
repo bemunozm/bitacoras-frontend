@@ -19,18 +19,31 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props para el componente EditActivityModal
+ * @param id ID de la actividad a editar
+ * @param setIsOpen Función para controlar la visibilidad del modal
+ */
 type EditActivityModalProps = {
   id: number;
   setIsOpen: (isOpen: boolean) => void;
 };
 
+/**
+ * Modal para editar actividades existentes
+ * Permite modificar descripción, fecha, categoría y archivos adjuntos
+ */
 export default function EditActivityModal({ id, setIsOpen }: EditActivityModalProps) {
+  /**
+   * Consulta para obtener los datos de la actividad
+   */
   const { data: activity, isLoading: isLoadingActivity } = useQuery({
     queryKey: ['activity', id],
     queryFn: () => getActivity(id),
     enabled: !!id
   });
 
+  // Valores iniciales del formulario
   const initialValues = {
     description: '',
     date: '', // Inicializar la fecha como una cadena vacía
@@ -39,8 +52,21 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
     attachments: []
   };
 
+  // Configuración del formulario con React Hook Form
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({ defaultValues: initialValues });
+  const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
+  const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([]);
+  const [existingAttachments, setExistingAttachments] = useState<Attachment[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
+  const isMobile = useIsMobile();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  /**
+   * Efecto para cargar los datos de la actividad en el formulario
+   * Ajusta la fecha para manejar la zona horaria
+   */
   useEffect(() => {
     if (activity) {
       setValue('description', activity.description);
@@ -55,10 +81,10 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
     }
   }, [activity, setValue]);
 
-  const queryClient = useQueryClient();
-
-  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
-
+  /**
+   * Mutación para actualizar la actividad
+   * Maneja estados de éxito y error
+   */
   const { mutate } = useMutation({
     mutationFn: updateActivity,
     onError: (error) => {
@@ -82,18 +108,22 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
     }
   });
 
+  /**
+   * Manejadores de eventos
+   */
   const handleUpdate = (formData: any) => {
     setIsSaving(true); // Activar estado de carga
     const date = new Date(formData.date);
     date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // Ajustar la fecha para evitar el desfase de un día
 
-    mutate({ ...formData, id: id, date: date, newAttachments: selectedAttachments, existingAttachments: existingAttachments });
+    mutate({ 
+      ...formData, 
+      id, 
+      date, 
+      newAttachments: selectedAttachments, 
+      existingAttachments 
+    });
   };
-
-  const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([]);
-  const [existingAttachments, setExistingAttachments] = useState<Attachment[]>([]); // Nuevo estado
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [attachmentsLoaded, setAttachmentsLoaded] = useState(false); // Nuevo estado
 
   const handleFilesAdded = (files: FileWithPreview[]) => {
     setSelectedAttachments(files);
@@ -103,23 +133,24 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
     setExistingAttachments(files);
   };
 
-  const { data: categories, isLoading: isLoadingCategories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
-  });
-
   const handleCategoryChange = (selected: string) => {
     setSelectedCategory(parseInt(selected));
     setValue('category_id', parseInt(selected)); // Añadir esta línea para actualizar el valor del formulario
   };
 
-  const isMobile = useIsMobile();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  /**
+   * Consulta para obtener las categorías disponibles
+   */
+  const { data: categories, isLoading: isLoadingCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+  });
 
   if (isLoadingActivity || isLoadingCategories || !attachmentsLoaded) return <LoadingSpinner className="h-10" />;
 
   return (
     <form noValidate onSubmit={handleSubmit(handleUpdate)} className="space-y-6 px-4">
+      {/* Campo de fecha */}
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="date" className="text-right dark:text-sidebar-foreground">
@@ -144,6 +175,8 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
           />
           {errors.date && <ErrorMessage className="col-start-2 col-end-4">{errors.date.message}</ErrorMessage>}
         </div>
+
+        {/* Selector de categoría - Adaptativo para móvil/desktop */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="category_id" className="text-right dark:text-sidebar-foreground">
             Categoría
@@ -228,6 +261,8 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
           </div>
           {errors.category_id && <ErrorMessage className="col-start-2 col-end-4">{errors.category_id.message}</ErrorMessage>}
         </div>
+
+        {/* Campo de descripción */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="description" className="text-right dark:text-sidebar-foreground">
             Descripción
@@ -240,6 +275,8 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
           />
           {errors.description && <ErrorMessage className="col-start-2 col-end-4">{errors.description.message}</ErrorMessage>}
         </div>
+
+        {/* Zona de archivos adjuntos */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="attachments" className="text-right dark:text-sidebar-foreground">
             Adjuntos
@@ -255,6 +292,8 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
             existingFiles={existingAttachments}
           />
       </div>
+
+      {/* Botones de acción */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
         <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
           {isSaving ? 'Guardando...' : 'Guardar cambios'}

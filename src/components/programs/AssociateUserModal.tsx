@@ -32,6 +32,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Program } from "@/types";
 
+// Tipos para el formulario de asociación
 type AssociateUserForm = {
   program_id: number;
   user_id: number;
@@ -43,17 +44,24 @@ type AssociateUserModalProps = {
   setIsOpen: (isOpen: boolean) => void;
 };
 
+// Opciones predefinidas para los turnos
 const turnOptions = [
   { value: "Diurno", label: "Diurno" },
   { value: "Vespertino", label: "Vespertino" },
   { value: "Nocturno", label: "Nocturno" },
 ];
 
+/**
+ * Componente modal para asociar un usuario a un programa
+ * Permite seleccionar un usuario y asignarle un turno
+ */
 export default function AssociateUserModal({ program, setIsOpen }: AssociateUserModalProps) {
+  // Estados y hooks
   const [isSaving, setIsSaving] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const isMobile = useIsMobile();
 
+  // Configuración del formulario con react-hook-form
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<AssociateUserForm>({
     defaultValues: {
       program_id: program.id,
@@ -64,11 +72,13 @@ export default function AssociateUserModal({ program, setIsOpen }: AssociateUser
 
   const queryClient = useQueryClient();
 
+  // Consulta de usuarios disponibles
   const { data: users, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['users'],
     queryFn: getUsers
   });
 
+  // Mutación para asociar usuario
   const { mutate } = useMutation({
     mutationFn: (data: AssociateUserForm) => associateUser(data),
     onError: (error) => {
@@ -90,14 +100,17 @@ export default function AssociateUserModal({ program, setIsOpen }: AssociateUser
     }
   });
 
+  // Manejo del envío del formulario
   const handleAssociate = (formData: AssociateUserForm) => {
     setIsSaving(true);
     mutate(formData);
   };
 
+
   if (isLoadingUsers) return <LoadingSpinner className="h-10" />;
 
   return (
+    // Formulario con campos para programa (deshabilitado), 
     <form className="space-y-6 px-4" noValidate onSubmit={handleSubmit(handleAssociate)}>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">

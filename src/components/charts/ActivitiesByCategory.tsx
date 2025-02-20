@@ -3,11 +3,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Activity } from '@/types'
 
+/**
+ * Props para el gráfico de actividades por categoría
+ * @param activities Lista de actividades a analizar
+ * @param period Período de tiempo seleccionado
+ */
 type ActivitiesByCategoryProps = {
     activities: Activity[],
     period: string
 }
 
+/**
+ * Agrupa las actividades por categoría, excluyendo 'Actividades Generales'
+ * @param activities Lista de actividades
+ * @returns Objeto con conteo de actividades por categoría
+ */
 const groupActivitiesByCategory = (activities: Activity[]) => {
    const grouped: { [key: string]: { name: string, value: number } } = {}
 
@@ -23,6 +33,11 @@ const groupActivitiesByCategory = (activities: Activity[]) => {
     return grouped
 }
 
+/**
+ * Genera datos para el gráfico con colores asignados
+ * @param activities Lista de actividades
+ * @returns Array de datos formateados para el gráfico circular
+ */
 const generateChartData = (activities: Activity[]) => {
   const groupedActivities = groupActivitiesByCategory(activities)
   return Object.values(groupedActivities).map((data, index) => ({
@@ -31,6 +46,11 @@ const generateChartData = (activities: Activity[]) => {
   }))
 }
 
+/**
+ * Genera la configuración del gráfico con colores asignados
+ * @param categories Lista de categorías
+ * @returns Objeto con configuración de colores por categoría
+ */
 const generateChartConfig = (categories: string[]) => {
   return categories.reduce((acc, category, index) => {
     acc[category] = { label: category, color: `hsl(var(--chart-${index + 1}))` }
@@ -55,6 +75,10 @@ const formatPeriod = (period: string) => {
   }
 }
 
+/**
+ * Gráfico circular que muestra la distribución de actividades por categoría
+ * Excluye las actividades generales para enfocarse en categorías específicas
+ */
 export default function ActivitiesByCategory({activities, period}: ActivitiesByCategoryProps) {
   const chartData = generateChartData(activities)
   const categories = chartData.map((data: any) => data.name)

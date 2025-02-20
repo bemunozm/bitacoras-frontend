@@ -12,12 +12,25 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import LoadingSpinner from "../LoadingSpinner";
 import { useState, useEffect } from "react";
 
+/**
+ * Props para el formulario de bitácora de reemplazo
+ * @param setIsOpen Función para controlar la visibilidad del formulario
+ * @param user Usuario actual (coordinador) que crea la bitácora
+ */
 type ReplacementBitacoraFormProps = {
     setIsOpen: (isOpen: boolean) => void;
     user: User
 };
 
+/**
+ * Formulario para crear bitácoras asignadas a usuarios de reemplazo
+ * Solo accesible para coordinadores y administradores
+ */
 export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacoraFormProps) {
+    /**
+     * Genera un array de los últimos 6 meses para la selección
+     * @returns Array de objetos con display y value para cada mes
+     */
     const getLastSixMonths = () => {
         const months = [];
         const date = new Date();
@@ -34,6 +47,10 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
 
     const lastSixMonths = getLastSixMonths();
 
+    /**
+     * Valores iniciales del formulario
+     * El mes se preselecciona para usuarios no administradores
+     */
     const initialValues = {
         month: !user.roles?.some((role: any) => role?.name === 'Administrador') ? lastSixMonths[0].value : '',
         recipe: '',
@@ -41,6 +58,7 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
         program_id: 0,
     };
 
+    // Configuración del formulario y estados
     const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<BitacoraForm>({
         defaultValues: initialValues
     });
@@ -50,10 +68,14 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
         queryFn: getPrograms
     });
 
+    // Filtrar programas según permisos del usuario
     const filteredPrograms = user.roles?.some((role: any) => role?.name === 'Administrador') ? programs : programs?.filter((program: Program) => program.users?.find((programUser) => programUser.is_coordinator)?.user.id === user.id);
 
     const [isSaving, setIsSaving] = useState(false);
 
+    /**
+     * Mutación para crear la bitácora de reemplazo
+     */
     const { mutate } = useMutation({
         mutationFn: createBitacora,
         onError: (error) => {
@@ -76,6 +98,9 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
         }
     });
 
+    /**
+     * Maneja el envío del formulario
+     */
     const handleCreate = (formData: BitacoraForm) => {
         setIsSaving(true);
         console.log(formData.month);
@@ -85,7 +110,10 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
 
     const [availableReplacements, setAvailableReplacements] = useState<User[]>([]);
 
-    // Actualizar la lista de reemplazos cuando cambie el programa
+    /**
+     * Efecto para actualizar la lista de reemplazos disponibles
+     * cuando se selecciona un programa
+     */
     useEffect(() => {
         const selectedProgram = programs?.find((p: Program) => p.id === watch('program_id'));
         if (selectedProgram) {
@@ -103,7 +131,9 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
 
     return (
         <form noValidate onSubmit={handleSubmit(handleCreate)} className="space-y-6 px-4">
+            {/* Campos del formulario */}
             <div className="grid gap-4 py-4">
+                {/* Selector de mes */}
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="month" className="text-right dark:text-sidebar-foreground">
                         Mes
@@ -131,6 +161,7 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
                     </Select>
                     {errors.month && <ErrorMessage className="col-start-2 col-end-4">{errors.month.message}</ErrorMessage>}
                 </div>
+                {/* Campo de boleta */}
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="recipe" className="text-right dark:text-sidebar-foreground">
                         Boleta
@@ -144,6 +175,7 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
                     />
                     {errors.recipe && <ErrorMessage className="col-start-2 col-end-4">{errors.recipe.message}</ErrorMessage>}
                 </div>
+                {/* Selector de programa */}
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="program" className="text-right dark:text-sidebar-foreground">
                         Programa
@@ -166,7 +198,7 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
                     {errors.program_id && <ErrorMessage className="col-start-2 col-end-4">{errors.program_id.message}</ErrorMessage>}
                 </div>
                 
-                {/* Nuevo campo para el reemplazo */}
+                {/* Selector de reemplazo */}
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="user_id" className="text-right dark:text-sidebar-foreground">
                         Reemplazo
@@ -196,6 +228,7 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
                     {errors.user_id && <ErrorMessage className="col-start-2 col-end-4">{errors.user_id.message}</ErrorMessage>}
                 </div>
             </div>
+            {/* Botón de guardar */}
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
                 <Button 
                     type="submit" 

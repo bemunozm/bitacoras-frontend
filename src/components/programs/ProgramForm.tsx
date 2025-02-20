@@ -17,10 +17,15 @@ type ProgramFormProps = {
     setIsOpen: (isOpen: boolean) => void;
 };
 
+/**
+ * Formulario para crear un nuevo programa
+ * Incluye campos para información básica y selección de coordinador
+ */
 export function ProgramForm({ setIsOpen }: ProgramFormProps) {
-
+    // Estado para control de guardado
     const [isSaving, setIsSaving] = useState(false);
 
+    // Valores iniciales del formulario
     const initialValues = {
         name: '',
         company: '',
@@ -30,15 +35,18 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
         residences: [],
     };
 
+    // Configuración del formulario y consultas
     const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({ defaultValues: initialValues });
 
     const queryClient = useQueryClient();
 
+    // Consulta de coordinadores disponibles
     const {data: coordinators, isLoading: isLoadingCoordinators} = useQuery({
         queryKey: ['coordinators'],
         queryFn: getCoordinators
     });
 
+    // Mutación para crear programa
     const { mutate } = useMutation({
         mutationFn: createProgram,
         onError: (error) => {
@@ -70,6 +78,8 @@ export function ProgramForm({ setIsOpen }: ProgramFormProps) {
     if (isLoadingCoordinators) return <LoadingSpinner className="h-10"/>
 
     return (
+        // Formulario con campos para nombre, compañía, dirección,
+        // región (select) y coordinador (select)
         <form noValidate onSubmit={handleSubmit(handleCreate)} className="space-y-6 px-4">
             <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">

@@ -12,18 +12,34 @@ import LoadingSpinner from "../LoadingSpinner";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { getPrograms } from "@/api/ProgramAPI";
 
+/**
+ * Props para el modal de edición de bitácoras de reemplazo
+ * @param id ID de la bitácora a editar
+ * @param setIsOpen Función para controlar la visibilidad del modal
+ */
 type EditReplacementBitacoraProps = {
   id: Bitacora['id'];
   setIsOpen: (isOpen: boolean) => void;
 };
 
+/**
+ * Modal para editar bitácoras asignadas a reemplazos
+ * Permite modificar mes, boleta, programa y usuario de reemplazo
+ */
 export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditReplacementBitacoraProps) {
+  /**
+   * Consulta para obtener los datos de la bitácora
+   */
   const { data: bitacora, isLoading } = useQuery({
     queryKey: ['bitacora', id],
     queryFn: () => getBitacora(id),
     enabled: !!id
   });
 
+  /**
+   * Genera un array de los últimos 6 meses para la selección
+   * @returns Array de objetos con display y value para cada mes
+   */
   const getLastSixMonths = () => {
     const months = [];
     const date = new Date();
@@ -40,6 +56,7 @@ export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditRepl
 
   const lastSixMonths = getLastSixMonths();
 
+  // Control de formulario con React Hook Form
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       month: '',
@@ -54,8 +71,14 @@ export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditRepl
     queryFn: getPrograms
   });
 
+  /**
+   * Estado para almacenar los reemplazos disponibles del programa seleccionado
+   */
   const [availableReplacements, setAvailableReplacements] = useState<User[]>([]);
 
+  /**
+   * Efecto para actualizar la lista de reemplazos cuando cambia el programa
+   */
   useEffect(() => {
     const selectedProgram = programs?.find((p: Program) => p.id === watch('program_id'));
     if (selectedProgram) {
@@ -65,6 +88,9 @@ export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditRepl
     }
   }, [watch('program_id'), programs]);
 
+  /**
+   * Efecto para cargar los datos iniciales de la bitácora
+   */
   useEffect(() => {
     if (bitacora) reset(bitacora);
   }, [bitacora, reset]);

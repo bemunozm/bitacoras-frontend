@@ -14,11 +14,15 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
+// Este componente muestra un gráfico de barras horizontal con los 5 usuarios más activos
+// basado en la cantidad de actividades que han registrado en un período específico
+
 type TopUsersProps = {
     bitacoras: Bitacora[],
     period: string
 }
 
+// Función auxiliar para formatear el período en texto legible
 const formatPeriod = (period: string) => {
   switch (period) {
     case 'current_month':
@@ -37,12 +41,19 @@ const formatPeriod = (period: string) => {
 }
 
 export default function TopUsers({ bitacoras, period }: TopUsersProps) {
+  // Calcula el número de actividades por usuario
+  // Reduce el array de bitácoras a un objeto que cuenta actividades por usuario
   const userActivityCount = bitacoras.reduce((acc, bitacora) => {
     const userName = bitacora.user.name
     acc[userName] = (acc[userName] || 0) + (bitacora.activities?.length || 0)
     return acc
   }, {} as Record<string, number>)
 
+  // Transforma los datos para el gráfico:
+  // 1. Convierte el objeto en array de entries
+  // 2. Ordena por número de actividades (descendente)
+  // 3. Toma los primeros 5
+  // 4. Mapea a la estructura requerida por el gráfico
   const topUsers = Object.entries(userActivityCount)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
@@ -52,6 +63,7 @@ export default function TopUsers({ bitacoras, period }: TopUsersProps) {
       fill: `hsl(var(--chart-${index + 1}))`
     }))
 
+  // Configuración del gráfico con tipos y etiquetas
   const chartConfig = {
     activities: {
       label: "Actividades",
@@ -63,6 +75,8 @@ export default function TopUsers({ bitacoras, period }: TopUsersProps) {
   } satisfies ChartConfig
 
   return (
+    // Renderiza un gráfico de barras horizontal dentro de una Card
+    // usando componentes de Recharts para la visualización
     <Card>
       <CardHeader>
         <CardTitle>Top 5 Usuarios</CardTitle>

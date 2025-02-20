@@ -5,11 +5,13 @@ import { Bitacora } from "@/types"
 import { getPrograms } from "@/api/ProgramAPI"
 import { useQuery } from "@tanstack/react-query"
 
+// Props del componente
 type ActivitiesByResidenceProps = {
     bitacoras: Bitacora[],
     period: string
 }
 
+// Convierte el identificador del período a texto legible en español
 const formatPeriod = (period: string) => {
   switch (period) {
     case 'current_month':
@@ -34,22 +36,26 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+/**
+ * Componente que visualiza la distribución de actividades por programa
+ * en un gráfico de barras vertical.
+ */
 export default function ActivitiesByResidence({bitacoras, period}: ActivitiesByResidenceProps) {
-
   const {data: programs } = useQuery({
     queryKey: ['programs'],
     queryFn: getPrograms
   });
   
+  // Agrupa y cuenta las actividades por programa, inicializando todos los programas en 0
   const groupActivitiesByProgram = (bitacoras: Bitacora[]) => {
     const grouped: { [key: string]: { name: string, actividades: number } } = {}
   
-    // Initialize all programs with 0 activities
+    // Inicializa programas
     programs?.forEach(program => {
-    grouped[program.name] = { name: program.name, actividades: 0 }
+      grouped[program.name] = { name: program.name, actividades: 0 }
     })
   
-    // Count activities for each program
+    // Suma actividades por programa
     bitacoras.forEach(bitacora => {
       const programName = bitacora.program?.name
       if (programName && grouped[programName]) {
@@ -60,6 +66,7 @@ export default function ActivitiesByResidence({bitacoras, period}: ActivitiesByR
     return grouped
   }
   
+  // Transforma los datos al formato requerido por el gráfico
   const generateChartData = (bitacoras: Bitacora[]) => {
     const groupedActivities = groupActivitiesByProgram(bitacoras)
     return Object.values(groupedActivities)

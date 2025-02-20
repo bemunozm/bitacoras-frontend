@@ -16,16 +16,23 @@ type EditAssociateUserModalProps = {
   setIsOpen: (isOpen: boolean) => void;
 };
 
+// Opciones predefinidas para los turnos
 const turnOptions = [
   { value: "Diurno", label: "Diurno" },
   { value: "Vespertino", label: "Vespertino" },
   { value: "Nocturno", label: "Nocturno" },
 ];
 
+/**
+ * Modal para editar la asociación de un usuario a un programa
+ * Permite modificar el turno del usuario
+ */
 export default function EditAssociateUserModal({ programUser, programName, setIsOpen }: EditAssociateUserModalProps) {
+  // Estados y configuración del formulario
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
 
+  // Inicialización del formulario con datos existentes
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<ProgramUserUpdateForm>({
     defaultValues: {
       turn: programUser.turn || "",
@@ -36,6 +43,7 @@ export default function EditAssociateUserModal({ programUser, programName, setIs
     reset({ turn: programUser.turn || "" });
   }, [programUser, reset]);
 
+  // Mutación para actualizar la asociación
   const { mutate } = useMutation({
     mutationFn: (data: ProgramUserUpdateForm) => updateAssociation(programUser.id, data.turn),
     onSuccess: (data) => {
@@ -63,6 +71,8 @@ export default function EditAssociateUserModal({ programUser, programName, setIs
   };
 
   return (
+    // Formulario con campos de programa y usuario (deshabilitados)
+    // y selector de turno (editable)
     <form onSubmit={handleSubmit(handleEdit)} className="space-y-6 px-4">
       <div className="grid gap-4 py-4">
         {/* Programa (deshabilitado) */}

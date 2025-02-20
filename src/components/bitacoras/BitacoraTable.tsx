@@ -16,18 +16,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { themes } from "@/utils/theme";
 
+/**
+ * Tabla de bitácoras con funcionalidades de filtrado y acciones
+ * @param searchTerm Término de búsqueda para filtrar bitácoras
+ * @param filter Filtro de vista (mine, coordinator, all)
+ * @param user Usuario actual para control de permisos
+ */
 export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm: string, filter: string, user: User }) {
+  // Consulta de bitácoras y estados
   const { data, isLoading } = useQuery({
     queryKey: ['bitacoras'],
     queryFn: getBitacoras
   });
   
 
-  const navigate = useNavigate();
+  // Estados para modales y selección
+  const navigate = useNavigate(); // Hook para cambiar de ruta
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedBitacora, setSelectedBitacora] = useState<Bitacora | null>(null);
 
+  /**
+   * Filtrado de bitácoras según criterios
+   * - Propias del usuario
+   * - Del coordinador
+   * - Búsqueda por término
+   */
   const filteredBitacoras = data?.filter((bitacora: Bitacora) => {
     if (filter === "mine") {
       const currentUser = user?.id; // Reemplaza esto con la lógica real
@@ -39,6 +53,10 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
            bitacora.user.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  /**
+   * Configuración de columnas de la tabla
+   * Incluye columnas condicionales según permisos
+   */
   const columns = [
     {
       name: 'Periodo',

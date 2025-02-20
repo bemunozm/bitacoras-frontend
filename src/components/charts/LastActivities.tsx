@@ -18,6 +18,10 @@ import { Activity } from "@/types"
 import { useQuery } from "@tanstack/react-query";
 import { getBitacorasByPeriod } from "@/api/BitacoraAPI";
 
+// Este componente muestra un gráfico de línea que representa la cantidad
+// de actividades diarias durante los últimos 7 días
+
+// Obtiene un array con las fechas de los últimos 7 días en formato YYYY-MM-DD
 const getLast7Days = () => {
   const dates = [];
   for (let i = 0; i <= 6; i++) {
@@ -28,6 +32,7 @@ const getLast7Days = () => {
   return dates.reverse();
 };
 
+// Agrupa las actividades por fecha y cuenta cuántas hay en cada día
 const groupActivitiesByDate = (activities: Activity[]) => {
   const grouped: { [key: string]: number } = {};
   activities.forEach(activity => {
@@ -42,6 +47,8 @@ const groupActivitiesByDate = (activities: Activity[]) => {
   return grouped;
 };
 
+// Genera los datos para el gráfico, asegurando que haya un valor para cada
+// uno de los últimos 7 días, incluso si no hay actividades
 const generateChartData = (activities: Activity[]) => {
   const last7Days = getLast7Days();
   console.log('last7Days', last7Days);
@@ -58,6 +65,7 @@ const generateChartData = (activities: Activity[]) => {
   return chartData
 };
 
+// Configuración del estilo y formato del gráfico
 const chartConfig = {
   desktop: {
     label: "Actividades",
@@ -69,16 +77,21 @@ const chartConfig = {
 
 export function LastActivities() {
 
+  // Obtiene las bitácoras del mes actual usando React Query
   const {data: bitacoras} = useQuery({
     queryFn: () => getBitacorasByPeriod('current_month'),
     queryKey: ["activities"],
   });
 
+  // Extrae todas las actividades de las bitácoras y las aplana en un solo array
   const activities = bitacoras?.map((bitacora) => bitacora.activities).flat();
 
+  // Prepara los datos para el gráfico
   const chartData = generateChartData(activities || []);
 
   return (
+    // Renderiza un gráfico de línea dentro de una Card
+    // mostrando la tendencia de actividades durante la última semana
     <Card>
       <CardHeader>
         <CardTitle>Actividades por día</CardTitle>

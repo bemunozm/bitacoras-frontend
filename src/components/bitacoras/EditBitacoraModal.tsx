@@ -13,17 +13,30 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { getPrograms } from "@/api/ProgramAPI";
 import { useAuth } from '@/hooks/useAuth';
 
+/**
+ * Props para el modal de edición de bitácoras
+ * @param id ID de la bitácora a editar
+ * @param setIsOpen Función para controlar la visibilidad del modal
+ */
 type EditBitacoraProps = {
   id: Bitacora['id'];
   setIsOpen: (isOpen: boolean) => void;
 };
 
-const getLastThreeMonths = (referenceDate: string) => {
+/**
+ * Obtiene los últimos seis meses desde una fecha de referencia
+ * @param referenceDate Fecha de referencia
+ * @returns Array de objetos con display y value para cada mes
+ */
+const getLastSixMonths = () => {
   const months = [];
-  const date = new Date(referenceDate);
-  for (let i = 2; i >= 0; i--) {
+  const date = new Date();  // Usamos la fecha actual en lugar de referenceDate
+  
+  for (let i = 0; i < 6; i++) {  // Cambiamos el orden del loop (0 a 5 en vez de 5 a 0)
     const monthDate = new Date(date.getFullYear(), date.getMonth() - i, 1);
     const lastDayOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+    lastDayOfMonth.setHours(23, 59, 59, 999); // Establecemos al último momento del día
+
     months.push({
       display: monthDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }),
       value: lastDayOfMonth.toISOString()
@@ -32,7 +45,33 @@ const getLastThreeMonths = (referenceDate: string) => {
   return months;
 };
 
+/**
+ * Determina el período correspondiente a una fecha dada
+ * @param date Fecha a evaluar
+ * @param periods Array de períodos disponibles
+ * @returns El valor del período correspondiente
+ */
+const findPeriodForDate = (date: string, periods: Array<{value: string}>) => {
+  const targetDate = new Date(date);
+  targetDate.setHours(0, 0, 0, 0);
+  
+  // Encontrar el período que corresponde a la fecha
+  return periods.find(period => {
+    const periodDate = new Date(period.value);
+    const periodMonth = periodDate.getMonth();
+    const periodYear = periodDate.getFullYear();
+    
+    return targetDate.getMonth() === periodMonth && 
+           targetDate.getFullYear() === periodYear;
+  })?.value || periods[0].value;
+};
+
+/**
+ * Modal para editar bitácoras existentes
+ * Permite modificar mes, boleta y programa asociado
+ */
 export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) {
+  // Consulta de datos iniciales
   const { data: bitacora, isLoading } = useQuery({
     queryKey: ['bitacora', id],
     queryFn: () => getBitacora(id),
@@ -41,6 +80,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
 
   const user = useAuth();
 
+  // Control de formulario con React Hook Form
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       month: '',
@@ -63,8 +103,18 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
         program.users?.some((programUser) => programUser.user_id === user.data?.id)
       );
 
+  /**
+   * Efecto para cargar datos iniciales
+   */
   useEffect(() => {
-    if (bitacora) reset(bitacora);
+    if (bitacora) {
+      const periods = getLastSixMonths();
+      const correctPeriod = findPeriodForDate(bitacora.month, periods);
+      reset({
+        ...bitacora,
+        month: correctPeriod
+      });
+    }
   }, [bitacora, reset]);
 
   const queryClient = useQueryClient();
@@ -89,6 +139,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
       reset();
       setIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ['bitacoras'] });
+      queryClient.invalidateQueries({ queryKey: ['bitacora'] });
       queryClient.invalidateQueries({ queryKey: ['bitacora', id] });  
     }
   });
@@ -98,7 +149,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
     mutate(formData);
   };
 
-  const lastThreeMonths = bitacora ? getLastThreeMonths(bitacora.created_at) : [];
+  const lastSixMonths = bitacora ? getLastSixMonths() : [];
 
   const isAdmin = user.data?.roles?.some(role => role?.name === 'Administrador');
 
@@ -112,18 +163,21 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
             Mes
           </Label>
           <Select
+            {...register('month', { required: 'Este campo es requerido' })}
             value={watch('month')}
             onValueChange={(value) => setValue('month', value)}
             disabled={!isAdmin}
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Seleccione un mes">
-                {lastThreeMonths.find(month => month.value === watch('month'))?.display}
+                {lastSixMonths.find(month => month.value === watch('month'))?.display}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {lastThreeMonths.map((month, index) => (
-                <SelectItem key={index} value={month.value} className=" first-letter:uppercase">{month.display}</SelectItem>
+              {lastSixMonths.map((month, index) => (
+                <SelectItem key={index} value={month.value} className="first-letter:uppercase">
+                  {month.display}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

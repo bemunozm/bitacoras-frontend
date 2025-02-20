@@ -234,7 +234,7 @@
 
 .actividades-generales-container {
   position: relative;
-  margin: 250px 64px 20px 64px;
+  margin: 280px 64px 30px 64px;
   padding: 10px;
   border: 1px dashed #666;
   border-radius: 4px;
@@ -271,4 +271,8 @@
   img {
     display: initial;
   }
+}
+
+.page-break {
+  page-break-before: always;
 }

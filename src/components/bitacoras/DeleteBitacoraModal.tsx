@@ -5,11 +5,20 @@ import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 
+/**
+ * Props para el modal de eliminación de bitácoras
+ * @param id ID de la bitácora a eliminar
+ * @param setIsOpen Función para controlar la visibilidad del modal
+ */
 type DeleteBitacoraModalProps = {
   id: number;
   setIsOpen: (isOpen: boolean) => void;
 };
 
+/**
+ * Modal de confirmación para eliminar bitácoras
+ * Incluye estado de carga y feedback visual
+ */
 export default function DeleteBitacoraModal({ id, setIsOpen }: DeleteBitacoraModalProps) {
   const queryClient = useQueryClient();
   const { handleSubmit } = useForm();

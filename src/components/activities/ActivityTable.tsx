@@ -19,21 +19,31 @@ import { useTheme } from '../theme-provider';
 import { Badge } from "@/components/ui/badge";
 import { themes } from '@/utils/theme';
 
+/**
+ * Props para el componente ActivityTable
+ * @param bitacora Bitácora actual con sus datos relacionados
+ * @param user Usuario actual con sus roles y permisos
+ */
 type ActivityTableProps = {
     bitacora: Bitacora;
     user: User;
 };
 
+/**
+ * Tabla de actividades con funcionalidades de filtrado y separación por categorías
+ * Incluye gestión de permisos y acciones según el rol del usuario
+ */
 export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
 
   const navigate = useNavigate();
     
-  // Agregar variables de control
+  // Control de permisos basado en roles y estados
   const isAdmin = user?.roles?.some(role => role?.name === 'Administrador')
   const isCoordinator = bitacora.program.users?.find((programUser) => programUser.is_coordinator)?.user.id === user.id
   const isBitacoraOwner = user?.id === bitacora.user_id
   const ownerIsReplacement = bitacora.user.is_replacement
 
+  // Estados para control de modales y búsqueda
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -41,12 +51,15 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
+  /**
+   * Consulta de actividades asociadas a la bitácora
+   */
   const { data: activities, isLoading } = useSuspenseQuery({
     queryKey: ['activities', bitacora.id],
     queryFn: () => getActivitiesByBitacoraId(bitacora.id)
   });
 
-  // Separar las actividades en generales y específicas
+  // Separación de actividades por tipo
   const generalActivities = activities?.filter((activity: Activity) => 
     activity.category.name === 'Actividades Generales'
   ) || [];
@@ -55,12 +68,16 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
     activity.category.name !== 'Actividades Generales'
   ) || [];
 
-  // Aplicamos el filtrado solo a las actividades específicas
+  // Filtrado de actividades específicas
   const filteredSpecificActivities = specificActivities.filter((activity: Activity) => {
     return activity.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
            activity.category.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  /**
+   * Configuración de columnas para las tablas
+   * Incluye columnas condicionales según permisos del usuario
+   */
   const columns = [
     {
       name: 'Fecha',
@@ -125,6 +142,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
 
   return (
     <>
+      {/* Modal de creación de actividad */}
       <ResponsiveDialog
         isOpen={isCreateOpen}
         setIsOpen={setIsCreateOpen}
@@ -134,6 +152,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
         <ActivityForm setIsOpen={setIsCreateOpen} id={bitacora.id}/>
       </ResponsiveDialog>
       <div className="space-y-6">
+        {/* Encabezado y botón de agregar */}
         <div className="flex justify-between items-center">
           <h3 className="text-2xl font-bold tracking-tight dark:text-sidebar-foreground">
             Actividades
@@ -208,6 +227,7 @@ export default function ActivityTable({ bitacora, user }: ActivityTableProps) {
           </div>
         </div>
 
+        {/* Modales de edición y eliminación */}
         {selectedActivity && (
           <>
             <ResponsiveDialog

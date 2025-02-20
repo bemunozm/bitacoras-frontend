@@ -19,12 +19,23 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props para el componente ActivityForm
+ * @param setIsOpen Función para controlar la visibilidad del formulario
+ * @param id ID de la bitácora a la que se asociará la actividad
+ */
 type ActivityFormProps = {
   setIsOpen: (isOpen: boolean) => void;
   id: number;
 };
 
+/**
+ * Formulario para crear nuevas actividades
+ * Permite agregar descripción, fecha, categoría y archivos adjuntos
+ * Se adapta a versión móvil y desktop
+ */
 export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
+  // Valores iniciales del formulario
   const initialValues = {
     description: '',
     date: new Date().toISOString().split('T')[0], // Fecha actual
@@ -33,17 +44,21 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
     attachments: []
   };
 
+  // Configuración del formulario con react-hook-form
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: initialValues });
-
   const queryClient = useQueryClient();
-  const [isSaving, setIsSaving] = useState(false); // Nuevo estado
+  const [isSaving, setIsSaving] = useState(false); //Estado que indica si se está guardando la actividad
   const isMobile = useIsMobile();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  /**
+   * Mutación para crear una nueva actividad
+   * Maneja estados de éxito y error
+   */
   const { mutate } = useMutation({
     mutationFn: createActivity,
     onError: (error) => {
-      setIsSaving(false); // Desactivar estado de carga en caso de error
+      setIsSaving(false);
       toast({
         title: 'Error',
         description: error.message,
@@ -51,7 +66,7 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
       });
     },
     onSuccess: (data) => {
-      setIsSaving(false); // Desactivar estado de carga en caso de éxito
+      setIsSaving(false);
       toast({
         title: '🎉Actividad creada!',
         description: data,
@@ -62,6 +77,10 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
     }
   });
 
+  /**
+   * Maneja el envío del formulario
+   * Ajusta la fecha para evitar desfases de zona horaria
+   */
   const handleCreate = (formData: any) => {
     setIsSaving(true); // Activar estado de carga
     const date = new Date(formData.date);
@@ -70,16 +89,24 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
     mutate({ ...formData, date, attachments: selectedAttachments, bitacora_id: id, category_id: selectedCategory });
   };
 
-  const handleFilesAdded = (files: FileWithPreview[]) => {
-    setSelectedAttachments(files);
-  };
-
+  // Estados y manejadores para archivos adjuntos y categorías
   const [selectedAttachments, setSelectedAttachments] = useState<FileWithPreview[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  
+  /**
+   * Consulta para obtener las categorías disponibles
+   */
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories,
   });
+
+  /**
+   * Manejadores de eventos
+   */
+  const handleFilesAdded = (files: FileWithPreview[]) => {
+    setSelectedAttachments(files);
+  };
 
   const handleCategoryChange = (selected: string) => {
     setSelectedCategory(parseInt(selected));
@@ -89,6 +116,7 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
 
   return (
     <form noValidate onSubmit={handleSubmit(handleCreate)} className="space-y-6 px-4">
+      {/* Campo de fecha */}
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="date" className="text-right dark:text-sidebar-foreground">
@@ -113,6 +141,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
           />
           {errors.date && <ErrorMessage className="col-start-2 col-end-4">{errors.date.message}</ErrorMessage>}
         </div>
+
+        {/* Selector de categoría - Adaptativo para móvil/desktop */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="category_id" className="text-right dark:text-sidebar-foreground">
             Categoría
@@ -194,6 +224,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
           </div>
           {errors.category_id && <ErrorMessage className="col-start-2 col-end-4">{errors.category_id.message}</ErrorMessage>}
         </div>
+
+        {/* Campo de descripción */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="description" className="text-right dark:text-sidebar-foreground">
             Descripción
@@ -206,6 +238,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
           />
           {errors.description && <ErrorMessage className="col-start-2 col-end-4">{errors.description.message}</ErrorMessage>}
         </div>
+
+        {/* Zona de archivos adjuntos */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="attachments" className="text-right dark:text-sidebar-foreground">
             Adjuntos
@@ -218,6 +252,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
             accept="image/*,application/pdf"
           />
       </div>
+
+      {/* Botones de acción */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
         <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
           {isSaving ? 'Guardando...' : 'Guardar'}

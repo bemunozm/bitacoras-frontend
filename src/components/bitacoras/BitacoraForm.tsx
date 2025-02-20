@@ -12,12 +12,26 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import LoadingSpinner from "../LoadingSpinner";
 import { useState } from "react";
 
+/**
+ * Props para el formulario de creación de bitácoras
+ * @param setIsOpen Función para controlar la visibilidad del formulario
+ * @param user Usuario actual con sus roles y permisos
+ */
 type BitacoraFormProps = {
     setIsOpen: (isOpen: boolean) => void;
     user: User
 };
 
+/**
+ * Formulario para crear nuevas bitácoras
+ * Incluye selección de mes, número de boleta y programa
+ * Con validaciones según el rol del usuario
+ */
 export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
+    /**
+     * Obtiene los últimos 6 meses para la selección
+     * @returns Array de objetos con display y value para cada mes
+     */
     const getLastSixMonths = () => {
         const months = [];
         const date = new Date();
@@ -32,6 +46,7 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
         return months;
     };
 
+    // Variable que almacena los últimos 6 meses
     const lastSixMonths = getLastSixMonths();
     
     const initialValues = {
@@ -41,10 +56,15 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
         program_id: 0,
     };
 
+    // Control de formulario con React Hook Form
     const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({ defaultValues: initialValues });
     const queryClient = useQueryClient();
     const isAdmin = user.roles?.some((role: any) => role?.name === 'Administrador');
 
+    /**
+     * Consulta para obtener programas disponibles
+     * Filtra según el rol del usuario
+     */
     const {data: programs, isLoading: isLoadingPrograms} = useQuery({
         queryKey: ['programs'],
         queryFn: getPrograms,
@@ -58,6 +78,10 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
 
     const [isSaving, setIsSaving] = useState(false); // Nuevo estado
 
+    /**
+     * Mutación para crear nueva bitácora
+     * Maneja estados de éxito y error
+     */
     const { mutate } = useMutation({
         mutationFn: createBitacora,
         onError: (error) => {
@@ -80,6 +104,9 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
         }
     });
 
+    /**
+     * Maneja el envío del formulario
+     */
     const handleCreate = (formData: BitacoraForm) => {
         setIsSaving(true); // Activar estado de carga
         console.log(formData.month);

@@ -3,17 +3,22 @@ import './Informe.css';
 import html2pdf from 'html2pdf.js';
 import { useEffect } from 'react';
 
+
+
+/**
+ * Componente que genera un informe mensual en PDF agrupando las actividades por semana
+ * @param bitacora - Objeto con la información de la bitácora
+ */
+const Informe = ({ bitacora } : any) => {
+  // Configuración para la generación del PDF
 const options = {
-  filename: 'my-document.pdf',
+  filename: `Informe ${bitacora.user.name} - ${getPeriod(bitacora.month)}.pdf`,
   margin: 0,
   image: { type: 'jpeg', quality: 0.98 },
   html2canvas: { scale: 4, useCORS: true }, // Agregar useCORS: true
   jsPDF: { unit: 'px', format: [595, 842], orientation: 'portrait' },
 };
-
-const Informe = ({ bitacora } : any) => {
-
-  
+  // Calcula el número de semana del mes para una fecha dada
   const getWeekFromDate = (date: string) => {
     const d = new Date(date);
     const start = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -23,11 +28,11 @@ const Informe = ({ bitacora } : any) => {
     return `Semana ${week + 1}`;
   };
   
+  // Agrupa las actividades por semana y categoría, excluyendo las actividades generales
   const groupActivitiesByWeekAndCategory = (activities: any[]) => {
     const grouped: any = {};
 
     activities
-      // Filtrar para excluir las Actividades Generales del agrupamiento por semana
       .filter(activity => activity.category.name !== 'Actividades Generales')
       .forEach((activity) => {
         const week = getWeekFromDate(activity.date);
@@ -49,6 +54,7 @@ const Informe = ({ bitacora } : any) => {
 
   const groupedActivities = groupActivitiesByWeekAndCategory(bitacora.activities);
 
+  // Efecto para manejar la generación del PDF una vez que todas las imágenes están cargadas
   useEffect(() => {
     const element = document.getElementById('informe');
     const images = element?.getElementsByTagName('img');
@@ -75,6 +81,7 @@ const Informe = ({ bitacora } : any) => {
   return (
     <div className="full-width-container">
       <div id="informe" className="informe-container">
+        {/* Cabecera del informe con información general */}
         <div className="informe-header-container">
           <div className="informe-title">Informe Mensual de Gestión</div>
           <table className="informe-table">
@@ -88,8 +95,8 @@ const Informe = ({ bitacora } : any) => {
               <tr>
                 <td className="informe-header">Dispositivo</td>
                 <td className="informe-data">{bitacora?.program.name}</td>
-                <td className="informe-header">Región</td>
-                <td className="informe-data">{bitacora?.program.state}</td>
+                <td className="informe-header">Turno</td>
+                <td className="informe-data">{bitacora?.shift || 'No especificado'}</td>
               </tr>
               <tr>
                 <td className="informe-header">Periodo Informado</td>
@@ -97,12 +104,19 @@ const Informe = ({ bitacora } : any) => {
                 <td className="informe-header">Número de boleta</td>
                 <td className="informe-data">{bitacora?.recipe}</td>
               </tr>
+              <tr>
+                <td className="informe-header">Fecha de emisión</td>
+                <td className="informe-data">{new Date().toLocaleDateString()}</td>
+                <td className="informe-header">Región</td>
+                <td className="informe-data">{bitacora?.program.state}</td>
+              </tr>
             </tbody>
           </table>
           <img className="informe-logo-ministerio" src="/logo-ministerio.png" />
           <img className="informe-logo-fundacion" src="/logo-fundacion.png" />
         </div>
 
+        {/* Sección de actividades generales si existen */}
         {bitacora.activities.some((activity: any) => activity.category.name === 'Actividades Generales') && (
           <div className="actividades-generales-container">
             <div className="actividades-generales-title">Actividades Generales</div>
@@ -116,6 +130,7 @@ const Informe = ({ bitacora } : any) => {
           </div>
         )}
 
+        {/* Sección principal de actividades agrupadas por semana */}
         <div className="informe-actividades-container">
           {Object.keys(groupedActivities).sort().map((week) => (
             <div key={week}>
@@ -135,25 +150,45 @@ const Informe = ({ bitacora } : any) => {
             </div>
           ))}
         </div>
+
+        {/* Sección de anexos con imágenes */}
         <div className="informe-anexos">
+          {/* Agregar título de anexos */}
           <div className="informe-anexos-title">Anexos</div>
-          {bitacora?.activities.map((activity: any, index: number) => (
-            activity.attachments && activity.attachments.length > 0 && (
-              <div key={activity.id} className={`informe-anexo-actividad ${index % 2 === 0 ? 'page-break' : ''}`}>
-                <div className="informe-anexo-actividad-title">
-                  <ul className="informe-anexo-actividad-list">
-                    <li>{activity.description}</li>
-                  </ul>
-                </div>
+          {bitacora?.activities.map((activity: any) => {
+            if (!activity.attachments || activity.attachments.length === 0) return null;
+            
+            // Dividir los anexos en grupos de 4 imágenes
+            const attachmentGroups = [];
+            for (let i = 0; i < activity.attachments.length; i += 4) {
+              attachmentGroups.push(activity.attachments.slice(i, i + 4));
+            }
+            
+            return attachmentGroups.map((group, groupIndex) => (
+              <div key={`${activity.id}-${groupIndex}`} className={`informe-anexo-actividad ${groupIndex > 0 ? 'page-break' : ''}`}>
+                {groupIndex === 0 && (
+                  <div className="informe-anexo-actividad-title">
+                    <ul className="informe-anexo-actividad-list">
+                      <li>{activity.description}</li>
+                    </ul>
+                  </div>
+                )}
                 <div className="informe-anexo-imagenes">
-                  {activity.attachments.map((attachment: any) => (
-                    <img key={attachment.id} src={attachment.image} alt={`Anexo ${attachment.id + 1}`} className="informe-anexo-imagen" />
+                  {group.map((attachment: any) => (
+                    <img 
+                      key={attachment.id} 
+                      src={attachment.image} 
+                      alt={`Anexo ${attachment.id + 1}`} 
+                      className="informe-anexo-imagen" 
+                    />
                   ))}
                 </div>
               </div>
-            )
-          ))}
+            ));
+          })}
         </div>
+
+        {/* Sección de firmas */}
         <div className="signature-container">
           <div className="signature-space">
             <hr className="signature-line" />
@@ -167,6 +202,8 @@ const Informe = ({ bitacora } : any) => {
           </div>
         </div>
       </div>
+      
+      {/* Pie de página con numeración */}
       <div className="footer">
         Página <span className="pageNumber"></span> de <span className="totalPages"></span>
       </div>
