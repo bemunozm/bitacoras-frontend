@@ -84,7 +84,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       month: '',
-      recipe: '',
+      recipe: null as number | null,
       completed: false,
       approved: false,
       user_id: 0,
@@ -97,11 +97,10 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
     queryFn: getPrograms
   });
 
-  const filteredPrograms = user.data?.roles?.some((role) => role?.name === 'Administrador')
-    ? programs
-    : programs?.filter((program: Program) =>
-        program.users?.some((programUser) => programUser.user_id === user.data?.id)
-      );
+  //Filtra siempre los programas a los qe pertenece el dueño de la bitacora
+  const filteredPrograms = programs?.filter((program: Program) =>
+    program.users?.some((programUser) => programUser.user_id === bitacora?.user_id)
+  );
 
   /**
    * Efecto para cargar datos iniciales
@@ -112,6 +111,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
       const correctPeriod = findPeriodForDate(bitacora.month, periods);
       reset({
         ...bitacora,
+        recipe: bitacora.recipe || null,
         month: correctPeriod
       });
     }
@@ -185,13 +185,14 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="recipe" className="text-right dark:text-sidebar-foreground">
-            Boleta
+            Nº BH o Liquidación
           </Label>
           <Input
             id="recipe"
-            placeholder="Número de boleta"
+            type='number'
+            placeholder="Número de boleta o liquidación"
             className="col-span-3 dark:text-sidebar-foreground"
-            {...register('recipe', { required: 'Este campo es requerido' })}
+            {...register('recipe')}
           />
           {errors.recipe && <ErrorMessage className=" col-start-2 col-end-4">{errors.recipe.message}</ErrorMessage>}
         </div>
@@ -203,6 +204,7 @@ export default function EditBitacoraModal({ id, setIsOpen }: EditBitacoraProps) 
             value={watch('program_id').toString()}
             onValueChange={(value) => setValue('program_id', parseInt(value))}
             {...register('program_id', { required: 'Este campo es requerido' })}
+            disabled={!isAdmin}
           >
             <SelectTrigger className="col-span-3 dark:text-sidebar-foreground">
               <SelectValue placeholder="Seleccione un programa">

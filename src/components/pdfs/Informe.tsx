@@ -18,6 +18,12 @@ const options = {
   html2canvas: { scale: 4, useCORS: true }, // Agregar useCORS: true
   jsPDF: { unit: 'px', format: [595, 842], orientation: 'portrait' },
 };
+
+// Calcula la fecha de emisión (último día del mes del periodo informado)
+const emisionDate = new Date(bitacora.month);
+emisionDate.setMonth(emisionDate.getMonth() + 1);
+emisionDate.setDate(0); // Esto establece la fecha al último día del mes anterior
+
   // Calcula el número de semana del mes para una fecha dada
   const getWeekFromDate = (date: string) => {
     const d = new Date(date);
@@ -72,7 +78,43 @@ const options = {
     }
 
     Promise.all(loadPromises).then(() => {
-      html2pdf().from(element).set(options).save();
+      html2pdf()
+        .from(element)
+        .set(options)
+        .toPdf()
+        .get('pdf')
+        .then((pdf: any) => {
+          const totalPages = pdf.internal.getNumberOfPages();
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+
+          for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            
+            // Configuración del texto
+            pdf.setFontSize(10);
+            pdf.setTextColor(100);
+
+            // Función helper para centrar texto
+            const centerText = (text: string, y: number) => {
+              const textWidth = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+              const x = (pageWidth - textWidth) / 2;
+              pdf.text(text, x, y);
+            };
+
+            // Footer con línea separadora
+            const footerY = pageHeight - 50; // Posición base del footer
+            
+            // Textos del footer
+            const headerText = `${bitacora.user.name} - ${getPeriod(bitacora.month)}`;
+            const footerText = `Página ${i} de ${totalPages}`;
+
+            // Centrar y posicionar textos
+            centerText(headerText, footerY + 15);
+            centerText(footerText, footerY + 30);
+          }
+        })
+        .save();
     });
   }, [bitacora]);
 
@@ -101,12 +143,12 @@ const options = {
               <tr>
                 <td className="informe-header">Periodo Informado</td>
                 <td className="informe-data">{bitacora?.month ? getPeriod(bitacora?.month) : ''}</td>
-                <td className="informe-header">Número de boleta</td>
+                <td className="informe-header">Nº BH o Liquidación</td>
                 <td className="informe-data">{bitacora?.recipe}</td>
               </tr>
               <tr>
                 <td className="informe-header">Fecha de emisión</td>
-                <td className="informe-data">{new Date().toLocaleDateString()}</td>
+                <td className="informe-data">{emisionDate.toLocaleDateString()}</td>
                 <td className="informe-header">Región</td>
                 <td className="informe-data">{bitacora?.program.state}</td>
               </tr>
@@ -152,41 +194,43 @@ const options = {
         </div>
 
         {/* Sección de anexos con imágenes */}
-        <div className="informe-anexos">
-          {/* Agregar título de anexos */}
-          <div className="informe-anexos-title">Anexos</div>
-          {bitacora?.activities.map((activity: any) => {
-            if (!activity.attachments || activity.attachments.length === 0) return null;
-            
-            // Dividir los anexos en grupos de 4 imágenes
-            const attachmentGroups = [];
-            for (let i = 0; i < activity.attachments.length; i += 4) {
-              attachmentGroups.push(activity.attachments.slice(i, i + 4));
-            }
-            
-            return attachmentGroups.map((group, groupIndex) => (
-              <div key={`${activity.id}-${groupIndex}`} className={`informe-anexo-actividad ${groupIndex > 0 ? 'page-break' : ''}`}>
-                {groupIndex === 0 && (
-                  <div className="informe-anexo-actividad-title">
-                    <ul className="informe-anexo-actividad-list">
-                      <li>{activity.description}</li>
-                    </ul>
+        {bitacora?.activities.some((activity: any) => activity.attachments?.length > 0) && (
+          <div className="informe-anexos">
+            {/* Título de anexos modificado */}
+            <div className="informe-anexos-title">Anexos (Respaldo Fotográfico)</div>
+            {bitacora?.activities.map((activity: any) => {
+              if (!activity.attachments || activity.attachments.length === 0) return null;
+              
+              // Dividir los anexos en grupos de 4 imágenes
+              const attachmentGroups = [];
+              for (let i = 0; i < activity.attachments.length; i += 4) {
+                attachmentGroups.push(activity.attachments.slice(i, i + 4));
+              }
+              
+              return attachmentGroups.map((group, groupIndex) => (
+                <div key={`${activity.id}-${groupIndex}`} className={`informe-anexo-actividad ${groupIndex > 0 ? 'page-break' : ''}`}>
+                  {groupIndex === 0 && (
+                    <div className="informe-anexo-actividad-title">
+                      <ul className="informe-anexo-actividad-list">
+                        <li>{activity.description}</li>
+                      </ul>
+                    </div>
+                  )}
+                  <div className="informe-anexo-imagenes">
+                    {group.map((attachment: any) => (
+                      <img 
+                        key={attachment.id} 
+                        src={attachment.image} 
+                        alt={`Anexo ${attachment.id + 1}`} 
+                        className="informe-anexo-imagen" 
+                      />
+                    ))}
                   </div>
-                )}
-                <div className="informe-anexo-imagenes">
-                  {group.map((attachment: any) => (
-                    <img 
-                      key={attachment.id} 
-                      src={attachment.image} 
-                      alt={`Anexo ${attachment.id + 1}`} 
-                      className="informe-anexo-imagen" 
-                    />
-                  ))}
                 </div>
-              </div>
-            ));
-          })}
-        </div>
+              ));
+            })}
+          </div>
+        )}
 
         {/* Sección de firmas */}
         <div className="signature-container">
@@ -201,11 +245,6 @@ const options = {
             <div className="signature-name">{bitacora.user.name}</div>
           </div>
         </div>
-      </div>
-      
-      {/* Pie de página con numeración */}
-      <div className="footer">
-        Página <span className="pageNumber"></span> de <span className="totalPages"></span>
       </div>
     </div>
   );

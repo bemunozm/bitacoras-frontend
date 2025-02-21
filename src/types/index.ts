@@ -159,7 +159,7 @@ export type ActivityUpdateForm = ActivityForm & { id: number, newAttachments: Fi
 export const bitacoraSchema = z.object({
     id: z.number(),
     month: z.string(),
-    recipe: z.string(),
+    recipe: z.number().nullable(),
     status: z.string(),
     user_id: z.number(),
     program_id: z.number(),

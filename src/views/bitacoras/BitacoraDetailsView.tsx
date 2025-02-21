@@ -55,10 +55,11 @@ export default function BitacoraDetailsView() {
         description: `La bitácora ha sido marcada como ${data}`,
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "No se pudo actualizar el estado de la bitácora",
+        variant: "destructive",
+        description: error.message,
       })
     }
   })
@@ -209,8 +210,8 @@ export default function BitacoraDetailsView() {
             <p className="font-medium dark:text-sidebar-foreground first-letter:uppercase">{bitacora?.month ? getPeriod(bitacora?.month) : ''}</p>
           </div>
           <div className="space-y-1">
-            <Label className="text-xs dark:text-sidebar-foreground">Boleta</Label>
-            <p className="font-medium dark:text-sidebar-foreground">#{bitacora?.recipe}</p>
+            <Label className="text-xs dark:text-sidebar-foreground">Nº BH o Liquidación</Label>
+            <p className="font-medium dark:text-sidebar-foreground">{bitacora?.recipe ? `#${bitacora.recipe}` : 'Sin Información'}</p>
           </div>
         </div>
 

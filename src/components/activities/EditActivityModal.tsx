@@ -62,6 +62,7 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
   const isMobile = useIsMobile();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isGeneralActivity, setIsGeneralActivity] = useState(false);
 
   /**
    * Efecto para cargar los datos de la actividad en el formulario
@@ -77,6 +78,9 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
       setValue('category_id', activity.category_id);
       setExistingAttachments(activity.attachments); // Guardar los adjuntos existentes
       setSelectedCategory(activity.category_id); // Preseleccionar la categoría
+      // Verificar si es actividad general al cargar
+      const isGeneral = activity.category?.name === "Actividades Generales";
+      setIsGeneralActivity(isGeneral);
       setAttachmentsLoaded(true); // Marcar como cargados
     }
   }, [activity, setValue]);
@@ -134,8 +138,10 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
   };
 
   const handleCategoryChange = (selected: string) => {
+    const selectedCat = categories?.find(cat => cat.id === parseInt(selected));
+    setIsGeneralActivity(selectedCat?.name === "Actividades Generales");
     setSelectedCategory(parseInt(selected));
-    setValue('category_id', parseInt(selected)); // Añadir esta línea para actualizar el valor del formulario
+    setValue('category_id', parseInt(selected));
   };
 
   /**
@@ -143,7 +149,14 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
    */
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['categories'],
-    queryFn: getCategories,
+    queryFn: async () => {
+      const cats = await getCategories();
+      return cats ? cats.sort((a, b) => {
+        if (a.name === "Actividades Generales") return -1;
+        if (b.name === "Actividades Generales") return 1;
+        return 0;
+      }) : [];
+    },
   });
 
   if (isLoadingActivity || isLoadingCategories || !attachmentsLoaded) return <LoadingSpinner className="h-10" />;
@@ -276,21 +289,25 @@ export default function EditActivityModal({ id, setIsOpen }: EditActivityModalPr
           {errors.description && <ErrorMessage className="col-start-2 col-end-4">{errors.description.message}</ErrorMessage>}
         </div>
 
-        {/* Zona de archivos adjuntos */}
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="attachments" className="text-right dark:text-sidebar-foreground">
-            Adjuntos
-          </Label>
-        </div>
-          <DropZone
-            onFilesAdded={handleFilesAdded}
-            onExistingFilesRemoved={handleExistingFilesRemoved}
-            maxFiles={5}
-            maxSize={5 * 1024 * 1024} // 5MB
-            accept="image/*,application/pdf"
-            initialFiles={selectedAttachments}
-            existingFiles={existingAttachments}
-          />
+        {/* Zona de archivos adjuntos - Solo mostrar si no es Actividad General */}
+        {!isGeneralActivity && (
+          <>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="attachments" className="text-right dark:text-sidebar-foreground">
+                Adjuntos
+              </Label>
+            </div>
+            <DropZone
+              onFilesAdded={handleFilesAdded}
+              onExistingFilesRemoved={handleExistingFilesRemoved}
+              maxFiles={5}
+              maxSize={5 * 1024 * 1024} // 5MB
+              accept="image/*,application/pdf"
+              initialFiles={selectedAttachments}
+              existingFiles={existingAttachments}
+            />
+          </>
+        )}
       </div>
 
       {/* Botones de acción */}

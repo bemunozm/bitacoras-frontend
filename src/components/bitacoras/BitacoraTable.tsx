@@ -93,11 +93,11 @@ export default function BitacoraTable({ searchTerm, filter, user }: { searchTerm
       sortable: true,
     },
     {
-      name: 'Terminado?',
+      name: 'Terminado',
       cell: (row: Bitacora) => row.status === 'Completado' || row.status === 'Aprobado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/>,
     },
     {
-      name: 'Aprobado?',
+      name: 'Aprobado',
       cell: (row: Bitacora) => row.status === 'Aprobado' ? <CircleCheck className="text-green-500 text-center"/> : <CircleX className="text-red-500"/>,
     },
     ...(user.roles?.some((role) => role?.name === 'Administrador') || filter === 'mine' ? [{

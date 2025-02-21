@@ -53,7 +53,7 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
      */
     const initialValues = {
         month: !user.roles?.some((role: any) => role?.name === 'Administrador') ? lastSixMonths[0].value : '',
-        recipe: '',
+        recipe: null,
         user_id: 0, // Este será el ID del reemplazo
         program_id: 0,
     };
@@ -164,13 +164,13 @@ export function ReplacementBitacoraForm({ setIsOpen, user }: ReplacementBitacora
                 {/* Campo de boleta */}
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="recipe" className="text-right dark:text-sidebar-foreground">
-                        Boleta
+                        Nº BH o Liquidación
                     </Label>
                     <Input
                         id="recipe"
-                        type="text"
-                        {...register('recipe', { required: 'Debe ingresar una receta' })}
-                        placeholder="Número de boleta"
+                        type="number"
+                        {...register('recipe')}
+                        placeholder="Número de boleta o liquidación"
                         className="col-span-3 dark:text-sidebar-foreground"
                     />
                     {errors.recipe && <ErrorMessage className="col-start-2 col-end-4">{errors.recipe.message}</ErrorMessage>}

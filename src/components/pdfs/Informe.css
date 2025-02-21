@@ -129,13 +129,16 @@
 }
 
 .informe-anexos-title {
-  width: 225px;
-  height: 15px;
-  color: black;
-  font-size: 9px;
+  text-align: center;
+  font-size: 13px;
   font-weight: bold;
+  margin: 20px 0;
   font-family: 'Inter';
-  margin-bottom: 10px; /* Agregar margen inferior */
+  color: black;
+  padding: 10px 0;
+  letter-spacing: 0.5px;
+  position: relative;
+  width: 100%;
 }
 
 .informe-anexos {

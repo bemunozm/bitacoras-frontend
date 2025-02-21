@@ -74,7 +74,54 @@ const options = {
     }
 
     Promise.all(loadPromises).then(() => {
-      html2pdf().from(element).set(options).save();
+      html2pdf()
+        .from(element)
+        .set(options)
+        .toPdf()
+        .get('pdf')
+        .then((pdf: any) => {
+          const totalPages = pdf.internal.getNumberOfPages();
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+
+          for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            
+            // Configuración del texto
+            pdf.setFontSize(10);
+            pdf.setTextColor(100);
+
+            // Función helper para centrar texto
+            const centerText = (text: string, y: number) => {
+              const textWidth = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+              const x = (pageWidth - textWidth) / 2;
+              pdf.text(text, x, y);
+            };
+
+            // Footer con línea separadora
+            const footerY = pageHeight - 50; // Posición base del footer
+            
+            // // Dibuja línea horizontal centrada
+            // const lineWidth = 400; // Ancho de la línea aumentado a 400px
+            // pdf.setDrawColor(100); // Mismo color que el texto (100)
+            // pdf.setLineWidth(0.5);
+            // pdf.line(
+            //   (pageWidth - lineWidth) / 2,
+            //   footerY,
+            //   (pageWidth + lineWidth) / 2,
+            //   footerY
+            // );
+
+            // Textos del footer
+            const headerText = `${bitacora.user.name} - ${getPeriod(bitacora.month)}`;
+            const footerText = `Página ${i} de ${totalPages}`;
+
+            // Centrar y posicionar textos
+            centerText(headerText, footerY + 15);
+            centerText(footerText, footerY + 30);
+          }
+        })
+        .save();
     });
   }, [bitacora]);
 
@@ -151,9 +198,9 @@ const options = {
             ))}
           </div>
           {/* Sección de anexos modificada */}
-          {bitacora?.activities.some((activity: any) => activity.attachments && activity.attachments.length > 0) && (
+          {bitacora?.activities.some((activity: any) => activity.attachments?.length > 0) && (
             <div className="informe-anexos">
-              <div className="informe-anexos-title">Anexos</div>
+              <div className="informe-anexos-title">Anexos (Respaldo Fotográfico)</div>
               {bitacora?.activities.map((activity: any) => {
                 if (!activity.attachments || activity.attachments.length === 0) return null;
 
@@ -201,9 +248,6 @@ const options = {
             </div>
           </div>
         </div>
-      </div>
-      <div className="footer">
-        Página <span className="pageNumber"></span> de <span className="totalPages"></span>
       </div>
     </div>
   );

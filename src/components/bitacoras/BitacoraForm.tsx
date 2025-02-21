@@ -51,7 +51,7 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
     
     const initialValues = {
         month: !user.roles?.some((role: any) => role?.name === 'Administrador') ? lastSixMonths[0].value : '',
-        recipe: '',
+        recipe: null,
         user_id: 0,
         program_id: 0,
     };
@@ -141,13 +141,14 @@ export function BitacoraForm({ setIsOpen, user }: BitacoraFormProps) {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="recipe" className="text-right dark:text-sidebar-foreground">
-                        Boleta
+                        Nº BH o Liquidación
                     </Label>
                     <Input
                         id="recipe"
-                        placeholder="Número de boleta"
+                        type="number"
+                        placeholder="Número de boleta o liquidación"
                         className="col-span-3 dark:text-sidebar-foreground"
-                        {...register('recipe', { required: 'Este campo es requerido' })}
+                        {...register('recipe')}
                     />
                     {errors.recipe && <ErrorMessage className=" col-start-2 col-end-4">{errors.recipe.message}</ErrorMessage>}
                 </div>

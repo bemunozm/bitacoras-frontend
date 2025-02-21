@@ -60,7 +60,7 @@ export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditRepl
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       month: '',
-      recipe: '',
+      recipe: null as number | null,
       user_id: 0,
       program_id: 0,
     }
@@ -92,7 +92,10 @@ export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditRepl
    * Efecto para cargar los datos iniciales de la bitácora
    */
   useEffect(() => {
-    if (bitacora) reset(bitacora);
+    if (bitacora) reset({
+      ...bitacora,
+      recipe: bitacora.recipe || null,
+    });
   }, [bitacora, reset]);
 
   const queryClient = useQueryClient();
@@ -160,13 +163,14 @@ export default function EditReplacementBitacoraModal({ id, setIsOpen }: EditRepl
 
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="recipe" className="text-right dark:text-sidebar-foreground">
-            Boleta
+            Nº BH o Liquidación
           </Label>
           <Input
             id="recipe"
-            placeholder="Número de boleta"
+            type='number'
+            placeholder="Número de boleta o liquidación"
             className="col-span-3 dark:text-sidebar-foreground"
-            {...register('recipe', { required: 'Este campo es requerido' })}
+            {...register('recipe')}
           />
           {errors.recipe && <ErrorMessage className="col-start-2 col-end-4">{errors.recipe.message}</ErrorMessage>}
         </div>

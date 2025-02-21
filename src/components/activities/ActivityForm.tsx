@@ -50,6 +50,7 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
   const [isSaving, setIsSaving] = useState(false); //Estado que indica si se está guardando la actividad
   const isMobile = useIsMobile();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isGeneralActivity, setIsGeneralActivity] = useState(false);
 
   /**
    * Mutación para crear una nueva actividad
@@ -98,7 +99,15 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
    */
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['categories'],
-    queryFn: getCategories,
+    queryFn: async () => {
+      const cats = await getCategories();
+      // Ordenar categorías para que "Actividades Generales" aparezca primero
+      return cats ? cats.sort((a, b) => {
+        if (a.name === "Actividades Generales") return -1;
+        if (b.name === "Actividades Generales") return 1;
+        return 0;
+      }) : []; 
+    },
   });
 
   /**
@@ -109,6 +118,8 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
   };
 
   const handleCategoryChange = (selected: string) => {
+    const selectedCat = categories?.find(cat => cat.id === parseInt(selected));
+    setIsGeneralActivity(selectedCat?.name === "Actividades Generales");
     setSelectedCategory(parseInt(selected));
   };
 
@@ -239,18 +250,22 @@ export function ActivityForm({ setIsOpen, id }: ActivityFormProps) {
           {errors.description && <ErrorMessage className="col-start-2 col-end-4">{errors.description.message}</ErrorMessage>}
         </div>
 
-        {/* Zona de archivos adjuntos */}
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="attachments" className="text-right dark:text-sidebar-foreground">
-            Adjuntos
-          </Label>
-        </div>
-          <DropZone
-            onFilesAdded={handleFilesAdded}
-            maxFiles={5}
-            maxSize={5 * 1024 * 1024} // 5MB
-            accept="image/*,application/pdf"
-          />
+        {/* Zona de archivos adjuntos - Solo se muestra si no es Actividad General */}
+        {!isGeneralActivity && (
+          <>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="attachments" className="text-right dark:text-sidebar-foreground">
+                Adjuntos
+              </Label>
+            </div>
+            <DropZone
+              onFilesAdded={handleFilesAdded}
+              maxFiles={5}
+              maxSize={5 * 1024 * 1024}
+              accept="image/*,application/pdf"
+            />
+          </>
+        )}
       </div>
 
       {/* Botones de acción */}
