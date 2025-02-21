@@ -37,8 +37,8 @@ export default function ReplacementsView() {
         <ReplacementForm setIsOpen={setIsCreateOpen} />
       </ResponsiveDialog>
       <div className="p-6 space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold tracking-tight dark:text-sidebar-foreground">
+        <div className="flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
+          <h2 className="text-3xl text-center font-bold tracking-tight dark:text-sidebar-foreground">
             Reemplazos
           </h2>
           <Button

@@ -83,12 +83,33 @@ export default function BitacorasView() {
         </div>
 
         
-        <Tabs value={tab} onValueChange={setTab}>
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
             <div className="flex justify-center my-5">
-                <TabsList>
-                    <TabsTrigger value="all">Todas las bitácoras</TabsTrigger>
-                    <TabsTrigger value="mine">Mis bitácoras</TabsTrigger>
-                    {data?.roles?.some((role) => role?.name === 'Coordinador') && <TabsTrigger value="coordinator">Mis programas</TabsTrigger>} 
+                <TabsList className={`grid w-full ${
+                    data?.roles?.some((role) => role?.name === 'Coordinador')
+                    ? 'grid-cols-3'
+                    : 'grid-cols-2'
+                } max-w-[400px] h-auto`}>
+                    <TabsTrigger 
+                        value="all" 
+                        className="text-[11px] sm:text-sm data-[state=active]:h-10"
+                    >
+                        Todas
+                    </TabsTrigger>
+                    <TabsTrigger 
+                        value="mine" 
+                        className="text-[11px] sm:text-sm h-10 data-[state=active]:h-10"
+                    >
+                        Mis bitácoras
+                    </TabsTrigger>
+                    {data?.roles?.some((role) => role?.name === 'Coordinador') && (
+                        <TabsTrigger 
+                            value="coordinator" 
+                            className="text-[11px] sm:text-sm h-10 data-[state=active]:h-10"
+                        >
+                            Programas
+                        </TabsTrigger>
+                    )} 
                 </TabsList>
             </div>
           <TabsContent value="all">
