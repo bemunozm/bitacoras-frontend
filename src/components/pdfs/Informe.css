@@ -171,17 +171,26 @@
 
 .informe-anexo-imagenes {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Dos columnas */
-  gap: 10px; /* Ajustar espacio entre imágenes */
+  grid-template-columns: repeat(2, 1fr); /* Dos columnas de igual tamaño */
+  gap: 20px; /* Espacio uniforme entre imágenes */
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 .informe-anexo-imagen {
-  width: 250px; /* Ajustar el tamaño a un cuadrado */
-  height: 250px; /* Ajustar el tamaño a un cuadrado */
-  object-fit: cover;
+  aspect-ratio: 1/1; /* Forzar relación de aspecto cuadrada */
+  width: 100%; /* Ocupar todo el ancho disponible en su celda */
+  height: 100%; /* Altura igual al ancho */
+  object-fit: contain; /* Mantener la relación de aspecto de la imagen */
   border: 1px solid grey;
-  padding: 4px;
-  box-sizing: border-box; /* Incluir padding y borde en el ancho total */
+  padding: 8px;
+  box-sizing: border-box;
+  background-color: white;
+  display: block; /* Eliminar espacios extra */
+  margin: 0 auto; /* Centrar la imagen */
+  max-width: 250px; /* Tamaño máximo */
+  max-height: 250px; /* Tamaño máximo */
 }
 
 .informe-header-container {
