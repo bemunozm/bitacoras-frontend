@@ -13,6 +13,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Button } from "@/components/ui/button";
 import { themes } from "@/utils/theme"
 
+const PROTECTED_ROLES = ['Administrador', 'Coordinador', 'Usuario', 'Administrativo'];
+
 export default function RoleTable({searchTerm}: {searchTerm: string}) {
     const {data , isLoading} = useQuery({
         queryKey: ['roles'],
@@ -45,28 +47,28 @@ export default function RoleTable({searchTerm}: {searchTerm: string}) {
         },
         {
             name: 'Acciones',
-            cell: (row: Role) => (
-                <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => { setSelectedRole(row); setIsEditOpen(true); }}>
-                            <SquarePen className="h-4 w-4 mr-2" />
-                            <span>Editar</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => { setSelectedRole(row); setIsDeleteOpen(true); }} className="text-red-500">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            <span>Eliminar</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            ),
+            cell: (row: Role) => 
+                !PROTECTED_ROLES.includes(row.name) ? (
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreVertical className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => { setSelectedRole(row); setIsEditOpen(true); }}>
+                                <SquarePen className="h-4 w-4 mr-2" />
+                                <span>Editar</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => { setSelectedRole(row); setIsDeleteOpen(true); }} className="text-red-500">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                <span>Eliminar</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : null,
             ignoreRowClick: true,
-            
             button: true
         }
     ];

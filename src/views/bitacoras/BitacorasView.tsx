@@ -60,13 +60,15 @@ export default function BitacorasView() {
             <Plus className="mr-2 h-4 w-4" />
             Bitácora
           </Button>
-          <Button
-            onClick={() => setIsCreateOpenReplacement(true)}
-            className="flex items-center space-x-1"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Bitácora Remplazo
-          </Button>
+            {data?.roles?.some(role => role?.name === 'Coordinador' || role?.name === 'Administrador') && (
+            <Button
+              onClick={() => setIsCreateOpenReplacement(true)}
+              className="flex items-center space-x-1"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Bitácora Remplazo
+            </Button>
+            )}
           </div>
         </div>
 
